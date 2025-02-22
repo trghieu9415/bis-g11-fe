@@ -1,10 +1,12 @@
 import './index.css';
-import Employees from '@/pages/dashboard/Employees';
+// import Employees from '@/pages/dashboard/Employees';
+import HREmployees from '@/pages/dashboard/HREmployees';
 
 function App() {
 	return (
 		<>
-			<Employees />
+			{/* <Employees /> */}
+			<HREmployees />
 		</>
 	);
 }
