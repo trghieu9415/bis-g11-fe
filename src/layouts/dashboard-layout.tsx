@@ -12,11 +12,14 @@ export default function DashboardLayout({
 	return (
 		<SidebarProvider className='scrollbar-hide'>
 			<AppSidebar />
-			<main className={`flex flex-col mx-3 w-full ${hScreen ? 'h-screen' : ''}`}>
+			<main
+				className={`flex flex-col mx-3 w-full ${hScreen ? 'h-screen' : ''} max-w-[calc(100vw-282px)]
+`}
+			>
 				<div className={`${hScreen ? '' : 'bg-white sticky'}`}>
 					<Header />
 				</div>
-				<div className={`flex mt-3 ${hScreen ? 'flex-1' : ''}`}>{mainContent}</div>
+				<div className={`flex mt-3 ${hScreen ? 'flex-1' : ''} flex-1`}>{mainContent}</div>
 			</main>
 		</SidebarProvider>
 	);
