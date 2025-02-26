@@ -20,48 +20,51 @@ import {
 } from '@tanstack/react-table';
 
 import { Button, buttonVariants } from '@/components/ui/button';
-import HREmployeeForm from '@/pages/dashboard/HREmployees/hremployee-form';
 
 import React from 'react';
 import moment from 'moment';
 
-type Employee = {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-	gender: string;
-	ip_address: string;
-	phone: string;
-	date: string;
+type Contract = {
+	id_contract: number;
+	id_employee: number;
+	fullname: string;
+	position: string;
+	base_salary: string;
+	date_start: string;
+	date_end: string;
+	status: string;
 };
 
-interface HREmployeeTableProps {
-	data?: Employee[];
+interface EmploymentContractProps {
+	data?: Contract[];
 }
 
-export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
+export default function EmployeementContractTable({ data = [] }: EmploymentContractProps) {
 	// Header
-	const columnHelper = createColumnHelper<Employee>();
+	const columnHelper = createColumnHelper<Contract>();
 	const columnDef = [
-		columnHelper.accessor('id', {
-			header: 'ID',
+		columnHelper.accessor('id_contract', {
+			header: 'Mã Hợp Đồng',
 			meta: {
 				isSticky: true
 			}
 		}),
-		columnHelper.accessor('first_name', { header: 'First Name' }),
-		columnHelper.accessor('last_name', { header: 'Last Name' }),
-		columnHelper.accessor('email', { header: 'Email' }),
-		columnHelper.accessor('gender', { header: 'Gender' }),
-		columnHelper.accessor('phone', { header: 'Phone' }),
-		columnHelper.accessor('date', {
-			header: 'Date',
-			cell: ({ getValue }) => moment(new Date(getValue())).format('MMM Do YY')
+		columnHelper.accessor('id_employee', { header: 'Mã Nhân Viên' }),
+		columnHelper.accessor('fullname', { header: 'Họ và Tên' }),
+		columnHelper.accessor('position', { header: 'Chức Vụ' }),
+		columnHelper.accessor('base_salary', { header: 'Lương Cơ Bản' }),
+		columnHelper.accessor('date_start', {
+			header: 'Ngày Bắt Đầu',
+			cell: ({ getValue }) => moment(new Date(getValue())).format('DD/MM/YYYY')
 		}),
+		columnHelper.accessor('date_end', {
+			header: 'Ngày Kết Thúc',
+			cell: ({ getValue }) => moment(new Date(getValue())).format('DD/MM/YYYY')
+		}),
+		columnHelper.accessor('status', { header: 'Trạng Thái' }),
 		columnHelper.display({
 			id: 'actions',
-			header: 'Actions',
+			header: 'Hành Động',
 			cell: ({ row }) => {
 				return (
 					<div className='flex gap-2'>
@@ -93,7 +96,7 @@ export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
 		pageIndex: 0
 	});
 
-	const [selectedEmployee, setSelectedEmployee] = React.useState(null);
+	const [selectedContract, setSelectedContract] = React.useState(null);
 	const [isFormOpen, setIsFormOpen] = React.useState(false);
 	const [formMode, setFormMode] = React.useState('');
 
@@ -103,7 +106,7 @@ export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
 
 	// Handle view detail the user
 	const handleView = row => {
-		setSelectedEmployee(row);
+		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('view');
 		// ...
@@ -111,7 +114,7 @@ export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
 
 	// Handle update the user
 	const handleUpdate = row => {
-		setSelectedEmployee(row);
+		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('update');
 		// ...
@@ -119,7 +122,7 @@ export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
 
 	// Handle delete the user
 	const handleDelete = row => {
-		setSelectedEmployee(row);
+		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('delete');
 		// ...
@@ -290,11 +293,11 @@ export default function HREmployeeTable({ data = [] }: HREmployeeTableProps) {
 			)}
 
 			{/* Show form to view/edit/delete */}
-			{isFormOpen && (
+			{/* {isFormOpen && (
 				<div className='fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50  z-50'>
-					<HREmployeeForm employee={selectedEmployee} mode={formMode} onClose={() => setIsFormOpen(false)} />
+					<HREmployeeForm employee={selectedContract} mode={formMode} onClose={() => setIsFormOpen(false)} />
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }

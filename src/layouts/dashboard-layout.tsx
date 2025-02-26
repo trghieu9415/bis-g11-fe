@@ -13,7 +13,7 @@ export default function DashboardLayout({
 		<SidebarProvider className='scrollbar-hide'>
 			<AppSidebar />
 			<main
-				className={`flex flex-col mx-3 w-full ${hScreen ? 'h-screen' : ''} max-w-[calc(100vw-282px)]
+				className={`flex flex-col mx-3 w-full ${hScreen ? 'h-screen' : ''} w-full
 `}
 			>
 				<div className={`${hScreen ? '' : 'bg-white sticky'}`}>
