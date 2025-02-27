@@ -11,7 +11,7 @@ function Content() {
 export default function Overview() {
 	return (
 		<>
-			<DashboardLayout mainContent={<Content />} hScreen />
+			<DashboardLayout mainContent={<Content />} />
 		</>
 	);
 }

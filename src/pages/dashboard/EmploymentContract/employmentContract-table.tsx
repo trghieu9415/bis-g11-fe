@@ -29,7 +29,7 @@ type Contract = {
 	id_employee: number;
 	fullname: string;
 	position: string;
-	base_salary: string;
+	base_salary: number;
 	date_start: string;
 	date_end: string;
 	status: string;
@@ -105,7 +105,7 @@ export default function EmployeementContractTable({ data = [] }: EmploymentContr
 	// };
 
 	// Handle view detail the user
-	const handleView = row => {
+	const handleView = (row: React.SetStateAction<null>) => {
 		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('view');
@@ -113,7 +113,7 @@ export default function EmployeementContractTable({ data = [] }: EmploymentContr
 	};
 
 	// Handle update the user
-	const handleUpdate = row => {
+	const handleUpdate = (row: React.SetStateAction<null>) => {
 		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('update');
@@ -121,7 +121,7 @@ export default function EmployeementContractTable({ data = [] }: EmploymentContr
 	};
 
 	// Handle delete the user
-	const handleDelete = row => {
+	const handleDelete = (row: React.SetStateAction<null>) => {
 		setSelectedContract(row);
 		setIsFormOpen(true);
 		setFormMode('delete');

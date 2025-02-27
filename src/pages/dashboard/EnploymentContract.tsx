@@ -3,12 +3,10 @@ import EmployeementContractTable from '@/pages/dashboard/EmploymentContract/empl
 import data from '@/pages/dashboard/EmploymentContract/data.json';
 
 function Content() {
-
-  
 	return (
-		<div className='flex flex-col w-full'>
-			<h1 className='text-xl font-bold mt-3 mb-4'>Danh sách nhân sự</h1>
-			<div className='my-auto'>
+		<div className='flex flex-col overflow-hidden'>
+			<h1 className='text-xl font-bold my-2'>Danh sách nhân sự</h1>
+			<div className='w-full'>
 				<EmployeementContractTable data={data} />
 			</div>
 		</div>

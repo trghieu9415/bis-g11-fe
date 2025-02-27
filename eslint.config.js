@@ -22,23 +22,10 @@ export default tseslint.config(
 			'unused-imports': eslintPluginUnusedImports
 		},
 		rules: {
-			...reactHooks.configs.recommended.rules,
-			'prettier/prettier': [
-				'warn'
-				// {
-				// 	tabWidth: 2,
-				// 	useTabs: true,
-				// 	semi: true,
-				// 	trailingComma: 'none',
-				// 	bracketSpacing: true,
-				// 	arrowParens: 'avoid',
-				// 	endOfLine: 'auto',
-				// 	singleQuote: true,
-				// 	printWidth: 120,
-				// 	jsxSingleQuote: true
-				// }
-			]
-			// 'unused-imports/no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }]
+			'@typescript-eslint/no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+			'unused-imports/no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+			'unused-imports/no-unused-imports': 'warn'
 		}
+		
 	}
 );

@@ -1,5 +1,5 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
-import EmployeeTable from './general-components/employee-table';
+import EmployeeTable from './employees/employee-table';
 
 function Content() {
 	return (

@@ -1,7 +1,9 @@
+import CustomTable from '@/components/custom-table';
+
 export default function EmployeeTable() {
 	return (
 		<div>
-			<div>đau đầu quá</div>
+			<CustomTable />
 		</div>
 	);
 }
