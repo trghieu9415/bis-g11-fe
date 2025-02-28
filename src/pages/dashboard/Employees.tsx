@@ -4,7 +4,7 @@ import EmployeeTable from './employees/employee-table';
 function Content() {
 	return (
 		<div className='flex flex-col w-full'>
-			<h1 className='text-lg font-bold'>Danh sách nhân sự</h1>
+			<h1 className='text-lg font-bold py-4 uppercase'>Danh sách nhân sự</h1>
 			<div>
 				<EmployeeTable />
 			</div>

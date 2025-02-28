@@ -1,0 +1,30 @@
+/* Scrollbar tổng */
+::-webkit-scrollbar {
+	/* Độ rộng */
+  width: 6px;
+	/* Độ cao khi cuộn ngang */
+  height: 6px;
+}
+
+/* Track - nền của scrollbar */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 4px;
+}
+
+/* Thumb - thanh trượt */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+/* Hover vào thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1d1 #f1f1f1;
+}
