@@ -29,7 +29,8 @@ export const columns: ColumnDef<Employee>[] = [
 			>
 				ID <ArrowUpDown />
 			</Button>
-		)
+		),
+		enableHiding: false
 	},
 	{
 		accessorKey: 'full_name',
@@ -49,7 +50,8 @@ export const columns: ColumnDef<Employee>[] = [
 				</Button>
 				{row.getValue('full_name')}
 			</span>
-		)
+		),
+		enableHiding: false
 	},
 	{
 		accessorKey: 'role',
@@ -74,7 +76,8 @@ export const columns: ColumnDef<Employee>[] = [
 					<Ban color='#ef5350' strokeWidth={3} />
 				)}
 			</span>
-		)
+		),
+		enableHiding: false
 	},
 	{
 		accessorKey: 'basic_salary',

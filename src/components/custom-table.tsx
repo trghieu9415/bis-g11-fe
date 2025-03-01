@@ -17,8 +17,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { Button } from './ui/button';
 import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { CustomDropdownTable } from './custom-dropdown-table';
 
-function Header({ setGlobalFilter }: { setGlobalFilter: React.Dispatch<React.SetStateAction<string>> }) {
+function Header<DType>({
+	table,
+	setGlobalFilter
+}: {
+	table: ReactTable<DType>;
+	setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
+}) {
 	return (
 		<div className='flex w-full justify-between p-2'>
 			<div className='flex w-full items-center'>
@@ -29,6 +36,9 @@ function Header({ setGlobalFilter }: { setGlobalFilter: React.Dispatch<React.Set
 					placeholder='ID...'
 					onChange={e => setGlobalFilter(e.target.value)}
 				/>
+			</div>
+			<div className='z-20'>
+				<CustomDropdownTable table={table} />
 			</div>
 		</div>
 	);
@@ -210,7 +220,7 @@ export default function CustomTable<DType>({ columns, data }: { columns: ColumnD
 	});
 	return (
 		<div className='text-xs border-2 px-4 border-[#e4e4e4]'>
-			<Header setGlobalFilter={setGlobalFilter} />
+			<Header table={table} setGlobalFilter={setGlobalFilter} />
 			<Body table={table} />
 			<Footer table={table} />
 		</div>
