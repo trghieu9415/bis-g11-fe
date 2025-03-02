@@ -1,14 +1,22 @@
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, CircleCheckBig, Ban, UserRoundPen } from 'lucide-react';
+import { ArrowUpDown, CircleCheckBig, Ban, UserRoundPen, Ellipsis } from 'lucide-react';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+
+import data from '@/pages/dashboard/Employees/data.json';
 
 type Employee = {
 	id: string;
 	full_name: string;
 	role: string;
 	status: boolean;
-	basic_salary: number;
+	base_salary: number;
 	level: string;
 	salary_coefficient: number;
 	gender: boolean;
@@ -67,7 +75,15 @@ export const columns: ColumnDef<Employee>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: 'Trạng thái',
+		header: ({ column }) => (
+			<Button
+				variant='link'
+				className='text-white w-20'
+				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+			>
+				Trạng thái <ArrowUpDown />
+			</Button>
+		),
 		cell: ({ row }) => (
 			<span className='flex justify-center'>
 				{row.getValue('status') ? (
@@ -77,10 +93,15 @@ export const columns: ColumnDef<Employee>[] = [
 				)}
 			</span>
 		),
+		sortingFn: (rowA, rowB) => {
+			const statusA = rowA.original.status ? 1 : 0;
+			const statusB = rowB.original.status ? 1 : 0;
+			return statusA - statusB;
+		},
 		enableHiding: false
 	},
 	{
-		accessorKey: 'basic_salary',
+		accessorKey: 'base_salary',
 		header: ({ column }) => (
 			<Button
 				variant='link'
@@ -174,85 +195,126 @@ export const columns: ColumnDef<Employee>[] = [
 				Địa chỉ <ArrowUpDown />
 			</Button>
 		)
+	},
+	{
+		id: 'actions',
+		header: 'Thao tác',
+		cell: ({ row }) => (
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant='ghost' size='icon'>
+						<Ellipsis className='w-4 h-4' />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align='end'>
+					<DropdownMenuItem onClick={() => handleView(row.original)}>Xem</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => handleEdit(row.original)}>Sửa</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => handleDelete(row.original)}>Xóa</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		)
 	}
 ];
 
-const employees: Employee[] = Array.from({ length: 24 }, (_, index) => {
-	const id = `NV-${(index + 1).toString().padStart(4, '0')}`;
-	const fullNames = [
-		'Nguyễn Văn A',
-		'Trần Thị B',
-		'Lê Quốc C',
-		'Phạm Minh D',
-		'Hoàng Anh E',
-		'Đặng Văn F',
-		'Lương Thị G',
-		'Vũ Minh H',
-		'Trịnh Hoài I',
-		'Lý Phương K',
-		'Bùi Thanh L',
-		'Ngô Hữu M',
-		'Tô Nhật N',
-		'Đào Văn O',
-		'Lâm Thị P',
-		'Trần Đức Q',
-		'Nguyễn Hồng R',
-		'Lý Bảo S',
-		'Đinh Hoàng T',
-		'Võ Minh U',
-		'Phan Hữu V',
-		'Mai Thanh X',
-		'Hà Quốc Y',
-		'Dương Thị Z'
-	];
-	const roles = [
-		'Software Engineer',
-		'HR Manager',
-		'Product Manager',
-		'UI/UX Designer',
-		'DevOps Engineer',
-		'Business Analyst',
-		'Marketing Specialist',
-		'Project Manager',
-		'Software Engineer',
-		'Customer Support'
-	];
-	const levels = ['Junior', 'Mid', 'Senior', 'Lead'];
-	const addresses = [
-		'123 Lê Lợi, Q1, TP.HCM',
-		'45 Hoàng Hoa Thám, Ba Đình, Hà Nội',
-		'78 Lạc Long Quân, Tây Hồ, Hà Nội',
-		'56 Trường Sa, Q3, TP.HCM',
-		'89 Phan Đình Phùng, Đống Đa, Hà Nội',
-		'120 Nguyễn Trãi, Thanh Xuân, Hà Nội',
-		'78 Trần Hưng Đạo, Q5, TP.HCM',
-		'67 Bạch Đằng, Hải Châu, Đà Nẵng',
-		'23 Nguyễn Huệ, Q1, TP.HCM',
-		'11 Điện Biên Phủ, Q10, TP.HCM'
-	];
+// Handle view
+const handleView = (employee: Employee) => {
+	console.log('XEM:', employee);
+};
 
-	return {
-		id,
-		full_name: fullNames[index],
-		role: roles[index % roles.length],
-		status: index % 3 !== 0,
-		basic_salary: 10000000 + (index % 5) * 2000000,
-		level: levels[index % levels.length],
-		salary_coefficient: 1.0 + (index % 5) * 0.2,
-		gender: index % 2 === 0,
-		email: `${fullNames[index].toLowerCase().replace(/ /g, '')}@example.com`,
-		phone: `09${(index + 1).toString().padStart(8, '0')}`,
-		date_of_birth: `19${80 + (index % 20)}-${((index % 12) + 1)
-			.toString()
-			.padStart(2, '0')}-${((index % 28) + 1).toString().padStart(2, '0')}`,
-		address: addresses[index % addresses.length]
-	};
-});
+// Handle view
+const handleEdit = (employee: Employee) => {
+	console.log('SỬA: ', employee);
+};
+
+// Handle view
+const handleDelete = (employee: Employee) => {
+	console.log('XÓA: ', employee);
+};
+
+// const employees: Employee[] = Array.from({ length: 24 }, (_, index) => {
+// 	const id = `NV-${(index + 1).toString().padStart(4, '0')}`;
+// 	const fullNames = [
+// 		'Nguyễn Văn A',
+// 		'Trần Thị B',
+// 		'Lê Quốc C',
+// 		'Phạm Minh D',
+// 		'Hoàng Anh E',
+// 		'Đặng Văn F',
+// 		'Lương Thị G',
+// 		'Vũ Minh H',
+// 		'Trịnh Hoài I',
+// 		'Lý Phương K',
+// 		'Bùi Thanh L',
+// 		'Ngô Hữu M',
+// 		'Tô Nhật N',
+// 		'Đào Văn O',
+// 		'Lâm Thị P',
+// 		'Trần Đức Q',
+// 		'Nguyễn Hồng R',
+// 		'Lý Bảo S',
+// 		'Đinh Hoàng T',
+// 		'Võ Minh U',
+// 		'Phan Hữu V',
+// 		'Mai Thanh X',
+// 		'Hà Quốc Y',
+// 		'Dương Thị Z'
+// 	];
+// 	const roles = [
+// 		'Software Engineer',
+// 		'HR Manager',
+// 		'Product Manager',
+// 		'UI/UX Designer',
+// 		'DevOps Engineer',
+// 		'Business Analyst',
+// 		'Marketing Specialist',
+// 		'Project Manager',
+// 		'Software Engineer',
+// 		'Customer Support'
+// 	];
+// 	const levels = ['Junior', 'Mid', 'Senior', 'Lead'];
+// 	const addresses = [
+// 		'123 Lê Lợi, Q1, TP.HCM',
+// 		'45 Hoàng Hoa Thám, Ba Đình, Hà Nội',
+// 		'78 Lạc Long Quân, Tây Hồ, Hà Nội',
+// 		'56 Trường Sa, Q3, TP.HCM',
+// 		'89 Phan Đình Phùng, Đống Đa, Hà Nội',
+// 		'120 Nguyễn Trãi, Thanh Xuân, Hà Nội',
+// 		'78 Trần Hưng Đạo, Q5, TP.HCM',
+// 		'67 Bạch Đằng, Hải Châu, Đà Nẵng',
+// 		'23 Nguyễn Huệ, Q1, TP.HCM',
+// 		'11 Điện Biên Phủ, Q10, TP.HCM'
+// 	];
+
+// 	return {
+// 		id,
+// 		full_name: fullNames[index],
+// 		role: roles[index % roles.length],
+// 		status: index % 3 !== 0,
+// 		basic_salary: 10000000 + (index % 5) * 2000000,
+// 		level: levels[index % levels.length],
+// 		salary_coefficient: 1.0 + (index % 5) * 0.2,
+// 		gender: index % 2 === 0,
+// 		email: `${fullNames[index].toLowerCase().replace(/ /g, '')}@example.com`,
+// 		phone: `09${(index + 1).toString().padStart(8, '0')}`,
+// 		date_of_birth: `19${80 + (index % 20)}-${((index % 12) + 1)
+// 			.toString()
+// 			.padStart(2, '0')}-${((index % 28) + 1).toString().padStart(2, '0')}`,
+// 		address: addresses[index % addresses.length]
+// 	};
+// });
 
 export default function EmployeeTable() {
+	const hiddenColumns = {
+		date_of_birth: false,
+		gender: false,
+		address: false,
+		base_salary: false,
+		salary_coefficient: false
+	};
+
 	return (
 		<div>
-			<CustomTable columns={columns} data={employees} />
+			<CustomTable columns={columns} data={data} hiddenColumns={hiddenColumns} />
 		</div>
 	);
 }

@@ -1,38 +1,21 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import {
-	Pagination,
-	PaginationContent,
-	PaginationItem,
-	PaginationPrevious,
-	PaginationLink,
-	PaginationNext,
-	PaginationEllipsis
-} from '@/components/ui/pagination';
-
-import {
-	useReactTable,
-	flexRender,
-	createColumnHelper,
-	getCoreRowModel,
-	getSortedRowModel,
-	getFilteredRowModel,
-	getPaginationRowModel
-} from '@tanstack/react-table';
-
-import { Button, buttonVariants } from '@/components/ui/button';
-
-import React from 'react';
-import moment from 'moment';
+import CustomTable from '@/components/custom-table';
+import { Button } from '@/components/ui/button';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown, CircleCheckBig, Ban, UserRoundPen } from 'lucide-react';
 
 type Contract = {
-	id_contract: number;
-	id_employee: number;
+	id_contract: string;
+	id_employee: string;
 	fullname: string;
-	position: string;
-	base_salary: number;
-	date_start: string;
-	date_end: string;
-	status: string;
+	position: boolean;
+	basic_salary: number;
+	level: string;
+	salary_coefficient: number;
+	gender: boolean;
+	email: string;
+	phone: string;
+	date_of_birth: string;
+	address: string;
 };
 
 interface EmploymentContractProps {
