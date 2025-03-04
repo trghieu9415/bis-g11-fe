@@ -11,7 +11,7 @@ import { ArrowUpDown, Ban, CircleCheckBig, Ellipsis, UserRoundPen } from 'lucide
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 
-import data from '@/pages/dashboard/Employees/data.json';
+import data from '@/pages/dashboard/HREmployees/data.json';
 
 type Employee = {
 	id: string;

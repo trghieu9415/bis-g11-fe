@@ -1,19 +1,20 @@
 import DashboardLayout from '@/layouts/dashboard-layout';
-import HREmployeeTable from '@/pages/dashboard/HREmployees/hremployee-table';
-import data from '@/pages/dashboard/HREmployees/data.json';
+import EmployeeTable from './HREmployees/hremployee-table';
+import EmployeeCreateNew from './HREmployees/hremployee-create-new';
 
 function Content() {
 	return (
 		<div className='flex flex-col w-full'>
-			<h1 className='text-xl font-bold mt-3 mb-4'>Danh sách nhân sự</h1>
-			<div className='my-auto'>
-				<HREmployeeTable data={data} />
+			<h1 className='text-lg font-bold py-4 uppercase'>Danh sách nhân sự</h1>
+			<EmployeeCreateNew />
+			<div className='mb-2'>
+				<EmployeeTable />
 			</div>
 		</div>
 	);
 }
 
-export default function HREmployees() {
+export default function Employees() {
 	return (
 		<>
 			<DashboardLayout mainContent={<Content />} />
