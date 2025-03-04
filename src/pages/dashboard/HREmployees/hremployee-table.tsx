@@ -10,6 +10,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Ban, CircleCheckBig, Ellipsis, UserRoundPen } from 'lucide-react';
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
+import { RegisterOptions } from 'react-hook-form';
 
 import data from '@/pages/dashboard/HREmployees/data.json';
 
@@ -34,6 +35,7 @@ type FieldConfig = {
 	type: 'input' | 'select' | 'number' | 'date';
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	disabled?: boolean;
+	validation?: RegisterOptions;
 };
 
 export default function EmployeeTable() {
@@ -251,7 +253,15 @@ export default function EmployeeTable() {
 	};
 
 	const employeeFields: FieldConfig[] = [
-		{ label: 'Họ và tên', key: 'full_name', type: 'input' },
+		{
+			label: 'Họ và tên',
+			key: 'full_name',
+			type: 'input',
+			validation: {
+				required: 'Vui lòng nhập họ và tên',
+				minLength: { value: 3, message: 'Họ và tên ít nhất 3 ký tự' }
+			}
+		},
 		{
 			label: 'Giới tính',
 			key: 'gender',
@@ -259,7 +269,8 @@ export default function EmployeeTable() {
 			options: [
 				{ value: 'false', label: 'Nữ', isBoolean: true },
 				{ value: 'true', label: 'Nam', isBoolean: true }
-			]
+			],
+			validation: { required: 'Vui lòng chọn giới tính' }
 		},
 		{ label: 'ID', key: 'id', type: 'input', disabled: true },
 		{ label: 'Vai trò', key: 'role', type: 'input', disabled: true },
@@ -270,15 +281,68 @@ export default function EmployeeTable() {
 			options: [
 				{ value: 'true', label: 'Hoạt động', isBoolean: true },
 				{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
-			]
+			],
+			validation: { required: 'Vui lòng chọn trạng thái' }
 		},
 		{ label: 'Cấp bậc', key: 'level', type: 'input', disabled: true },
 		{ label: 'Lương cơ bản', key: 'base_salary', type: 'number', disabled: true },
 		{ label: 'Hệ số lương', key: 'salary_coefficient', type: 'number', disabled: true },
-		{ label: 'Ngày sinh', key: 'date_of_birth', type: 'date' },
-		{ label: 'Địa chỉ', key: 'address', type: 'input' },
-		{ label: 'Email', key: 'email', type: 'input' },
-		{ label: 'SĐT', key: 'phone', type: 'input' }
+		{
+			label: 'Ngày sinh',
+			key: 'date_of_birth',
+			type: 'date',
+			validation: {
+				required: 'Vui lòng chọn ngày sinh',
+				validate: value => {
+					if (!value) return 'Ngày sinh không hợp lệ';
+
+					const birthDate = new Date(value);
+					const today = new Date();
+
+					if (birthDate > today) return 'Ngày sinh không thể ở tương lai';
+
+					const age = today.getFullYear() - birthDate.getFullYear();
+					const monthDiff = today.getMonth() - birthDate.getMonth();
+					const dayDiff = today.getDate() - birthDate.getDate();
+
+					if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
+						return 'Ngày sinh phải trên 18 tuổi';
+					}
+
+					return true;
+				}
+			}
+		},
+		{
+			label: 'Địa chỉ',
+			key: 'address',
+			type: 'input',
+			validation: {
+				required: 'Vui lòng nhập địa chỉ',
+				pattern: {
+					value: /^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
+					message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+				}
+			}
+		},
+		{
+			label: 'Email',
+			key: 'email',
+			type: 'input',
+			validation: {
+				required: 'Vui lòng nhập email',
+				pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Email không hợp lệ' }
+			}
+		},
+		{
+			label: 'SĐT',
+			key: 'phone',
+			type: 'input',
+			validation: {
+				required: 'Vui lòng nhập số điện thoại',
+				pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' }
+			}
+		}
 	];
 
 	const handleSave = (data: Employee) => {

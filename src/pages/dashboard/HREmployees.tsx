@@ -14,7 +14,7 @@ function Content() {
 	);
 }
 
-export default function Employees() {
+export default function HREmployees() {
 	return (
 		<>
 			<DashboardLayout mainContent={<Content />} />
