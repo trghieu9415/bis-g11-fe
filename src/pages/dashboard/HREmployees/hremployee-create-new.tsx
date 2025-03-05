@@ -338,7 +338,7 @@ export default function EmployeeCreateNew() {
 																const dayDiff = today.getDate() - birthDate.getDate();
 
 																if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
-																	return 'Bạn phải trên 18 tuổi';
+																	return 'Ngày sinh phải trên 18 tuổi';
 																}
 
 																return true;
