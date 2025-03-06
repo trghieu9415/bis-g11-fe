@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
-import fake_data_for_contract from '@/pages/dashboard/hremployees/fake_data_for_contract.json';
+import fake_role_level from '@/pages/dashboard/HREmployees/fake_role_level.json';
 
 export default function EmployeeCreateNew() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -92,19 +92,33 @@ export default function EmployeeCreateNew() {
 	};
 
 	const handleLevelChange = (levelId: string) => {
-		const selectedLevel = fake_data_for_contract?.level.find(item => item.id.toString() === levelId);
+		const selectedRole = fake_role_level?.find(item => item.id === formData.role_id);
+		const selectedLevel = selectedRole?.levels.find(level => level.id === Number(levelId));
+
 		if (selectedLevel) {
 			setValue('level_id', selectedLevel.id);
-			setValue('level_name', selectedLevel.level_name);
-			setValue('salary_coefficient', selectedLevel.salary_coefficient);
+			setValue('level_name', selectedLevel.levelName);
+			setValue('salary_coefficient', selectedLevel.salaryCoefficient);
 		}
 	};
 
 	const handleRoleChange = (roleId: string) => {
-		const selectedRole = fake_data_for_contract?.role.find(item => item.id.toString() === roleId);
+		const selectedRole = fake_role_level?.find(item => item.id.toString() === roleId);
+
 		if (selectedRole) {
 			setValue('role_id', selectedRole.id);
-			setValue('role_name', selectedRole.role_name);
+			setValue('role_name', selectedRole.name);
+
+			if (selectedRole.levels.length > 0) {
+				const firstLevel = selectedRole.levels[0];
+				setValue('level_id', firstLevel.id);
+				setValue('level_name', firstLevel.levelName);
+				setValue('salary_coefficient', firstLevel.salaryCoefficient);
+			} else {
+				setValue('level_id', null);
+				setValue('level_name', '');
+				setValue('salary_coefficient', 1);
+			}
 		}
 	};
 
@@ -476,10 +490,10 @@ export default function EmployeeCreateNew() {
 													<SelectValue placeholder='Chọn vai trò' />
 												</SelectTrigger>
 												<SelectContent>
-													{fake_data_for_contract?.role.map((item, index) => {
+													{fake_role_level?.map((item, index) => {
 														return (
 															<SelectItem value={String(item.id)} key={index}>
-																{item.role_name}
+																{item.name}
 															</SelectItem>
 														);
 													})}
@@ -495,18 +509,19 @@ export default function EmployeeCreateNew() {
 												{...register('level_id', { required: 'Vui lòng chọn cấp bậc' })}
 												value={watch('level_id') ? String(watch('level_id')) : undefined}
 												onValueChange={handleLevelChange}
+												disabled={formData.role_id ? false : true}
 											>
 												<SelectTrigger className='mt-1' id='level'>
 													<SelectValue placeholder='Chọn cấp bậc' />
 												</SelectTrigger>
 												<SelectContent>
-													{fake_data_for_contract?.level.map((item, index) => {
-														return (
-															<SelectItem value={String(item.id)} key={index}>
-																{item.level_name}
+													{fake_role_level
+														?.find(role => role.id === formData.role_id)
+														?.levels.map(item => (
+															<SelectItem value={String(item.id)} key={item.id}>
+																{item.levelName}
 															</SelectItem>
-														);
-													})}
+														))}
 												</SelectContent>
 											</Select>
 											{errors.level_id && <p className='text-red-500 text-sm'>{errors.level_id.message}</p>}{' '}

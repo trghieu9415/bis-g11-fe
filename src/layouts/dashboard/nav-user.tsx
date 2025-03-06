@@ -14,6 +14,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 
+import { Button } from '@/components/ui/button';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from '@/components/ui/dialog';
+
+import EmployeeCalendar from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-calendar';
+import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-time-tracking';
+import { useState, useEffect } from 'react';
+
 export function NavUser({
 	user
 }: {
@@ -24,6 +38,20 @@ export function NavUser({
 	};
 }) {
 	const { isMobile } = useSidebar();
+
+	// const [test, setTest] = useState('');
+
+	// const clickTest = () => {
+	// 	if (test === 'TEST') {
+	// 		setTest('TEST LOAD');
+	// 		return;
+	// 	}
+	// 	setTest('TEST');
+	// };
+
+	// useEffect(() => {
+	// 	console.log('Updated test:', test);
+	// }, [test]);
 
 	return (
 		<SidebarMenu>
@@ -76,10 +104,29 @@ export function NavUser({
 								<BadgeCheck />
 								Xin nghỉ phép
 							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<CalendarCheck />
-								Chấm công
-							</DropdownMenuItem>
+							<EmployeeTimeTracking />
+							{/* <Dialog>
+								<DialogTrigger asChild>
+									<Button
+										variant='outline'
+										className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'
+									>
+										<CalendarCheck />
+										Chấm công
+									</Button>
+								</DialogTrigger>
+								<DialogContent className='!w-[50vw] !max-w-none'>
+									<DialogHeader>
+										<DialogTitle>Bảng chấm công</DialogTitle>
+										<DialogDescription>
+											Đảm bảo bạn luôn nhớ check-in và check-out đúng giờ để theo dõi thời gian làm việc chính xác và
+											tránh sai sót trong bảng chấm công!
+										</DialogDescription>
+									</DialogHeader>
+
+									<EmployeeCalendar onTest={clickTest} />
+								</DialogContent>
+							</Dialog> */}
 							<DropdownMenuItem>
 								<ShieldQuestion />
 								Quyền lợi nhân viên

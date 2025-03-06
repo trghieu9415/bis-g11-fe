@@ -9,6 +9,7 @@
 		}
 	],
 	"compilerOptions": {
+		"typeRoots": ["./node_modules/@types"],
 		"moduleResolution": "node",
 		"lib": ["es6", "dom"],
 		"noImplicitAny": true,
@@ -16,7 +17,7 @@
 		"strictNullChecks": true,
 		"baseUrl": ".",
 		"paths": {
-      "@/*": ["./src/*"],
+			"@/*": ["./src/*"]
 		}
 	}
 }
