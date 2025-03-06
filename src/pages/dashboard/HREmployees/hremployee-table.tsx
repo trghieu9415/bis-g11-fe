@@ -17,7 +17,9 @@ import { RegisterOptions } from 'react-hook-form';
 // import data from '@/pages/dashboard/HREmployees/data.json';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
-import { updateUser } from '@/services/userService/updateUser';
+import { updateUser, deleteUser } from '@/services/userService';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 type Employee = {
 	id: number;
@@ -59,7 +61,6 @@ export default function EmployeeTable() {
 		dispatch(fetchUsers());
 	}, [dispatch]);
 
-	console.log(users);
 	const columns: ColumnDef<Employee>[] = [
 		{
 			accessorKey: 'idString',
@@ -381,11 +382,6 @@ export default function EmployeeTable() {
 	];
 
 	const handleSave = async (data: Employee) => {
-		if (!window.confirm('Bạn có chắc muốn lưu thay đổi không?')) {
-			console.log('❌ Hủy cập nhật');
-			return;
-		}
-
 		const userId = data.id;
 		const updatedUserData = {
 			fullName: data.full_name,
@@ -404,19 +400,46 @@ export default function EmployeeTable() {
 
 		// Call API for update user info
 		try {
-			const res = await updateUser(userId, updatedUserData);
-			console.log('CẬP NHẬT THÀNH CÔNG RỒI NHA: ', res);
-
+			await updateUser(userId, updatedUserData);
+			toast.success('Cập nhật thông tin nhân viên thành công!');
 			dispatch(fetchUsers());
 			setIsDialogOpen(false);
-		} catch (error) {
-			alert(`Có lỗi trong quá trình cập nhật, vui lòng thử lại sau... \n(${error})`);
+		} catch (error: unknown) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
 		}
 	};
 
-	const handleDelete = (data: Employee) => {
-		console.log('Deleting data:', data);
-		setIsDialogOpen(false);
+	const handleDelete = async (data: Employee) => {
+		const userId = data.id;
+
+		try {
+			await deleteUser(userId);
+			toast.success('Cập nhật thông tin nhân viên thành công!');
+			dispatch(fetchUsers());
+			setIsDialogOpen(false);
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
 	};
 
 	return (

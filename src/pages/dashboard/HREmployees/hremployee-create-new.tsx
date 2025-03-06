@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormSetError } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -8,10 +9,50 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 import fake_role_level from '@/pages/dashboard/HREmployees/fake_role_level.json';
+import { addUser } from '@/services/userService';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import {
+	AlertDialog,
+	AlertDialogTrigger,
+	AlertDialogContent,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogCancel,
+	AlertDialogAction
+} from '@/components/ui/alert-dialog';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { fetchUsers } from '@/redux/slices/usersSlice';
+
+interface UserFormData {
+	fullname: string;
+	phone: string;
+	gender: number | null;
+	email: string;
+	date_of_birth: string;
+	address: string;
+	username: string;
+	password: string;
+	base_salary: string;
+	role_id: number | null;
+	role_name: string;
+	level_name: string;
+	level_id: number | null;
+	salary_coefficient: number;
+	standard_working_days: number;
+	start_date: string;
+	end_date: string;
+}
 
 export default function EmployeeCreateNew() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isNumberStep, setIsNumberStep] = useState(1);
+	const dispatch = useAppDispatch();
+	const { users } = useSelector((state: RootState) => state.users);
+
+	console.log(users);
 
 	const {
 		register,
@@ -20,8 +61,9 @@ export default function EmployeeCreateNew() {
 		getValues,
 		trigger,
 		watch,
-		reset
-	} = useForm({
+		reset,
+		setError
+	} = useForm<UserFormData>({
 		defaultValues: {
 			fullname: '',
 			phone: '',
@@ -81,6 +123,33 @@ export default function EmployeeCreateNew() {
 
 		setValue('password', password);
 		setValue('username', newUsername);
+	};
+
+	const checkUserExistence = (
+		email: string,
+		phone: string,
+		username: string,
+		setError: UseFormSetError<UserFormData>
+	) => {
+		const existingEmail = users.find(user => user.email === email);
+		const existingPhone = users.find(user => user.phone === phone);
+		const existingUsername = users.find(user => user.username === username);
+
+		if (existingEmail) {
+			setError('email', { type: 'manual', message: 'Email đã tồn tại' });
+		}
+		if (existingPhone) {
+			setError('phone', { type: 'manual', message: 'Số điện thoại đã tồn tại' });
+		}
+		if (existingUsername) {
+			setError('username', { type: 'manual', message: 'Tên đăng nhập đã tồn tại' });
+		}
+
+		if (existingEmail || existingPhone || existingUsername) {
+			return true;
+		}
+
+		return false;
 	};
 
 	// Contract info
@@ -161,7 +230,14 @@ export default function EmployeeCreateNew() {
 			] as const;
 
 			const isValid = await trigger(fieldsToValidate);
-			if (isValid) {
+
+			const email = getValues('email');
+			const phone = getValues('phone');
+			const username = getValues('username');
+
+			const isExist = checkUserExistence(email, phone, username, setError);
+
+			if (isValid && !isExist) {
 				setIsNumberStep(prev => Math.min(3, prev + 1));
 			}
 		} else if (isNumberStep === 2) {
@@ -184,8 +260,44 @@ export default function EmployeeCreateNew() {
 		}
 	};
 
-	const handleSubmitClick = async () => {
-		alert('VIẾT THÊM LOGIC GỌI API ĐI!!');
+	const handleSubmitClick = async (data: UserFormData) => {
+		const userData = {
+			fullName: data.fullname,
+			phoneNumber: data.phone,
+			email: data.email,
+			dateOfBirth: data.date_of_birth,
+			address: data.address,
+			gender: data.gender ? 'MALE' : 'FEMALE',
+			username: data.username,
+			password: data.password,
+			reqContract: {
+				baseSalary: Number(data.base_salary.replace(/,/g, '')),
+				standardWorkingDay: data.standard_working_days,
+				startDate: data.start_date,
+				endDate: data.end_date,
+				expiryDate: data.end_date,
+				seniorityId: data.level_id
+			}
+		};
+
+		try {
+			await addUser(userData);
+			toast.success('Thêm thông tin nhân viên thành công!');
+			dispatch(fetchUsers());
+			setIsOpen(false);
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
 	};
 
 	return (
@@ -458,7 +570,6 @@ export default function EmployeeCreateNew() {
 													Generate
 												</Button>
 											</div>
-											{/* <p className='text-red-500 text-sm'>Vui lòng nhập họ và tên</p> */}
 										</div>
 									</div>
 								</div>
@@ -707,13 +818,26 @@ export default function EmployeeCreateNew() {
 										Next
 									</Button>
 								) : (
-									<Button
-										type='button'
-										className='px-4 py-2 border bg-green-800 text-white rounded-md hover:bg-green-900 transition'
-										onClick={handleSubmitClick}
-									>
-										Submit
-									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
+												Submit
+											</button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Xác nhận thêm nhân viên</AlertDialogTitle>
+												<AlertDialogDescription>
+													Bạn có chắc chắn muốn thêm nhân viên này vào hệ thống? Các thông tin sẽ được lưu trữ và không
+													thể thay đổi sau khi xác nhận.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<AlertDialogAction onClick={() => handleSubmitClick(formData)}>Confirm</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
 								)}
 							</div>
 						</div>

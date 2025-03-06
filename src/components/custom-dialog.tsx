@@ -6,6 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectValue, SelectTrigger, SelectItem } from '@/components/ui/select';
 import { SelectContent } from '@radix-ui/react-select';
 import { Trash2 } from 'lucide-react';
+import {
+	AlertDialog,
+	AlertDialogTrigger,
+	AlertDialogContent,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogCancel,
+	AlertDialogAction
+} from '@/components/ui/alert-dialog';
 
 interface FieldConfig {
 	label: string;
@@ -178,17 +189,32 @@ export default function CustomDialog<T extends Record<string, string | number | 
 				{/* Start: Actions btn */}
 				<div className={`flex mt-4 ${isDelete ? 'justify-between' : 'justify-end'}`}>
 					{isDelete && (
-						<button
-							className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'
-							onClick={() => {
-								if (onDelete && formData) {
-									onDelete(formData);
-								}
-							}}
-						>
-							<Trash2 />
-							Delete
-						</button>
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'>
+									<Trash2 />
+									Delete
+								</button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Bạn có chắc chắn không?</AlertDialogTitle>
+									<AlertDialogDescription>
+										Hành động này không thể hoàn tác. Dữ liệu của bạn sẽ bị xóa vĩnh viễn.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction
+										onClick={() => {
+											if (onDelete && formData) onDelete(formData);
+										}}
+									>
+										Continue
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					)}
 					<div className='flex justify-end gap-2'>
 						<button
@@ -198,14 +224,23 @@ export default function CustomDialog<T extends Record<string, string | number | 
 							Cancel
 						</button>
 						{isSave && (
-							<button
-								className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
-								onClick={() => {
-									handleSaveClick();
-								}}
-							>
-								Save changes
-							</button>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
+										Save changes
+									</button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Xác nhận lưu</AlertDialogTitle>
+										<AlertDialogDescription>Bạn có chắc chắn muốn lưu những thay đổi này không?</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction onClick={handleSaveClick}>Confirm</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						)}
 					</div>
 				</div>
