@@ -14,6 +14,7 @@ interface FieldConfig {
 	disabled?: boolean;
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	validation?: RegisterOptions;
+	show?: 'view' | 'edit' | 'delete';
 }
 
 // Cập nhật kiểu cho CustomDialogProps để xác định rõ kiểu của entity và formData
@@ -90,85 +91,91 @@ export default function CustomDialog<T extends Record<string, string | number | 
 				</DialogHeader>
 				<div className='overflow-x-auto max-h-[65vh]'>
 					<div className='grid grid-cols-2 gap-x-14 gap-y-4 p-4'>
-						{fields.map(({ label, key, type, options, disabled, validation }) => (
+						{fields.map(({ label, key, type, options, disabled, validation, show }) => (
 							<div className='flex items-center flex-col' key={key}>
 								<div className='flex items-start flex-col space-x-2 flex-1 w-full'>
-									<label className='w-32 text-sm mb-1 text-start font-semibold'>{label}</label>
-									{type === 'input' || type === 'number' ? (
-										<div className='!ml-0 w-full'>
-											<Input
-												type={type === 'number' ? 'number' : 'text'}
-												className='w-full'
-												disabled={disabled || isReadOnly || isDelete}
-												readOnly={isReadOnly || isDelete}
-												{...register(key as Path<T>, {
-													required: validation?.required ? validation.required : false,
-													minLength: validation?.minLength ? validation?.minLength : undefined,
-													pattern: validation?.pattern ? validation?.pattern : undefined
-												})}
-											/>
-											{errors[key as Path<T>] && (
-												<div className='flex justify-start w-full'>
-													<p className='text-red-500 text-sm'>
-														{(errors[key as keyof T] as FieldError)?.message || ''}
-													</p>
+									{(!show || show === mode) && (
+										<>
+											<label className='w-full text-sm mb-1 text-start font-semibold'>{label}</label>
+											{type === 'input' || type === 'number' ? (
+												<div className='!ml-0 w-full'>
+													<Input
+														type={type === 'number' ? 'number' : 'text'}
+														className='w-full'
+														disabled={disabled || isReadOnly || isDelete}
+														readOnly={isReadOnly || isDelete}
+														{...register(key as Path<T>, {
+															required: validation?.required ? validation.required : false,
+															minLength: validation?.minLength ? validation?.minLength : undefined,
+															pattern: validation?.pattern ? validation?.pattern : undefined
+														})}
+													/>
+													{errors[key as Path<T>] && (
+														<div className='flex justify-start w-full'>
+															<p className='text-red-500 text-sm'>
+																{(errors[key as keyof T] as FieldError)?.message || ''}
+															</p>
+														</div>
+													)}
 												</div>
-											)}
-										</div>
-									) : type === 'select' && options ? (
-										<div className='!ml-0 w-full'>
-											<Select
-												value={String(watch(key as Path<T>) ?? '')}
-												onValueChange={value => {
-													const selectedOption = options.find(opt => opt.value === value);
-													let parsedValue: PathValue<T, Path<T>> = value as PathValue<T, Path<T>>;
+											) : type === 'select' && options ? (
+												<div className='!ml-0 w-full'>
+													<Select
+														value={String(watch(key as Path<T>) ?? '')}
+														onValueChange={value => {
+															const selectedOption = options.find(opt => opt.value === value);
+															let parsedValue: PathValue<T, Path<T>> = value as PathValue<T, Path<T>>;
 
-													if (selectedOption?.isBoolean) {
-														parsedValue = (value === 'true') as PathValue<T, Path<T>>;
-													}
-													handleChange(key as keyof T, parsedValue);
-												}}
-												disabled={isReadOnly || isDelete}
-											>
-												<SelectTrigger className='w-full border p-2 rounded-md'>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent className='bg-white border border-gray-300 shadow-lg rounded-md z-10 w-full'>
-													{options.map(({ value, label }) => (
-														<SelectItem key={value} value={value} className='w-full flex-1'>
-															{label}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-									) : type === 'date' ? (
-										<div className='!ml-0 w-full'>
-											<Input
-												type='date'
-												className='w-full block'
-												disabled={isReadOnly || isDelete}
-												{...register(key as Path<T>, {
-													required: validation?.required ? validation.required : false,
-													minLength: validation?.minLength ? validation?.minLength : undefined,
-													pattern: validation?.pattern ? validation?.pattern : undefined,
-													validate: validation?.validate ? validation?.validate : undefined
-												})}
-											/>
-											{errors[key as Path<T>] && (
-												<div className='flex justify-start w-full'>
-													<p className='text-red-500 text-sm'>
-														{(errors[key as keyof T] as FieldError)?.message || ''}
-													</p>
+															if (selectedOption?.isBoolean) {
+																parsedValue = (value === 'true') as PathValue<T, Path<T>>;
+															}
+															handleChange(key as keyof T, parsedValue);
+														}}
+														disabled={isReadOnly || isDelete}
+													>
+														<SelectTrigger className='w-full border p-2 rounded-md'>
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent className='bg-white border border-gray-300 shadow-lg rounded-md z-10 w-full'>
+															{options.map(({ value, label }) => (
+																<SelectItem key={value} value={value} className='w-full flex-1'>
+																	{label}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
 												</div>
-											)}
-										</div>
-									) : null}
+											) : type === 'date' ? (
+												<div className='!ml-0 w-full'>
+													<Input
+														type='date'
+														className='w-full block'
+														disabled={isReadOnly || isDelete}
+														{...register(key as Path<T>, {
+															required: validation?.required ? validation.required : false,
+															minLength: validation?.minLength ? validation?.minLength : undefined,
+															pattern: validation?.pattern ? validation?.pattern : undefined,
+															validate: validation?.validate ? validation?.validate : undefined
+														})}
+													/>
+													{errors[key as Path<T>] && (
+														<div className='flex justify-start w-full'>
+															<p className='text-red-500 text-sm'>
+																{(errors[key as keyof T] as FieldError)?.message || ''}
+															</p>
+														</div>
+													)}
+												</div>
+											) : null}
+										</>
+									)}
 								</div>
 							</div>
 						))}
 					</div>
 				</div>
+
+				{/* Start: Actions btn */}
 				<div className={`flex mt-4 ${isDelete ? 'justify-between' : 'justify-end'}`}>
 					{isDelete && (
 						<button
@@ -202,6 +209,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 						)}
 					</div>
 				</div>
+				{/* End: Actions btn */}
 			</DialogContent>
 		</Dialog>
 	);

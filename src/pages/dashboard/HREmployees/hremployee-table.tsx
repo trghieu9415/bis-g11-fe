@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,10 +14,14 @@ import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions } from 'react-hook-form';
 
-import data from '@/pages/dashboard/HREmployees/data.json';
+// import data from '@/pages/dashboard/HREmployees/data.json';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { fetchUsers } from '@/redux/slices/usersSlice';
+import { updateUser } from '@/services/userService/updateUser';
 
 type Employee = {
-	id: string;
+	id: number;
+	idString: string;
 	full_name: string;
 	role: string;
 	status: boolean;
@@ -27,15 +33,18 @@ type Employee = {
 	phone: string;
 	date_of_birth: string;
 	address: string;
+	username: string;
+	password: string;
 };
 
 type FieldConfig = {
 	label: string;
-	key: keyof Employee;
+	key: keyof Employee | 'password';
 	type: 'input' | 'select' | 'number' | 'date';
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	disabled?: boolean;
 	validation?: RegisterOptions;
+	show?: 'view' | 'edit' | 'delete';
 };
 
 export default function EmployeeTable() {
@@ -43,9 +52,17 @@ export default function EmployeeTable() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
 
+	const dispatch = useAppDispatch();
+	const { users } = useSelector((state: RootState) => state.users);
+
+	useEffect(() => {
+		dispatch(fetchUsers());
+	}, [dispatch]);
+
+	console.log(users);
 	const columns: ColumnDef<Employee>[] = [
 		{
-			accessorKey: 'id',
+			accessorKey: 'idString',
 			header: ({ column }) => (
 				<Button
 					variant='link'
@@ -342,12 +359,59 @@ export default function EmployeeTable() {
 				required: 'Vui lòng nhập số điện thoại',
 				pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' }
 			}
+		},
+		{
+			label: 'Username',
+			disabled: true,
+			key: 'username',
+			type: 'input'
+		},
+		{
+			label: 'Mật khẩu (Để trống nếu muốn giữ nguyên)',
+			key: 'password',
+			type: 'input',
+			show: 'edit',
+			validation: {
+				pattern: {
+					value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+					message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+				}
+			}
 		}
 	];
 
-	const handleSave = (data: Employee) => {
-		console.log('Saving data:', data);
-		setIsDialogOpen(false);
+	const handleSave = async (data: Employee) => {
+		if (!window.confirm('Bạn có chắc muốn lưu thay đổi không?')) {
+			console.log('❌ Hủy cập nhật');
+			return;
+		}
+
+		const userId = data.id;
+		const updatedUserData = {
+			fullName: data.full_name,
+			phoneNumber: data.phone,
+			email: data.email,
+			dateOfBirth: data.date_of_birth,
+			address: data.address,
+			gender: data.gender ? 'MALE' : 'FEMALE',
+			username: data.username,
+			password: ''
+		};
+
+		if (data.password) {
+			updatedUserData.password = data.password;
+		}
+
+		// Call API for update user info
+		try {
+			const res = await updateUser(userId, updatedUserData);
+			console.log('CẬP NHẬT THÀNH CÔNG RỒI NHA: ', res);
+
+			dispatch(fetchUsers());
+			setIsDialogOpen(false);
+		} catch (error) {
+			alert(`Có lỗi trong quá trình cập nhật, vui lòng thử lại sau... \n(${error})`);
+		}
 	};
 
 	const handleDelete = (data: Employee) => {
@@ -357,7 +421,7 @@ export default function EmployeeTable() {
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={data} hiddenColumns={hiddenColumns} />
+			<CustomTable columns={columns} data={users} hiddenColumns={hiddenColumns} />
 			{selectedEmployee && (
 				<CustomDialog
 					entity={selectedEmployee}

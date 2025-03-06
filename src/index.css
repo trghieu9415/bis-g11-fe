@@ -1,4 +1,4 @@
-@import url("./scrollbar.css");
+@import url('./scrollbar.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,7 +99,6 @@
 
 *:focus {
 	outline: none;
-	
 }
 
 @layer base {
@@ -112,13 +111,27 @@
 }
 
 /* Ẩn spinner trên Chrome, Safari, Edge */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  appearance: none;
-  margin: 0;
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	appearance: none;
+	margin: 0;
 }
 
 /* Ẩn spinner trên Firefox */
-input[type="number"] {
-  -moz-appearance: textfield;
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+/* Css cho bảng chấm công */
+.sx__month-grid-day {
+	min-height: 88px !important;
+}
+
+.sx__view-selection-selected-item {
+	display: none;
+}
+
+.sx__today-button,
+.sx__forward-backward-navigation {
+	display: block !important;
 }
