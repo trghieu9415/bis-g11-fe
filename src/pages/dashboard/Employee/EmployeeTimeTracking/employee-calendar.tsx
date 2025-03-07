@@ -22,6 +22,7 @@ interface EmployeeCalendarProps {
 }
 
 function EmployeeCalendar({ events, onCheckIn }: EmployeeCalendarProps) {
+	console.log(events);
 	const eventsService = useState(() => createEventsServicePlugin())[0];
 	const calendar = useCalendarApp({
 		views: [createViewMonthGrid(), createViewMonthAgenda()],
