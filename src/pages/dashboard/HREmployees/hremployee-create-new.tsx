@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, UseFormSetError } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
-import fake_role_level from '@/pages/dashboard/HREmployees/fake_role_level.json';
 import { addUser } from '@/services/userService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -25,6 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
+import { fetchRoles } from '@/redux/slices/rolesSlice';
 
 interface UserFormData {
 	fullname: string;
@@ -51,8 +51,14 @@ export default function EmployeeCreateNew() {
 	const [isNumberStep, setIsNumberStep] = useState(1);
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
+	const { roles } = useSelector((state: RootState) => state.roles);
 
-	console.log(users);
+	useEffect(() => {
+		if (isNumberStep === 2 && roles.length === 0) {
+			console.log('FETCH ROLES');
+			dispatch(fetchRoles());
+		}
+	}, [isNumberStep, roles.length, dispatch]);
 
 	const {
 		register,
@@ -161,8 +167,8 @@ export default function EmployeeCreateNew() {
 	};
 
 	const handleLevelChange = (levelId: string) => {
-		const selectedRole = fake_role_level?.find(item => item.id === formData.role_id);
-		const selectedLevel = selectedRole?.levels.find(level => level.id === Number(levelId));
+		const selectedRole = roles?.find(item => item.id === formData.role_id);
+		const selectedLevel = selectedRole?.resSeniority.find(level => level.id === Number(levelId));
 
 		if (selectedLevel) {
 			setValue('level_id', selectedLevel.id);
@@ -172,14 +178,14 @@ export default function EmployeeCreateNew() {
 	};
 
 	const handleRoleChange = (roleId: string) => {
-		const selectedRole = fake_role_level?.find(item => item.id.toString() === roleId);
+		const selectedRole = roles?.find(item => item.id.toString() === roleId);
 
 		if (selectedRole) {
 			setValue('role_id', selectedRole.id);
 			setValue('role_name', selectedRole.name);
 
-			if (selectedRole.levels.length > 0) {
-				const firstLevel = selectedRole.levels[0];
+			if (selectedRole?.resSeniority?.length > 0) {
+				const firstLevel = selectedRole.resSeniority[0];
 				setValue('level_id', firstLevel.id);
 				setValue('level_name', firstLevel.levelName);
 				setValue('salary_coefficient', firstLevel.salaryCoefficient);
@@ -601,7 +607,9 @@ export default function EmployeeCreateNew() {
 													<SelectValue placeholder='Chọn vai trò' />
 												</SelectTrigger>
 												<SelectContent>
-													{fake_role_level?.map((item, index) => {
+													{roles?.map((item, index) => {
+														if (item.name.toLowerCase() === 'admin'.toLowerCase()) return;
+
 														return (
 															<SelectItem value={String(item.id)} key={index}>
 																{item.name}
@@ -626,9 +634,9 @@ export default function EmployeeCreateNew() {
 													<SelectValue placeholder='Chọn cấp bậc' />
 												</SelectTrigger>
 												<SelectContent>
-													{fake_role_level
+													{roles
 														?.find(role => role.id === formData.role_id)
-														?.levels.map(item => (
+														?.resSeniority.map(item => (
 															<SelectItem value={String(item.id)} key={item.id}>
 																{item.levelName}
 															</SelectItem>

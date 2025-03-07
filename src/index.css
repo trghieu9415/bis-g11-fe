@@ -135,3 +135,8 @@ input[type='number'] {
 .sx__forward-backward-navigation {
 	display: block !important;
 }
+
+/* Css cho tailwind */
+.grid-cols-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}

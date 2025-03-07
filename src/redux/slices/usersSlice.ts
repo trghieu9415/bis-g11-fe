@@ -61,7 +61,7 @@ const initialState: UsersState = {
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-	const response = await axios.get<ApiResponse[]>('/users');
+	const response = await axios.get<ApiResponse[]>('/api/v1/users');
 
 	const formattedData: Employee[] = response.data.map(user => ({
 		id: user.id,
