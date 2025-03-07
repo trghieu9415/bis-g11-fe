@@ -17,7 +17,9 @@ import { RegisterOptions } from 'react-hook-form';
 // import data from '@/pages/dashboard/HREmployees/data.json';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
-import { updateUser } from '@/services/userService/updateUser';
+import { updateUser, deleteUser } from '@/services/userService';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 type Employee = {
 	id: number;
@@ -44,7 +46,7 @@ type FieldConfig = {
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	disabled?: boolean;
 	validation?: RegisterOptions;
-	show?: 'view' | 'edit' | 'delete';
+	showOnly?: 'view' | 'edit' | 'delete';
 };
 
 export default function EmployeeTable() {
@@ -59,7 +61,6 @@ export default function EmployeeTable() {
 		dispatch(fetchUsers());
 	}, [dispatch]);
 
-	console.log(users);
 	const columns: ColumnDef<Employee>[] = [
 		{
 			accessorKey: 'idString',
@@ -269,123 +270,150 @@ export default function EmployeeTable() {
 		salary_coefficient: false
 	};
 
-	const employeeFields: FieldConfig[] = [
-		{
-			label: 'Họ và tên',
-			key: 'full_name',
-			type: 'input',
-			validation: {
-				required: 'Vui lòng nhập họ và tên',
-				minLength: { value: 3, message: 'Họ và tên ít nhất 3 ký tự' }
-			}
-		},
-		{
-			label: 'Giới tính',
-			key: 'gender',
-			type: 'select',
-			options: [
-				{ value: 'false', label: 'Nữ', isBoolean: true },
-				{ value: 'true', label: 'Nam', isBoolean: true }
-			],
-			validation: { required: 'Vui lòng chọn giới tính' }
-		},
-		{ label: 'ID', key: 'id', type: 'input', disabled: true },
-		{ label: 'Vai trò', key: 'role', type: 'input', disabled: true },
-		{
-			label: 'Trạng thái',
-			key: 'status',
-			type: 'select',
-			options: [
-				{ value: 'true', label: 'Hoạt động', isBoolean: true },
-				{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
-			],
-			validation: { required: 'Vui lòng chọn trạng thái' }
-		},
-		{ label: 'Cấp bậc', key: 'level', type: 'input', disabled: true },
-		{ label: 'Lương cơ bản', key: 'base_salary', type: 'number', disabled: true },
-		{ label: 'Hệ số lương', key: 'salary_coefficient', type: 'number', disabled: true },
-		{
-			label: 'Ngày sinh',
-			key: 'date_of_birth',
-			type: 'date',
-			validation: {
-				required: 'Vui lòng chọn ngày sinh',
-				validate: value => {
-					if (!value) return 'Ngày sinh không hợp lệ';
-
-					const birthDate = new Date(value);
-					const today = new Date();
-
-					if (birthDate > today) return 'Ngày sinh không thể ở tương lai';
-
-					const age = today.getFullYear() - birthDate.getFullYear();
-					const monthDiff = today.getMonth() - birthDate.getMonth();
-					const dayDiff = today.getDate() - birthDate.getDate();
-
-					if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
-						return 'Ngày sinh phải trên 18 tuổi';
+	const employeeFields: FieldConfig[][][] = [
+		[
+			[
+				{
+					label: 'Họ và tên',
+					key: 'full_name',
+					type: 'input',
+					validation: {
+						required: 'Vui lòng nhập họ và tên',
+						minLength: { value: 3, message: 'Họ và tên ít nhất 3 ký tự' }
 					}
+				}
+			],
+			[
+				{
+					label: 'Giới tính',
+					key: 'gender',
+					type: 'select',
+					options: [
+						{ value: 'false', label: 'Nữ', isBoolean: true },
+						{ value: 'true', label: 'Nam', isBoolean: true }
+					],
+					validation: { required: 'Vui lòng chọn giới tính' }
+				},
+				{
+					label: 'Trạng thái',
+					key: 'status',
+					type: 'select',
+					options: [
+						{ value: 'true', label: 'Hoạt động', isBoolean: true },
+						{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
+					],
+					validation: { required: 'Vui lòng chọn trạng thái' }
+				}
+			]
+		],
 
-					return true;
+		[
+			[
+				{ label: 'ID', key: 'id', type: 'input', disabled: true },
+				{
+					label: 'Ngày sinh',
+					key: 'date_of_birth',
+					type: 'date',
+					validation: {
+						required: 'Vui lòng chọn ngày sinh',
+						validate: value => {
+							if (!value) return 'Ngày sinh không hợp lệ';
+
+							const birthDate = new Date(value);
+							const today = new Date();
+
+							if (birthDate > today) return 'Ngày sinh không thể ở tương lai';
+
+							const age = today.getFullYear() - birthDate.getFullYear();
+							const monthDiff = today.getMonth() - birthDate.getMonth();
+							const dayDiff = today.getDate() - birthDate.getDate();
+
+							if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
+								return 'Ngày sinh phải trên 18 tuổi';
+							}
+
+							return true;
+						}
+					}
 				}
-			}
-		},
-		{
-			label: 'Địa chỉ',
-			key: 'address',
-			type: 'input',
-			validation: {
-				required: 'Vui lòng nhập địa chỉ',
-				pattern: {
-					value: /^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-					message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+			],
+			[{ label: 'Vai trò', key: 'role', type: 'input', disabled: true }]
+		],
+		[
+			[{ label: 'Cấp bậc', key: 'level', type: 'input', disabled: true }],
+			[
+				{ label: 'Lương cơ bản', key: 'base_salary', type: 'number', disabled: true },
+				{ label: 'Hệ số lương', key: 'salary_coefficient', type: 'number', disabled: true }
+			]
+		],
+		[
+			[
+				{
+					label: 'Địa chỉ',
+					key: 'address',
+					type: 'input',
+					validation: {
+						required: 'Vui lòng nhập địa chỉ',
+						pattern: {
+							value:
+								/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
+							message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+						}
+					}
 				}
-			}
-		},
-		{
-			label: 'Email',
-			key: 'email',
-			type: 'input',
-			validation: {
-				required: 'Vui lòng nhập email',
-				pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Email không hợp lệ' }
-			}
-		},
-		{
-			label: 'SĐT',
-			key: 'phone',
-			type: 'input',
-			validation: {
-				required: 'Vui lòng nhập số điện thoại',
-				pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' }
-			}
-		},
-		{
-			label: 'Username',
-			disabled: true,
-			key: 'username',
-			type: 'input'
-		},
-		{
-			label: 'Mật khẩu (Để trống nếu muốn giữ nguyên)',
-			key: 'password',
-			type: 'input',
-			show: 'edit',
-			validation: {
-				pattern: {
-					value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-					message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+			]
+		],
+		[
+			[
+				{
+					label: 'Email',
+					key: 'email',
+					type: 'input',
+					validation: {
+						required: 'Vui lòng nhập email',
+						pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Email không hợp lệ' }
+					}
 				}
-			}
-		}
+			],
+			[
+				{
+					label: 'SĐT',
+					key: 'phone',
+					type: 'input',
+					validation: {
+						required: 'Vui lòng nhập số điện thoại',
+						pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' }
+					}
+				}
+			]
+		],
+		[
+			[
+				{
+					label: 'Username',
+					disabled: true,
+					key: 'username',
+					type: 'input'
+				}
+			],
+			[
+				{
+					label: 'Mật khẩu (Để trống nếu không đổi)',
+					key: 'password',
+					type: 'input',
+					showOnly: 'edit',
+					validation: {
+						pattern: {
+							value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+							message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+						}
+					}
+				}
+			]
+		]
 	];
 
 	const handleSave = async (data: Employee) => {
-		if (!window.confirm('Bạn có chắc muốn lưu thay đổi không?')) {
-			console.log('❌ Hủy cập nhật');
-			return;
-		}
-
 		const userId = data.id;
 		const updatedUserData = {
 			fullName: data.full_name,
@@ -404,19 +432,46 @@ export default function EmployeeTable() {
 
 		// Call API for update user info
 		try {
-			const res = await updateUser(userId, updatedUserData);
-			console.log('CẬP NHẬT THÀNH CÔNG RỒI NHA: ', res);
-
+			await updateUser(userId, updatedUserData);
+			toast.success('Cập nhật thông tin nhân viên thành công!');
 			dispatch(fetchUsers());
 			setIsDialogOpen(false);
-		} catch (error) {
-			alert(`Có lỗi trong quá trình cập nhật, vui lòng thử lại sau... \n(${error})`);
+		} catch (error: unknown) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
 		}
 	};
 
-	const handleDelete = (data: Employee) => {
-		console.log('Deleting data:', data);
-		setIsDialogOpen(false);
+	const handleDelete = async (data: Employee) => {
+		const userId = data.id;
+
+		try {
+			await deleteUser(userId);
+			toast.success('Cập nhật thông tin nhân viên thành công!');
+			dispatch(fetchUsers());
+			setIsDialogOpen(false);
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
 	};
 
 	return (

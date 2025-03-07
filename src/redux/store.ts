@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import usersReducer from './slices/usersSlice';
+import rolesReducer from './slices/rolesSlice';
 
 export const store = configureStore({
 	reducer: {
-		users: usersReducer
+		users: usersReducer,
+		roles: rolesReducer
 	}
 });
 

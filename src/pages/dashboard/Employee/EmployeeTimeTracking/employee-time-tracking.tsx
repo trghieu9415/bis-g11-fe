@@ -30,7 +30,9 @@ export default function EmployeeTimeTracking() {
 		// }
 	]);
 
-	const onCheckIn = () => {};
+	const onCheckIn = () => {
+		
+	};
 
 	return (
 		<Dialog>
