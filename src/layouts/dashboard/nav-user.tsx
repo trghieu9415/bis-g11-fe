@@ -14,19 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 
-import { Button } from '@/components/ui/button';
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger
-} from '@/components/ui/dialog';
-
-import EmployeeCalendar from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-calendar';
 import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-time-tracking';
-import { useState, useEffect } from 'react';
+import EmployeeLeaveRequest from '@/pages/dashboard/Employee/employee-leave-request';
 
 export function NavUser({
 	user
@@ -38,20 +27,6 @@ export function NavUser({
 	};
 }) {
 	const { isMobile } = useSidebar();
-
-	// const [test, setTest] = useState('');
-
-	// const clickTest = () => {
-	// 	if (test === 'TEST') {
-	// 		setTest('TEST LOAD');
-	// 		return;
-	// 	}
-	// 	setTest('TEST');
-	// };
-
-	// useEffect(() => {
-	// 	console.log('Updated test:', test);
-	// }, [test]);
 
 	return (
 		<SidebarMenu>
@@ -100,10 +75,7 @@ export function NavUser({
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<BadgeCheck />
-								Xin nghỉ phép
-							</DropdownMenuItem>
+							<EmployeeLeaveRequest />
 							<EmployeeTimeTracking />
 							{/* <Dialog>
 								<DialogTrigger asChild>

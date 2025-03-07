@@ -31,7 +31,17 @@ export default function EmployeeTimeTracking() {
 	]);
 
 	const onCheckIn = () => {
-		
+		console.log('CLICKED');
+		setEvents(prev => [
+			...prev,
+			{
+				calendarId: 'red-theme',
+				end: '2025-03-05 10:44',
+				id: '1741171491189',
+				start: '2025-03-05 10:44',
+				title: 'Check-out'
+			}
+		]);
 	};
 
 	return (
