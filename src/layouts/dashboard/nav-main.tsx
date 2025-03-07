@@ -1,5 +1,6 @@
 'use client';
 import { ChevronRight, CalendarDays, UsersRound, Hourglass } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -24,11 +25,11 @@ export function NavMain() {
 			items: [
 				{
 					title: 'Danh sách nhân sự',
-					url: '#'
+					url: '/hremployee'
 				},
 				{
 					title: 'Hợp đồng lao động',
-					url: '#'
+					url: '/employee'
 				},
 				{
 					title: 'Vi phạm',
@@ -104,12 +105,12 @@ export function NavMain() {
 									{item.items?.map(subItem => (
 										<SidebarMenuSubItem key={subItem.title}>
 											<SidebarMenuSubButton asChild>
-												<a href={subItem.url} className='flex justify-between'>
+												<NavLink to={subItem.url} className='flex justify-between'>
 													<span>{subItem.title}</span>
 													{subItem.total ? (
 														<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
 													) : null}
-												</a>
+												</NavLink>
 											</SidebarMenuSubButton>
 										</SidebarMenuSubItem>
 									))}
