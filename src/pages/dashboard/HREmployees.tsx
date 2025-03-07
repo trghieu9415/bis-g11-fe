@@ -1,8 +1,7 @@
-import DashboardLayout from '@/layouts/dashboard-layout';
 import EmployeeTable from './HREmployees/hremployee-table';
 import EmployeeCreateNew from './HREmployees/hremployee-create-new';
 
-function Content() {
+export default function HREmployees() {
 	return (
 		<div className='flex flex-col w-full'>
 			<h1 className='text-lg font-bold py-4 uppercase'>Danh sách nhân sự</h1>
@@ -11,13 +10,5 @@ function Content() {
 				<EmployeeTable />
 			</div>
 		</div>
-	);
-}
-
-export default function HREmployees() {
-	return (
-		<>
-			<DashboardLayout mainContent={<Content />} />
-		</>
 	);
 }
