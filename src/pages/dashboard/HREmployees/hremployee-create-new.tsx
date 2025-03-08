@@ -561,7 +561,7 @@ export default function EmployeeCreateNew() {
 														className='mt-1'
 														value={formData.password}
 														{...register('password', {
-															required: 'Vui lòng nhập tên đăng nhập',
+															required: 'Vui lòng nhập mật khẩu',
 															pattern: {
 																value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
 																message:

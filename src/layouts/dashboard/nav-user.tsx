@@ -1,6 +1,6 @@
 'use client';
 
-import { BadgeCheck, ShieldQuestion, ChevronsUpDown, CalendarCheck, LogOut, SquareUser } from 'lucide-react';
+import { ChevronsUpDown, LogOut, ShieldQuestion, SquareUser } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -16,11 +16,13 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/c
 
 import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-time-tracking';
 import EmployeeLeaveRequest from '@/pages/dashboard/Employee/employee-leave-request';
+import { NavLink } from 'react-router-dom';
 
 export function NavUser({
 	user
 }: {
 	user: {
+		id: number;
 		name: string;
 		email: string;
 		avatar: string;
@@ -68,37 +70,17 @@ export function NavUser({
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<SquareUser />
-								Thông tin cá nhân
-							</DropdownMenuItem>
+							<NavLink to={`/user/${user.id}`}>
+								<DropdownMenuItem className='hover:bg-gray-100 hover:cursor-pointer'>
+									<SquareUser />
+									Thông tin cá nhân
+								</DropdownMenuItem>
+							</NavLink>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
 							<EmployeeLeaveRequest />
 							<EmployeeTimeTracking />
-							{/* <Dialog>
-								<DialogTrigger asChild>
-									<Button
-										variant='outline'
-										className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'
-									>
-										<CalendarCheck />
-										Chấm công
-									</Button>
-								</DialogTrigger>
-								<DialogContent className='!w-[50vw] !max-w-none'>
-									<DialogHeader>
-										<DialogTitle>Bảng chấm công</DialogTitle>
-										<DialogDescription>
-											Đảm bảo bạn luôn nhớ check-in và check-out đúng giờ để theo dõi thời gian làm việc chính xác và
-											tránh sai sót trong bảng chấm công!
-										</DialogDescription>
-									</DialogHeader>
-
-									<EmployeeCalendar onTest={clickTest} />
-								</DialogContent>
-							</Dialog> */}
 							<DropdownMenuItem>
 								<ShieldQuestion />
 								Quyền lợi nhân viên

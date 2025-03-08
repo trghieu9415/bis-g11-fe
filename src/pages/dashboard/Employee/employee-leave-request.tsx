@@ -59,7 +59,7 @@ export default function EmployeeLeaveRequest() {
 	const formData = watch();
 
 	useEffect(() => {
-		if (!user) {
+		if (!user.id) {
 			dispatch(fetchUserDetail(2));
 		}
 
