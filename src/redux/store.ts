@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import usersReducer from './slices/usersSlice';
 import rolesReducer from './slices/rolesSlice';
 import userDetailReducer from './slices/userDetailSlice';
+import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
 
 export const store = configureStore({
 	reducer: {
 		users: usersReducer,
 		roles: rolesReducer,
-		user: userDetailReducer
+		user: userDetailReducer,
+		leaveRequestByUserID: leaveRequestByUserIDReducer
 	}
 });
 

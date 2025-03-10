@@ -26,6 +26,10 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { RootState, useAppDispatch } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
+import { fetchAllLeaveRequestsByUserId } from '@/redux/slices/leaveRequestByUserIDSlice';
+import { addLeaveRequest } from '@/services/leaveRequestService';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 export default function EmployeeLeaveRequest() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,7 +53,6 @@ export default function EmployeeLeaveRequest() {
 		defaultValues: {
 			title: '',
 			description: '',
-			sendDate: '',
 			startDate: '',
 			endDate: '',
 			typeLeave: ''
@@ -59,26 +62,28 @@ export default function EmployeeLeaveRequest() {
 	const formData = watch();
 
 	useEffect(() => {
-		if (!user.id) {
-			dispatch(fetchUserDetail(2));
-		}
-
 		if (isDialogOpen) {
 			reset();
+		}
+	}, [isDialogOpen]);
+
+	useEffect(() => {
+		if (!user.id) {
+			dispatch(fetchUserDetail(2));
 		}
 
 		if (!formData.startDate) {
 			setValue('endDate', '');
 		}
-	}, [dispatch, isDialogOpen, formData.startDate]);
+	}, [dispatch, formData.startDate]);
 
 	const getMaxLeaveDays = () => {
 		switch (formData.typeLeave) {
-			case 'leave':
+			case 'PAID_LEAVE':
 				return 12;
-			case 'maternity':
+			case 'MATERNITY_LEAVE':
 				return 180;
-			case 'sick':
+			case 'SICK_LEAVE':
 				return 7;
 			default:
 				return 0;
@@ -86,12 +91,38 @@ export default function EmployeeLeaveRequest() {
 	};
 
 	const handleSubmitClick = async () => {
-		const fieldsToValidate = ['title', 'description', 'sendDate', 'startDate', 'endDate', 'typeLeave'] as const;
+		const fieldsToValidate = ['title', 'description', 'startDate', 'endDate', 'typeLeave'] as const;
 
 		const isValid = await trigger(fieldsToValidate);
 		if (isValid) {
-			alert('CALL API');
-			console.log(formData);
+			try {
+				const leaveReqObject = {
+					title: formData.title,
+					startDate: formData.startDate,
+					endDate: formData.endDate,
+					description: formData.description,
+					leaveReason: formData.typeLeave,
+					userId: user.id
+				};
+				const res = await addLeaveRequest(leaveReqObject);
+				if (res?.data) {
+					dispatch(fetchAllLeaveRequestsByUserId(user.id));
+					toast.success('Thêm đơn xin nghỉ phép thành công!');
+					setIsDialogOpen(false);
+				}
+			} catch (error) {
+				const err = error as AxiosError;
+
+				if (err.response?.status === 400) {
+					toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				} else if (err.response?.status === 404) {
+					toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				} else if (err.response?.status === 500) {
+					toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				} else {
+					toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+				}
+			}
 		}
 	};
 
@@ -145,17 +176,17 @@ export default function EmployeeLeaveRequest() {
 										<SelectValue placeholder='Chọn loại nghỉ phép' />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value='leave'>Nghỉ phép</SelectItem>
-										<SelectItem value='maternity'>Nghỉ thai sản</SelectItem>
-										<SelectItem value='sick'>Nghỉ ốm</SelectItem>
+										<SelectItem value='PAID_LEAVE'>Nghỉ phép</SelectItem>
+										<SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>
+										<SelectItem value='SICK_LEAVE'>Nghỉ ốm</SelectItem>
 									</SelectContent>
 								</Select>
 								{errors.typeLeave && <p className='text-red-500 text-sm'>({errors.typeLeave.message})</p>}
 							</div>
 							<div className='text-black mt-4'>
 								<div>
-									{date} tháng {month} năm {year}. Nay tôi làm đơn này, kính xin Trường phòng Nhân sự cho tôi xin nghỉ
-									phép từ ngày{' '}
+									{date} tháng {month}, {year}. Nay tôi làm đơn này, kính xin Trường phòng Nhân sự cho tôi xin nghỉ phép
+									từ ngày{' '}
 									<input
 										type='date'
 										id='startDate'
@@ -186,7 +217,6 @@ export default function EmployeeLeaveRequest() {
 											required: 'Vui lòng chọn ngày kết thúc',
 											validate: value => {
 												if (!formData.startDate || value < formData.startDate) {
-													console.log(formData, value >= formData.startDate);
 													return 'Ngày kết thúc phải sau ngày bắt đầu';
 												} else {
 													if (formData.startDate && formData.typeLeave) {
@@ -229,14 +259,7 @@ export default function EmployeeLeaveRequest() {
 
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
-							<Button
-								onClick={() => {
-									const today = new Date();
-									const formattedDate = today.toISOString().split('T')[0];
-									setValue('sendDate', formattedDate);
-								}}
-								className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
-							>
+							<Button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
 								Submit
 							</Button>
 						</AlertDialogTrigger>
