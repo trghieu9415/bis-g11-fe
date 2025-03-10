@@ -4,13 +4,15 @@ import usersReducer from './slices/usersSlice';
 import rolesReducer from './slices/rolesSlice';
 import userDetailReducer from './slices/userDetailSlice';
 import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
+import contractsByUserIDReducer from './slices/contractsByUserIDSlice';
 
 export const store = configureStore({
 	reducer: {
 		users: usersReducer,
 		roles: rolesReducer,
 		user: userDetailReducer,
-		leaveRequestByUserID: leaveRequestByUserIDReducer
+		leaveRequestByUserID: leaveRequestByUserIDReducer,
+		contractsByUserID: contractsByUserIDReducer
 	}
 });
 

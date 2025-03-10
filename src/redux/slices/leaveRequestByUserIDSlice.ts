@@ -32,7 +32,6 @@ export const fetchAllLeaveRequestsByUserId = createAsyncThunk(
 	'leave-request/fetchAllLeaveRequestsByUserId',
 	async (id: number) => {
 		const response = await axios.get<ApiResponse[]>(`/api/v1/leaveReqs/user/${id}`);
-		console.log(response);
 		return response.data;
 	}
 );
