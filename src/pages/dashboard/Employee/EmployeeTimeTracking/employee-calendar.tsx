@@ -76,7 +76,7 @@ function EmployeeCalendar({ events, onCheckIn }: EmployeeCalendarProps) {
 			</div>
 
 			<div>
-				<ScheduleXCalendar calendarApp={calendar} />
+			{calendar && <ScheduleXCalendar calendarApp={calendar} />}
 			</div>
 		</div>
 	);
