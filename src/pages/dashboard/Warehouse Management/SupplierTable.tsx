@@ -1,4 +1,4 @@
-import data from '@/pages/dashboard/Warehouse Management/data.json';
+import data from '@/pages/dashboard/Warehouse Management/SupplierData.json';
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,24 +14,26 @@ import CustomDialog from '@/components/custom-dialog';
 
 type FieldConfig = {
 	label: string;
-	key: keyof Product;
+	key: keyof Supplier;
 	type: 'input' | 'select' | 'number' | 'date';
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	disabled?: boolean;
 };
-type Product = {
+type Supplier = {
 	id: number;
 	name: string;
+	phone: string;
+	email: string;
+	address: string;
 	status: boolean;
-	quantity: number;
-	price: string;
+	percentage: number;
 };
 
-const ProductsTable = () => {
-	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+const SupplierTable = () => {
+	const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
-	const columns: ColumnDef<Product>[] = [
+	const columns: ColumnDef<Supplier>[] = [
 		{
 			accessorKey: 'id',
 			header: ({ column }) => (
@@ -94,20 +96,20 @@ const ProductsTable = () => {
 			enableHiding: false
 		},
 		{
-			accessorKey: 'quantity',
+			accessorKey: 'phone',
 			header: ({ column }) => (
 				<Button
 					variant='link'
 					className='text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Số Lượng <ArrowUpDown />
+					SĐT <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex justify-center'>{row.getValue('quantity')}</span>
+			cell: ({ row }) => <span className='flex justify-center'>{row.getValue('phone')}</span>
 		},
 		{
-			accessorKey: 'price',
+			accessorKey: 'email',
 			header: ({ column }) => (
 				<Button
 					variant='link'
@@ -118,6 +120,20 @@ const ProductsTable = () => {
 				</Button>
 			)
 		},
+		{
+			accessorKey: 'percentage',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Giá <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex justify-center'>{row.getValue('percentage')}%</span>
+		},
+
 		{
 			id: 'actions',
 			header: 'Thao tác',
@@ -138,21 +154,21 @@ const ProductsTable = () => {
 		}
 	];
 
-	const handleOpenDialog = (product: Product, mode: 'view' | 'edit' | 'delete') => {
-		setSelectedProduct(product);
+	const handleOpenDialog = (supplier: Supplier, mode: 'view' | 'edit' | 'delete') => {
+		setSelectedSupplier(supplier);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
 
 	const handleCloseDialog = () => {
 		setIsDialogOpen(false);
-		setSelectedProduct(null);
+		setSelectedSupplier(null);
 	};
 	const productFields: FieldConfig[][][] = [
 		[
 			[
 				{ label: 'ID', key: 'id', type: 'input', disabled: true },
-				{ label: 'Tên sản phẩm', key: 'name', type: 'input' }
+				{ label: 'Tên nhà cung cấp', key: 'name', type: 'input' }
 			]
 		],
 		[
@@ -168,18 +184,24 @@ const ProductsTable = () => {
 				}
 			]
 		],
+		[[{ label: 'SĐT', key: 'phone', type: 'input' }], [{ label: 'Email', key: 'email', type: 'input' }]],
 		[
-			[{ label: 'Số lượng', key: 'quantity', type: 'number', disabled: true }],
-			[{ label: 'Giá', key: 'price', type: 'input' }]
+			[
+				{
+					label: 'Chiết khấu',
+					key: 'percentage',
+					type: 'input'
+				}
+			]
 		]
 	];
 
-	const handleSave = (data: Product) => {
+	const handleSave = (data: Supplier) => {
 		console.log('Saving data:', data);
 		setIsDialogOpen(false);
 	};
 
-	const handleDelete = (data: Product) => {
+	const handleDelete = (data: Supplier) => {
 		console.log('Deleting data:', data);
 		setIsDialogOpen(false);
 	};
@@ -187,9 +209,9 @@ const ProductsTable = () => {
 	return (
 		<div>
 			<CustomTable columns={columns} data={data} />
-			{selectedProduct && (
+			{selectedSupplier && (
 				<CustomDialog
-					entity={selectedProduct}
+					entity={selectedSupplier}
 					isOpen={isDialogOpen}
 					onClose={handleCloseDialog}
 					mode={dialogMode}
@@ -202,4 +224,4 @@ const ProductsTable = () => {
 	);
 };
 
-export default ProductsTable;
+export default SupplierTable;
