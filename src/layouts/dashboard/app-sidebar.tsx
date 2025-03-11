@@ -7,6 +7,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } fr
 
 const data = {
 	user: {
+		id: 2,
 		name: 'Quản trị viên',
 		email: 'admin@company.com',
 		avatar: './avatars/black_cat.jpg'

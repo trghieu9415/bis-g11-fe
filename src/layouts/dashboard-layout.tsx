@@ -10,7 +10,7 @@ export default function DashboardLayout({ mainContent }: { mainContent: React.Re
 				<div className='sticky top-0'>
 					<Header />
 				</div>
-				<div className='flex mt-3 overflow-hidden'>{mainContent}</div>
+				<div className='flex mt-3 overflow-hidden flex-1'>{mainContent}</div>
 			</main>
 		</SidebarProvider>
 	);
