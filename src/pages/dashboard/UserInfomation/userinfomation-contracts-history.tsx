@@ -250,6 +250,19 @@ export default function UserInfomationContractsHistory() {
 													</DialogHeader>
 
 													<div className='flex flex-col gap-2 w-full flex-1'>
+														{item.status === 0 ? (
+															<span className='flex items-center text-red-500 font-bold flex-1 justify-end mr-2 float-end'>
+																<XCircle className='w-4 h-4 text-red-500 mr-1' /> Hết hạn
+															</span>
+														) : item.status === 1 ? (
+															<span className='flex items-center text-green-600 font-bold flex-1 justify-end mr-2 float-end'>
+																<CheckCircle className='w-4 h-4 text-green-600 mr-1' /> Còn hiệu lực
+															</span>
+														) : (
+															<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
+																<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
+															</span>
+														)}
 														<div className='h-full'>
 															<Tabs defaultValue='general-info' className='text-center h-[460px] overflow-y-auto'>
 																<TabsList className='mb-1'>
