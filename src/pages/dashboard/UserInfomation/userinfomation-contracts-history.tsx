@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, ListRestart, HelpCircle, Info } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import {
 	Dialog,
@@ -16,22 +17,10 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog';
-import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction
-} from '@/components/ui/alert-dialog';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 
 import { fetchAllContractsByUserId } from '@/redux/slices/contractsByUserIDSlice';
-import { fileURLToPath } from 'url';
 
 interface ApiResponse {
 	id: number;
@@ -121,10 +110,13 @@ export default function UserInfomationContractsHistory() {
 		setFilteredContracts(contracts);
 	};
 
+	console.log(user);
+	console.log(filteredContracts);
+
 	return (
 		<div className='flex flex-col items-center justify-between flex-1 gap-4 h-full max-h-[100%]'>
 			<div className='px-4 py-6 flex-1 w-full  border-gray-200 border-solid border rounded-md h-full overflow-y-auto'>
-				<h1 className='text-lg font-bold uppercase text-center'>Lịch sử hợp đồng</h1>
+				<h1 className='text-base font-bold uppercase text-center'>Lịch sử hợp đồng</h1>
 				<div className='flex justify-center items-center gap-2 mt-2 '>
 					<div className='flex gap-2 mb-4'>
 						<div>
@@ -246,22 +238,225 @@ export default function UserInfomationContractsHistory() {
 													</Button>
 												</DialogTrigger>
 												<DialogContent
-													className='!w-[50vw] !max-w-none !max-h-[90vh] h-[570px]'
+													className='!w-[70vw] !max-w-none !max-h-[90vh] h-[800px] flex items-start justify-start flex-col'
 													onOpenAutoFocus={e => e.preventDefault()}
 												>
 													<DialogHeader>
-														<DialogTitle>Nội dung đơn xin nghỉ phép</DialogTitle>
+														<DialogTitle>Nội dung hợp đồng lao động</DialogTitle>
 														<DialogDescription>
-															Chi tiết về đơn xin nghỉ phép của bạn, bao gồm thời gian nghỉ, lý do và trạng thái phê
-															duyệt.
+															Chi tiết về hợp đồng lao động của bạn, bao gồm các điều khoản công việc, quyền lợi, nghĩa
+															vụ của người lao động và người sử dụng lao động, mức lương và thời gian làm việc.
 														</DialogDescription>
 													</DialogHeader>
 
-													{/* Nội dung chi tiết hợp đồng */}
+													<div className='flex flex-col gap-2 w-full flex-1'>
+														<div className='h-full'>
+															<Tabs defaultValue='general-info' className='text-center h-[460px] overflow-y-auto'>
+																<TabsList className='mb-1'>
+																	<TabsTrigger value='general-info'>Thông tin chung</TabsTrigger>
+																	<TabsTrigger value='term-job'>Điều khoản</TabsTrigger>
+																</TabsList>
+																<TabsContent value='general-info' className='text-start'>
+																	<h2 className='font-bold text-base border-b-[1px] mb-2 pb-1'>Bên sử dụng lao động</h2>
+																	<p className='ml-2'>
+																		<strong>Chúng tôi, một bên là: </strong>
+																		Ông Lữ Quang Minh
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Đại diện cho: </strong>
+																		Công ty TNHH Inverse
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Chức vụ: </strong>
+																		Giám đốc
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Địa chỉ: </strong>
+																		118/1 Nguyên Hồng, Phường 1, Quận Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Điện thoại: </strong>
+																		0931814480
+																	</p>
 
-													<div
-														className={`flex items-center ${item.status === 2 ? 'justify-between' : 'justify-end'}  gap-2`}
-													>
+																	<h2 className='font-bold text-base mt-4 border-b-[1px] mb-2 pb-1'>Bên lao động</h2>
+																	<p className='ml-2'>
+																		<strong>Họ và tên: </strong>
+																		{user.fullName}
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Ngày sinh: </strong>
+																		{user.dateOfBirth}
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Địa chỉ: </strong>
+																		{user.address}
+																	</p>
+																	<p className='ml-2'>
+																		<strong>Số điện thoại: </strong>
+																		{user.phoneNumber}
+																	</p>
+																</TabsContent>
+																<TabsContent value='term-job' className='text-start'>
+																	<Accordion type='single' collapsible>
+																		<AccordionItem value='item-1'>
+																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																				Điều 1: Điều khoản và công việc
+																			</AccordionTrigger>
+																			<AccordionContent className='ml-2 text-base'>
+																				<p className='ml-2'>
+																					<strong>Loại hợp đồng: </strong>
+																					Xác định thời hạn từ {item.startDate} đến {item.endDate}
+																				</p>
+																				<p className='ml-2'>
+																					<strong>Địa điểm làm việc: </strong>
+																					Công ty TNHH Inverse
+																				</p>
+																				<p className='ml-2'>
+																					<strong>Chức vụ/chức danh chuyên môn: </strong>
+																					{item.roleName} - {item.levelName}
+																				</p>
+																				<p className='ml-2'>
+																					<strong>Mô tả công việc: </strong>
+																					Các công việc theo sự phân công của lãnh đạo Công ty
+																				</p>
+																			</AccordionContent>
+																		</AccordionItem>
+																		<AccordionItem value='item-2'>
+																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																				Điều 2: Thời Gian Làm Việc
+																			</AccordionTrigger>
+																			<AccordionContent className='ml-2 text-base'>
+																				<p className='ml-2'>Thời gian làm việc theo quy định của công ty.</p>
+																			</AccordionContent>
+																		</AccordionItem>
+																		<AccordionItem value='item-3'>
+																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																				Điều 3: Quyền Lợi và Nghĩa Vụ của Người Lao Động
+																			</AccordionTrigger>
+																			<AccordionContent className='ml-2 text-base'>
+																				<Accordion type='single' collapsible>
+																					<AccordionItem value='item-3-1'>
+																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																							Điều 3.1: Quyền lợi
+																						</AccordionTrigger>
+																						<AccordionContent className='ml-2 text-base'>
+																							<p className='ml-2'>
+																								<strong>Lương cơ bản: </strong>
+																								{item.baseSalary.toLocaleString('en-US') + 'VNĐ'}
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Hệ số lương: </strong>
+																								{item.salaryCoefficient}
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Lương Gross: </strong>
+																								{(item.baseSalary * item.salaryCoefficient).toLocaleString('en-US') +
+																									'VNĐ'}
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Hình thức trả lương: </strong>
+																								Chuyển khoản vào ngày 5 của tháng kế tiếp.
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Tăng lương: </strong>
+																								Theo quy định của công ty.
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Thưởng: </strong>
+																								Theo quy định của công ty.
+																							</p>
+																							<p className='ml-2'>
+																								<strong>Chế độ bảo hiểm: </strong>
+																								Bảo hiểm xã hội và y tế theo quy định của pháp luật.
+																							</p>
+																						</AccordionContent>
+																					</AccordionItem>
+																					<AccordionItem value='item-3-2'>
+																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																							Điều 3.2: Nghĩa vụ
+																						</AccordionTrigger>
+																						<AccordionContent className='ml-2 text-base'>
+																							<p className='ml-2'>
+																								Hoàn thành công việc được giao và bảo vệ tài sản của công ty.
+																							</p>
+																							<p className='ml-2'>
+																								Tuân thủ quy định của công ty và thực hiện các cam kết trong hợp đồng.
+																							</p>
+																						</AccordionContent>
+																					</AccordionItem>
+																				</Accordion>
+																			</AccordionContent>
+																		</AccordionItem>
+																		<AccordionItem value='item-4'>
+																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																				Điều 4: Quyền và Nghĩa Vụ của Người Sử Dụng Lao Động
+																			</AccordionTrigger>
+																			<AccordionContent className='ml-2 text-base'>
+																				<Accordion type='single' collapsible>
+																					<AccordionItem value='item-4-1'>
+																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																							Điều 4.1: Nghĩa vụ
+																						</AccordionTrigger>
+																						<AccordionContent className='ml-2 text-base'>
+																							<p className='ml-2'>
+																								Đảm bảo công việc và các quyền lợi của người lao động theo hợp đồng.
+																							</p>
+																							<p className='ml-2'>
+																								Thanh toán đầy đủ các chế độ và quyền lợi cho người lao động đúng hạn.
+																							</p>
+																						</AccordionContent>
+																					</AccordionItem>
+																					<AccordionItem value='item-4-2'>
+																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																							Điều 4.2: Quyền hạn
+																						</AccordionTrigger>
+																						<AccordionContent className='ml-2 text-base'>
+																							<p className='ml-2'>
+																								Có quyền chấm dứt hợp đồng trong trường hợp người lao động vi phạm nội
+																								quy công ty.
+																							</p>
+																						</AccordionContent>
+																					</AccordionItem>
+																				</Accordion>
+																			</AccordionContent>
+																		</AccordionItem>
+																		<AccordionItem value='item-5'>
+																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																				Điều 5: Điều Khoản Chung
+																			</AccordionTrigger>
+																			<AccordionContent className='ml-2 text-base'>
+																				<p className='ml-2'>Hợp đồng được làm thành 2 bản, mỗi bên giữ 1 bản.</p>
+																				<p className='ml-2'>Thông Tin Thêm</p>
+																				<p className='ml-4'>
+																					<strong>Mã hợp đồng: </strong>
+																					{item.idString}
+																				</p>
+																				<p className='ml-4'>
+																					<strong>Ngày bắt đầu: </strong>
+																					{item.startDate}
+																				</p>
+																				<p className='ml-4'>
+																					<strong>Ngày kết thúc: </strong>
+																					{item.endDate}
+																				</p>
+																				<p className='ml-4'>
+																					<strong>Mức lương cơ bản: </strong>
+																					{item.baseSalary.toLocaleString('en-US') + 'VNĐ'}
+																				</p>
+																				<p className='ml-4'>
+																					<strong>Hệ số lương: </strong>
+																					{item.salaryCoefficient}
+																				</p>
+																			</AccordionContent>
+																		</AccordionItem>
+																	</Accordion>
+																</TabsContent>
+															</Tabs>
+														</div>
+													</div>
+
+													<div className={`flex items-center justify-end gap-2 w-full`}>
 														<Button
 															onClick={() => setIsDialogOpen(false)}
 															className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-800 transition '
