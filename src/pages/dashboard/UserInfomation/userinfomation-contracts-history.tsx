@@ -99,8 +99,6 @@ export default function UserInfomationContractsHistory() {
 				);
 			});
 
-			console.log(filteredContracts);
-
 			setFilteredContracts(filteredContracts);
 		}
 	};
@@ -109,9 +107,6 @@ export default function UserInfomationContractsHistory() {
 		reset();
 		setFilteredContracts(contracts);
 	};
-
-	console.log(user);
-	console.log(filteredContracts);
 
 	return (
 		<div className='flex flex-col items-center justify-between flex-1 gap-4 h-full max-h-[100%]'>

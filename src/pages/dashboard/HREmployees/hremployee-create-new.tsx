@@ -55,7 +55,6 @@ export default function EmployeeCreateNew() {
 
 	useEffect(() => {
 		if (isNumberStep === 2 && roles.length === 0) {
-			console.log('FETCH ROLES');
 			dispatch(fetchRoles());
 		}
 	}, [isNumberStep, roles.length, dispatch]);
