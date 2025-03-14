@@ -194,11 +194,15 @@ function Footer<DType>({ table }: { table: ReactTable<DType> }) {
 export default function CustomTable<DType>({
 	columns,
 	data,
-	hiddenColumns = {}
+	hiddenColumns = {},
+	hideFooter = false,
+	hideHeader = false
 }: {
 	columns: ColumnDef<DType>[];
 	data: DType[];
 	hiddenColumns?: VisibilityState;
+	hideFooter?: boolean;
+	hideHeader?: boolean;
 }) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -228,9 +232,9 @@ export default function CustomTable<DType>({
 	});
 	return (
 		<div className='text-xs border-2 px-4 border-[#e4e4e4]'>
-			<Header table={table} setGlobalFilter={setGlobalFilter} />
+			{!hideHeader && <Header table={table} setGlobalFilter={setGlobalFilter} />}
 			<Body table={table} />
-			<Footer table={table} />
+			{!hideFooter && <Footer table={table} />}
 		</div>
 	);
 }

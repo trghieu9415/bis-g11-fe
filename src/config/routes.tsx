@@ -4,7 +4,10 @@ const routes = {
 	hremployee: '/hremployee',
 	employee: '/employee',
 	products: '/products',
-	supplier: '/supplier'
+	supplier: '/supplier',
+	newOrder: 'new-order',
+	orders: 'orders',
+	customers: 'customers'
 };
 
 export default routes;
