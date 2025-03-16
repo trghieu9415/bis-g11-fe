@@ -18,7 +18,6 @@ import { RegisterOptions } from 'react-hook-form';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
 import { fetchContracts } from '@/redux/slices/contractsSlice';
-import { updateUser, deleteUser } from '@/services/userService';
 import { updateContract } from '@/services/contractService';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
@@ -38,6 +37,7 @@ type Contract = {
 	roleName: string;
 	levelName: string;
 	salaryCoefficient: number;
+	seniorityId: number;
 };
 
 type FieldConfig = {
@@ -57,12 +57,11 @@ export default function ContractTable() {
 
 	const dispatch = useAppDispatch();
 	const { contracts } = useSelector((state: RootState) => state.contracts);
+	console.log(contracts);
 
 	useEffect(() => {
 		dispatch(fetchContracts());
 	}, [dispatch]);
-
-	// console.log(contracts);
 
 	const columns: ColumnDef<Contract>[] = [
 		{
@@ -232,7 +231,7 @@ export default function ContractTable() {
 	];
 
 	const handleOpenDialog = (contract: Contract, mode: 'view' | 'edit' | 'delete') => {
-		setSelectedContract(contract);
+		setSelectedContract(contract as Contract);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
@@ -288,13 +287,19 @@ export default function ContractTable() {
 							if (!value || !selectedContract?.startDate) return true;
 							const expiryDate = new Date(value);
 							const startDate = new Date(selectedContract?.startDate);
-							return expiryDate >= startDate || 'Ngày hết hạn phải lớn hơn hoặc bằng ngày bắt đầu';
+							const endDate = new Date(selectedContract?.endDate ?? '');
+
+							if (expiryDate < startDate) {
+								return 'Ngày hết hạn phải lớn hơn hoặc bằng ngày bắt đầu';
+							} else if (expiryDate > endDate) {
+								return 'Ngày hết hạn phải nhỏ hơn hoặc bằng ngày kết thúc';
+							}
 						}
 					}
 				},
 				{
 					label: 'Trạng thái',
-					key: 'status',
+					key: 'statusLabel',
 					type: 'input',
 					disabled: true
 				}
@@ -327,20 +332,17 @@ export default function ContractTable() {
 		]
 	];
 
-	// console.log(selectedContract);
-
 	const handleSave = async (data: Contract) => {
-		console.log(data);
-		// const idContract = data.id;
-		// const contractData = {
-		// 	baseSalary: data.baseSalary,
-		// 	startDate: data.startDate,
-		// 	endDate: data.endDate,
-		// 	expiryDate: data.expiryDate,
-		// 	userId: data.userId,
-		// 	seniorityId: data.levelId
-		// };
-		// Call API for update user info
+		const idContract = data.id;
+		const contractData = {
+			baseSalary: parseInt(data.baseSalary.replace(/[^0-9]/g, ''), 10),
+			startDate: data.startDate,
+			endDate: data.endDate,
+			expiryDate: data.expiryDate,
+			userId: data.userId,
+			seniorityId: data.seniorityId
+		};
+
 		try {
 			await updateContract(idContract, contractData);
 			toast.success('Cập nhật hợp đồng thành công!');
@@ -361,41 +363,17 @@ export default function ContractTable() {
 		}
 	};
 
-	// const handleDelete = async (data: Employee) => {
-	// 	const userId = data.id;
-
-	// 	try {
-	// 		await deleteUser(userId);
-	// 		toast.success('Cập nhật thông tin nhân viên thành công!');
-	// 		dispatch(fetchUsers());
-	// 		setIsDialogOpen(false);
-	// 	} catch (error) {
-	// 		const err = error as AxiosError;
-
-	// 		if (err.response?.status === 400) {
-	// 			toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
-	// 		} else if (err.response?.status === 404) {
-	// 			toast.error('Lỗi 404: Không tìm thấy nhân viên.');
-	// 		} else if (err.response?.status === 500) {
-	// 			toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-	// 		} else {
-	// 			toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-	// 		}
-	// 	}
-	// };
-
 	return (
 		<div>
 			<CustomTable columns={columns} data={contracts} hiddenColumns={hiddenColumns} />
 			{selectedContract && (
 				<CustomDialog
-					entity={selectedContract}
+					entity={selectedContract as Contract}
 					isOpen={isDialogOpen}
 					onClose={handleCloseDialog}
 					mode={dialogMode}
 					fields={contractsFields}
 					onSave={handleSave}
-					// onDelete={handleDelete}
 				/>
 			)}
 		</div>

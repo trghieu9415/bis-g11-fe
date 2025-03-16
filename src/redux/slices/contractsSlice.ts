@@ -15,6 +15,7 @@ interface ApiResponse {
 	roleName: string;
 	levelName: string;
 	salaryCoefficient: number;
+	seniorityId: number;
 }
 
 interface TransformedContract extends Omit<ApiResponse, 'baseSalary'> {

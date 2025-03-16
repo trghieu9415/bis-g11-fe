@@ -10,3 +10,14 @@ export const updateContract = async (idContract: number, contractData: object) =
 		throw error;
 	}
 };
+
+export const addContract = async (contractData: object) => {
+	try {
+		const response = await axios.post(`/api/v1/contracts`, contractData);
+		console.log('Thêm hợp đồng phép thành công:', response);
+		return response;
+	} catch (error) {
+		console.error('Lỗi khi thêm hợp đồng phép:', error);
+		throw error;
+	}
+};
