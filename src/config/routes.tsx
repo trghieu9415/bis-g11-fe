@@ -2,7 +2,9 @@ const routes = {
 	home: '/',
 	userInfomation: '/user/:id',
 	hremployee: '/hremployee',
-	employee: '/employee'
+	contracts: '/contracts',
+	leaveRequests: '/leave-requests',
+	leaveRequestsByType: '/leave-requests/:type'
 };
 
 export default routes;

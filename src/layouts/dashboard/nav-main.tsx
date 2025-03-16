@@ -15,8 +15,36 @@ import {
 } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 
+import { RootState, useAppDispatch } from '@/redux/store';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { fetchAllLeaveRequests } from '@/redux/slices/leaveRequestsSlice';
+import { ElementType } from 'react';
+
 export function NavMain() {
-	const data = [
+	const dispatch = useAppDispatch();
+	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
+
+	useEffect(() => {
+		if (leaveRequests?.length == 0) {
+			dispatch(fetchAllLeaveRequests());
+		}
+	}, [dispatch]);
+
+	const leaveStats = {
+		sick: leaveRequests.filter(req => req.leaveReason === 0).length,
+		leave: leaveRequests.filter(req => req.leaveReason === 1).length,
+		maternity: leaveRequests.filter(req => req.leaveReason === 2).length,
+		all: leaveRequests.length
+	};
+
+	const data: {
+		title: string;
+		url: string;
+		icon?: ElementType;
+		isActive: boolean;
+		items: { title: string; url: string; total?: number }[];
+	}[] = [
 		{
 			title: 'Nhân viên',
 			url: '#',
@@ -29,7 +57,7 @@ export function NavMain() {
 				},
 				{
 					title: 'Hợp đồng lao động',
-					url: '/employee'
+					url: '/contracts'
 				},
 				{
 					title: 'Vi phạm',
@@ -47,24 +75,25 @@ export function NavMain() {
 			icon: Hourglass,
 			isActive: true,
 			items: [
-				{
-					title: 'Nghỉ phép',
-					url: '#',
-					total: 1
-				},
-				{
-					title: 'Nghỉ thai sản',
-					url: '#',
-					total: 0
-				},
-				{
-					title: 'Nghỉ ốm',
-					url: '#',
-					total: 2
-				},
+				// {
+				// 	title: 'Nghỉ phép',
+				// 	url: '/leave-requests/paid',
+				// 	total: leaveStats.leave
+				// },
+				// {
+				// 	title: 'Nghỉ thai sản',
+				// 	url: '/leave-requests/maternity',
+				// 	total: leaveStats.maternity
+				// },
+				// {
+				// 	title: 'Nghỉ bệnh',
+				// 	url: '/leave-requests/sick',
+				// 	total: leaveStats.sick
+				// },
 				{
 					title: 'Tất cả đơn',
-					url: '#'
+					url: '/leave-requests',
+					total: leaveStats.all
 				}
 			]
 		},
@@ -107,7 +136,7 @@ export function NavMain() {
 											<SidebarMenuSubButton asChild>
 												<NavLink to={subItem.url} className='flex justify-between'>
 													<span>{subItem.title}</span>
-													{subItem.total ? (
+													{subItem?.total ? (
 														<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
 													) : null}
 												</NavLink>

@@ -148,7 +148,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																				}
 																				handleChange(key as keyof T, parsedValue);
 																			}}
-																			disabled={isReadOnly || isDelete}
+																			disabled={disabled || isReadOnly || isDelete}
 																		>
 																			<SelectTrigger className='w-full border p-2 rounded-md'>
 																				<SelectValue />
@@ -167,7 +167,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																		<Input
 																			type='date'
 																			className='w-full block'
-																			disabled={isReadOnly || isDelete}
+																			disabled={disabled || isReadOnly || isDelete}
 																			{...register(key as Path<T>, {
 																				required: validation?.required || false,
 																				minLength: validation?.minLength,

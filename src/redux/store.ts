@@ -6,6 +6,8 @@ import userDetailReducer from './slices/userDetailSlice';
 import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
 import contractsByUserIDReducer from './slices/contractsByUserIDSlice';
 import attendanceDetailsByUserIDReducer from './slices/attendanceDetailByUserIDSlice';
+import contractsReducer from './slices/contractsSlice';
+import leaveRequestsReducer from './slices/leaveRequestsSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -14,7 +16,9 @@ export const store = configureStore({
 		user: userDetailReducer,
 		leaveRequestByUserID: leaveRequestByUserIDReducer,
 		contractsByUserID: contractsByUserIDReducer,
-		attendanceDetailsByUserID: attendanceDetailsByUserIDReducer
+		attendanceDetailsByUserID: attendanceDetailsByUserIDReducer,
+		contracts: contractsReducer,
+		leaveRequests: leaveRequestsReducer
 	}
 });
 
