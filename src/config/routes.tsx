@@ -5,7 +5,9 @@ const routes = {
 	contracts: '/contracts',
 	leaveRequests: '/leave-requests',
 	leaveRequestsByType: '/leave-requests/:type',
-	timeTrackingToday: '/time-tracking/today'
+	timeTrackingToday: '/time-tracking/today',
+	products: '/products',
+	supplier: '/supplier'
 };
 
 export default routes;
