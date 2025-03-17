@@ -3,9 +3,18 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { CheckCircle, Clock, HelpCircle, Info, Trash2, XCircle, ListRestart } from 'lucide-react';
 import {
 	Dialog,
 	DialogContent,
@@ -14,19 +23,10 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog';
-import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction
-} from '@/components/ui/alert-dialog';
-import { toast } from 'react-toastify';
+import { Input } from '@/components/ui/input';
 import { AxiosError } from 'axios';
+import { CheckCircle, Clock, HelpCircle, Info, ListRestart, Trash2, XCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import { fetchAllLeaveRequestsByUserId } from '@/redux/slices/leaveRequestByUserIDSlice';
 import { deleteLeaveRequest } from '@/services/leaveRequestService';
@@ -214,6 +214,10 @@ export default function UserInfomationLeaveRequestsHistory() {
 										<span className='flex items-center text-red-500 font-bold flex-1 justify-end mr-2 float-end'>
 											<XCircle className='w-4 h-4 text-red-500 mr-1' /> Bị từ chối
 										</span>
+									) : item.status === 0 ? (
+										<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
+											<XCircle className='w-4 h-4 text-gray-400 mr-1' /> Đã hủy
+										</span>
 									) : (
 										<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
 											<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
@@ -308,6 +312,10 @@ export default function UserInfomationLeaveRequestsHistory() {
 																) : item.status === 3 ? (
 																	<span className='flex items-center text-red-500 font-bold'>
 																		<XCircle className='w-4 h-4 text-red-500 mr-1' /> Bị từ chối
+																	</span>
+																) : item.status === 0 ? (
+																	<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
+																		<XCircle className='w-4 h-4 text-gray-400 mr-1' /> Đã hủy
 																	</span>
 																) : (
 																	<span className='flex items-center text-gray-400 font-bold'>

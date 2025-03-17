@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useForm, UseFormSetError } from 'react-hook-form';
+import { useState, useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
-import { addUser } from '@/services/userService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import {
@@ -22,9 +21,22 @@ import {
 	AlertDialogCancel,
 	AlertDialogAction
 } from '@/components/ui/alert-dialog';
+import {
+	Command,
+	CommandDialog,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
+	CommandShortcut
+} from '@/components/ui/command';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
 import { fetchRoles } from '@/redux/slices/rolesSlice';
+import { addContract } from '@/services/contractService';
+import { fetchContracts } from '@/redux/slices/contractsSlice';
 
 interface UserFormData {
 	fullname: string;
@@ -41,21 +53,45 @@ interface UserFormData {
 	level_name: string;
 	level_id: number | null;
 	salary_coefficient: number;
-	standard_working_days: number;
 	start_date: string;
 	end_date: string;
 }
 
-export default function EmployeeCreateNew() {
+type Employee = {
+	id: number;
+	idString: string;
+	full_name: string;
+	role: string;
+	status: boolean;
+	base_salary: number;
+	level: string;
+	salary_coefficient: number;
+	gender: boolean;
+	email: string;
+	phone: string;
+	date_of_birth: string;
+	address: string;
+	username: string;
+	password: string;
+};
+
+export default function ContractCreateNew() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isNumberStep, setIsNumberStep] = useState(1);
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
 	const { roles } = useSelector((state: RootState) => state.roles);
+	const [selectedUser, setSelectedUser] = useState<Employee | null>(null);
+	const [isShowErrorChooseUser, setIsShowErrorChooseUser] = useState(false);
+	const lastItemRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		if (isNumberStep === 2 && roles.length === 0) {
 			dispatch(fetchRoles());
+		}
+
+		if (users.length === 0) {
+			dispatch(fetchUsers());
 		}
 	}, [isNumberStep, roles.length, dispatch]);
 
@@ -70,21 +106,12 @@ export default function EmployeeCreateNew() {
 		setError
 	} = useForm<UserFormData>({
 		defaultValues: {
-			fullname: '',
-			phone: '',
-			gender: null as number | null,
-			email: '',
-			date_of_birth: '',
-			address: '',
-			username: '',
-			password: '',
 			base_salary: '',
 			role_id: null as number | null,
 			role_name: '',
 			level_name: '',
 			level_id: null as number | null,
 			salary_coefficient: 1,
-			standard_working_days: 20,
 			start_date: '',
 			end_date: ''
 		}
@@ -94,70 +121,12 @@ export default function EmployeeCreateNew() {
 
 	const openDialog = () => {
 		reset();
+		setSelectedUser(null);
 		setIsOpen(true);
 		setIsNumberStep(1);
 	};
 	const closeDialog = () => setIsOpen(false);
 
-	// Personal Info
-	const generatePassword = () => {
-		const uppercase: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		const lowercase: string = 'abcdefghijklmnopqrstuvwxyz';
-		const numbers: string = '0123456789';
-		const specialChars: string = '!@#$%^&*';
-
-		const getRandomChar = (charset: string): string => charset.charAt(Math.floor(Math.random() * charset.length));
-
-		let passwordArray: string[] = [
-			getRandomChar(uppercase),
-			getRandomChar(lowercase),
-			getRandomChar(numbers),
-			getRandomChar(specialChars)
-		];
-
-		const allChars: string = uppercase + lowercase + numbers + specialChars;
-		while (passwordArray.length < 12) {
-			passwordArray.push(getRandomChar(allChars));
-		}
-
-		passwordArray = passwordArray.sort(() => Math.random() - 0.5);
-		const password: string = passwordArray.join('');
-
-		const email = watch('email') || '';
-		const newUsername = email.split('@')[0] || '';
-
-		setValue('password', password);
-		setValue('username', newUsername);
-	};
-
-	const checkUserExistence = (
-		email: string,
-		phone: string,
-		username: string,
-		setError: UseFormSetError<UserFormData>
-	) => {
-		const existingEmail = users.find(user => user.email === email);
-		const existingPhone = users.find(user => user.phone === phone);
-		const existingUsername = users.find(user => user.username === username);
-
-		if (existingEmail) {
-			setError('email', { type: 'manual', message: 'Email đã tồn tại' });
-		}
-		if (existingPhone) {
-			setError('phone', { type: 'manual', message: 'Số điện thoại đã tồn tại' });
-		}
-		if (existingUsername) {
-			setError('username', { type: 'manual', message: 'Tên đăng nhập đã tồn tại' });
-		}
-
-		if (existingEmail || existingPhone || existingUsername) {
-			return true;
-		}
-
-		return false;
-	};
-
-	// Contract info
 	const formatSalary = (value: string) => {
 		const rawValue = value.replace(/,/g, '');
 		if (!/^\d*$/.test(rawValue)) return;
@@ -196,54 +165,35 @@ export default function EmployeeCreateNew() {
 		}
 	};
 
-	// Review & Submit
+	console.log(users);
+
+	// Person information
 	const personalInfo = [
-		{ label: 'Họ và tên', value: formData.fullname },
-		{ label: 'Số điện thoại', value: formData.phone },
-		{ label: 'Giới tính', value: formData.gender === 1 ? 'Nam' : 'Nữ' },
-		{ label: 'Email', value: formData.email },
-		{ label: 'Ngày sinh', value: formData.date_of_birth },
-		{ label: 'Địa chỉ', value: formData.address }
+		{ label: 'Họ và tên', value: selectedUser?.full_name },
+		{ label: 'Số điện thoại', value: selectedUser?.phone },
+		{ label: 'Giới tính', value: selectedUser?.gender ? 'Nam' : 'Nữ' },
+		{ label: 'Email', value: selectedUser?.email },
+		{ label: 'Ngày sinh', value: selectedUser?.date_of_birth },
+		{ label: 'Địa chỉ', value: selectedUser?.address }
 	];
 
-	const accountInfo = [
-		{ label: 'Tên đăng nhập', value: formData.username },
-		{ label: 'Mật khẩu', value: formData.password }
-	];
-
+	// Review & Submit
 	const contractInfo = [
 		{ label: 'Lương cơ bản', value: formData.base_salary },
 		{ label: 'Chức vụ', value: formData.role_name },
 		{ label: 'Cấp bậc', value: formData.level_name },
 		{ label: 'Hệ số lương', value: formData.salary_coefficient },
-		{ label: 'Ngày công chuẩn', value: formData.standard_working_days },
 		{ label: 'Ngày bắt đầu', value: formData.start_date },
 		{ label: 'Ngày kết thúc', value: formData.end_date }
 	];
 
 	const handleNextClick = async () => {
 		if (isNumberStep === 1) {
-			const fieldsToValidate = [
-				'fullname',
-				'phone',
-				'email',
-				'date_of_birth',
-				'gender',
-				'address',
-				'username',
-				'password'
-			] as const;
-
-			const isValid = await trigger(fieldsToValidate);
-
-			const email = getValues('email');
-			const phone = getValues('phone');
-			const username = getValues('username');
-
-			const isExist = checkUserExistence(email, phone, username, setError);
-
-			if (isValid && !isExist) {
+			if (selectedUser?.id) {
 				setIsNumberStep(prev => Math.min(3, prev + 1));
+				setIsShowErrorChooseUser(false);
+			} else {
+				setIsShowErrorChooseUser(true);
 			}
 		} else if (isNumberStep === 2) {
 			const fieldsToValidate = [
@@ -253,7 +203,6 @@ export default function EmployeeCreateNew() {
 				'level_id',
 				'base_salary',
 				'salary_coefficient',
-				'standard_working_days',
 				'start_date',
 				'end_date'
 			] as const;
@@ -265,30 +214,22 @@ export default function EmployeeCreateNew() {
 		}
 	};
 
-	const handleSubmitClick = async (data: UserFormData) => {
-		const userData = {
-			fullName: data.fullname,
-			phoneNumber: data.phone,
-			email: data.email,
-			dateOfBirth: data.date_of_birth,
-			address: data.address,
-			gender: data.gender ? 'MALE' : 'FEMALE',
-			username: data.username,
-			password: data.password,
-			reqContract: {
-				baseSalary: Number(data.base_salary.replace(/,/g, '')),
-				standardWorkingDay: data.standard_working_days,
-				startDate: data.start_date,
-				endDate: data.end_date,
-				expiryDate: data.end_date,
-				seniorityId: data.level_id
-			}
+	const handleSubmitClick = async (data: UserFormData, selectedUser: Employee) => {
+		const contractData = {
+			baseSalary: Number(data.base_salary.replace(/,/g, '')),
+			startDate: data.start_date,
+			endDate: data.end_date,
+			expiryDate: data.end_date,
+			seniorityId: data.level_id,
+			userId: selectedUser.id
 		};
 
+		console.log(contractData);
+
 		try {
-			await addUser(userData);
-			toast.success('Thêm thông tin nhân viên thành công!');
-			dispatch(fetchUsers());
+			await addContract(contractData);
+			toast.success('Thêm hợp đồng cho nhân viên thành công!');
+			dispatch(fetchContracts());
 			setIsOpen(false);
 		} catch (error) {
 			const err = error as AxiosError;
@@ -296,7 +237,7 @@ export default function EmployeeCreateNew() {
 			if (err.response?.status === 400) {
 				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error('Lỗi 404: Không tìm thấy hợp đồng.');
 			} else if (err.response?.status === 500) {
 				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
 			} else {
@@ -316,9 +257,9 @@ export default function EmployeeCreateNew() {
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogContent className='w-full max-w-2xl mx-auto p-6 space-y-4' onOpenAutoFocus={e => e.preventDefault()}>
 					<DialogHeader>
-						<DialogTitle className='text-2xl font-bold text-center'>Tạo nhân viên & hợp đồng mới</DialogTitle>
+						<DialogTitle className='text-2xl font-bold text-center'>Tạo hợp đồng mới</DialogTitle>
 						<DialogDescription className='text-center text-gray-500'>
-							Điền thông tin để tạo nhân viên và hợp đồng mới
+							Chọn thông tin nhân viên và tạo hợp đồng mới
 						</DialogDescription>
 					</DialogHeader>
 
@@ -383,6 +324,36 @@ export default function EmployeeCreateNew() {
 								<div className='pb-4 border-b border-solid border-b-gray-300 mb-4 mr-2'>
 									<h3 className='text-gray-500 font-bold text-sm'>Bước 1</h3>
 									<h2 className='text-black font-bold text-lg'>Thông tin cá nhân</h2>
+									<Command>
+										<CommandInput placeholder='Tìm kiếm nhân viên ở đây...' />
+										<CommandList>
+											<CommandEmpty>No results found.</CommandEmpty>
+											<CommandGroup heading='Kết quả'>
+												<div className='max-h-[96px] overflow-y-auto'>
+													{users.map((item, index) => {
+														if (!item.role && !item.level && item.username.toLowerCase() !== 'admin') {
+															return (
+																<CommandItem
+																	key={index}
+																	onSelect={() => {
+																		if (lastItemRef.current) {
+																			lastItemRef.current.scrollIntoView({ behavior: 'smooth' });
+																		}
+																		setIsShowErrorChooseUser(false);
+																		setSelectedUser(item);
+																	}}
+																>
+																	({item.idString}) {item.full_name}
+																</CommandItem>
+															);
+														}
+													})}
+												</div>
+											</CommandGroup>
+											<CommandSeparator />
+										</CommandList>
+										{isShowErrorChooseUser && <p className='text-red-500 text-sm mt-2'>Vui lòng chọn nhân viên, nếu không có hãy tạo nhân viên mới nhé.</p>}
+									</Command>
 								</div>
 
 								<div className='mr-2'>
@@ -396,15 +367,10 @@ export default function EmployeeCreateNew() {
 												id='fullname'
 												type='text'
 												className='mt-1'
-												{...register('fullname', {
-													required: 'Vui lòng nhập họ và tên',
-													minLength: {
-														value: 3,
-														message: 'Họ và tên phải có ít nhất 3 ký tự'
-													}
-												})}
+												value={selectedUser?.full_name || ''}
+												readOnly
+												disabled
 											/>
-											{errors.fullname && <p className='text-red-500 text-sm'>{errors.fullname.message}</p>}
 										</div>
 										<div>
 											<label className='text-sm' htmlFor='phone'>
@@ -414,15 +380,10 @@ export default function EmployeeCreateNew() {
 												id='phone'
 												type='text'
 												className='mt-1'
-												{...register('phone', {
-													required: 'Vui lòng nhập số điện thoại',
-													pattern: {
-														value: /^0\d{9}$/,
-														message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0'
-													}
-												})}
+												value={selectedUser?.phone || ''}
+												readOnly
+												disabled
 											/>
-											{errors.phone && <p className='text-red-500 text-sm'>{errors.phone.message}</p>}{' '}
 										</div>
 									</div>
 									<div className='grid grid-cols-2 gap-4 mb-2'>
@@ -430,19 +391,7 @@ export default function EmployeeCreateNew() {
 											<label className='text-sm' htmlFor='email'>
 												<strong>Email</strong>
 											</label>
-											<Input
-												id='email'
-												type='email'
-												className='mt-1'
-												{...register('email', {
-													required: 'Vui lòng nhập email',
-													pattern: {
-														value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-														message: 'Email không hợp lệ'
-													}
-												})}
-											/>
-											{errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}{' '}
+											<Input id='email' type='email' value={selectedUser?.email || ''} readOnly disabled />
 										</div>
 										<div className='grid grid-cols-2 gap-4'>
 											<div>
@@ -454,31 +403,10 @@ export default function EmployeeCreateNew() {
 														id='date_of_birth'
 														type='date'
 														className='mt-1 block'
-														{...register('date_of_birth', {
-															required: 'Vui lòng chọn ngày sinh',
-															validate: value => {
-																if (!value) return 'Ngày sinh không hợp lệ';
-
-																const birthDate = new Date(value);
-																const today = new Date();
-
-																if (birthDate > today) return 'Ngày sinh không thể ở tương lai';
-
-																const age = today.getFullYear() - birthDate.getFullYear();
-																const monthDiff = today.getMonth() - birthDate.getMonth();
-																const dayDiff = today.getDate() - birthDate.getDate();
-
-																if (age < 18 || (age === 18 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))) {
-																	return 'Ngày sinh phải trên 18 tuổi';
-																}
-
-																return true;
-															}
-														})}
+														value={selectedUser?.date_of_birth || ''}
+														readOnly
+														disabled
 													/>
-													{errors.date_of_birth && (
-														<p className='text-red-500 text-sm'>{errors.date_of_birth.message}</p>
-													)}
 												</div>
 											</div>
 											<div>
@@ -486,11 +414,7 @@ export default function EmployeeCreateNew() {
 													<label className='text-sm' htmlFor='gender'>
 														<strong>Giới tính</strong>
 													</label>
-													<Select
-														{...register('gender', { required: 'Vui lòng chọn giới tính' })}
-														onValueChange={value => setValue('gender', value === 'male' ? 1 : 0)}
-														value={watch('gender') === 1 ? 'male' : watch('gender') === 0 ? 'female' : undefined}
-													>
+													<Select value={selectedUser?.gender ? 'male' : 'female'} disabled>
 														<SelectTrigger className='mt-1' id='gender'>
 															<SelectValue placeholder='Giới tính' />
 														</SelectTrigger>
@@ -499,13 +423,12 @@ export default function EmployeeCreateNew() {
 															<SelectItem value='female'>Nữ</SelectItem>
 														</SelectContent>
 													</Select>
-													{errors.gender && <p className='text-red-500 text-sm'>{errors.gender.message}</p>}
 												</div>
 											</div>
 										</div>
 									</div>
 									<div className='grid grid-cols-1 mb-2'>
-										<div>
+										<div ref={lastItemRef}>
 											<label className='text-sm' htmlFor='address'>
 												<strong>Địa chỉ</strong>
 											</label>
@@ -513,68 +436,10 @@ export default function EmployeeCreateNew() {
 												id='address'
 												type='text'
 												className='mt-1'
-												{...register('address', {
-													required: 'Vui lòng nhập địa chỉ',
-													pattern: {
-														value:
-															/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-														message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
-													}
-												})}
+												value={selectedUser?.address || ''}
+												readOnly
+												disabled
 											/>
-											{errors.address && <p className='text-red-500 text-sm'>{errors.address.message}</p>}
-										</div>
-									</div>
-								</div>
-								<div className='mr-2'>
-									<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Account Info</h2>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
-										<div>
-											<label className='text-sm' htmlFor='username'>
-												<strong>Tên đăng nhập</strong>
-											</label>
-											<Input
-												id='username'
-												type='text'
-												className='mt-1'
-												{...register('username', {
-													required: 'Vui lòng nhập tên đăng nhập',
-													pattern: {
-														value: /^(?![_.])[a-zA-Z0-9._]{6,20}(?<![_.])$/,
-														message:
-															'Tên đăng nhập chỉ chứa chữ, số, dấu chấm hoặc gạch dưới, không bắt đầu/kết thúc bằng dấu chấm/gạch dưới'
-													}
-												})}
-											/>
-											{errors.username && <p className='text-red-500 text-sm'>{errors.username.message}</p>}
-										</div>
-										<div>
-											<label className='text-sm' htmlFor='password'>
-												<strong>Mật khẩu</strong>
-											</label>
-											<div className='flex gap-2'>
-												<div>
-													<Input
-														id='password'
-														type='text'
-														className='mt-1'
-														value={formData.password}
-														{...register('password', {
-															required: 'Vui lòng nhập mật khẩu',
-															pattern: {
-																value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-																message:
-																	'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
-															}
-														})}
-													/>
-													{errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
-												</div>
-
-												<Button type='button' className='mt-1' onClick={generatePassword}>
-													Generate
-												</Button>
-											</div>
 										</div>
 									</div>
 								</div>
@@ -661,18 +526,12 @@ export default function EmployeeCreateNew() {
 											/>
 											{errors.base_salary && <p className='text-red-500 text-sm'>{errors.base_salary.message}</p>}{' '}
 										</div>
-										<div className='grid grid-cols-2 gap-4'>
+										<div className='grid grid-cols-1 gap-4'>
 											<div>
 												<label className='text-sm' htmlFor=''>
 													<strong>Hệ số lương</strong>
 												</label>
 												<Input type='number' className='mt-1' value={formData.salary_coefficient} readOnly disabled />
-											</div>
-											<div>
-												<label className='text-sm' htmlFor=''>
-													<strong>Ngày công chuẩn</strong>
-												</label>
-												<Input type='number' className='mt-1' value={20} readOnly disabled />
 											</div>
 										</div>
 									</div>
@@ -766,16 +625,6 @@ export default function EmployeeCreateNew() {
 													<p>{item.value || 'Chưa có dữ liệu'}</p>
 												</label>
 											))}
-
-											<h2 className='mb-2 mt-4 border-solid border-b border-gray-300 inline-block'>
-												Thông tin tài khoản
-											</h2>
-											{accountInfo.map((item, index) => (
-												<label key={index} className='text-sm flex items-center gap-1 mt-1'>
-													<strong>{item.label}:</strong>
-													<p>{item.value || 'Chưa có dữ liệu'}</p>
-												</label>
-											))}
 										</div>
 										<div>
 											<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Thông tin hợp đồng</h2>
@@ -803,7 +652,7 @@ export default function EmployeeCreateNew() {
 										className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
 										onClick={() => setIsNumberStep(prev => Math.max(1, prev - 1))}
 									>
-										Prev
+										Trở về
 									</Button>
 								</div>
 							)}
@@ -813,7 +662,7 @@ export default function EmployeeCreateNew() {
 									onClick={closeDialog}
 									className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
 								>
-									Cancel
+									Thoát
 								</Button>
 								{isNumberStep < 3 ? (
 									<Button
@@ -822,13 +671,13 @@ export default function EmployeeCreateNew() {
 										// onClick={() => setIsNumberStep(prev => Math.min(3, prev + 1))}
 										onClick={handleNextClick}
 									>
-										Next
+										Tiếp
 									</Button>
 								) : (
 									<AlertDialog>
 										<AlertDialogTrigger asChild>
 											<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
-												Submit
+												Tạo
 											</button>
 										</AlertDialogTrigger>
 										<AlertDialogContent>
@@ -841,7 +690,17 @@ export default function EmployeeCreateNew() {
 											</AlertDialogHeader>
 											<AlertDialogFooter>
 												<AlertDialogCancel>Cancel</AlertDialogCancel>
-												<AlertDialogAction onClick={() => handleSubmitClick(formData)}>Confirm</AlertDialogAction>
+												<AlertDialogAction
+													onClick={() => {
+														if (selectedUser) {
+															handleSubmitClick(formData, selectedUser);
+														} else {
+															toast.error('Có vẻ bạn chưa chọn nhân viên, vui lòng thử lại!');
+														}
+													}}
+												>
+													Xác nhận
+												</AlertDialogAction>
 											</AlertDialogFooter>
 										</AlertDialogContent>
 									</AlertDialog>

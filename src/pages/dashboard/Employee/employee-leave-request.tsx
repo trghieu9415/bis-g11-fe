@@ -80,7 +80,7 @@ export default function EmployeeLeaveRequest() {
 	const getMaxLeaveDays = () => {
 		switch (formData.typeLeave) {
 			case 'PAID_LEAVE':
-				return 12;
+				return 1;
 			case 'MATERNITY_LEAVE':
 				return 180;
 			case 'SICK_LEAVE':
@@ -178,7 +178,7 @@ export default function EmployeeLeaveRequest() {
 									<SelectContent>
 										<SelectItem value='PAID_LEAVE'>Nghỉ phép</SelectItem>
 										<SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>
-										<SelectItem value='SICK_LEAVE'>Nghỉ ốm</SelectItem>
+										<SelectItem value='SICK_LEAVE'>Nghỉ bệnh</SelectItem>
 									</SelectContent>
 								</Select>
 								{errors.typeLeave && <p className='text-red-500 text-sm'>({errors.typeLeave.message})</p>}
@@ -225,7 +225,8 @@ export default function EmployeeLeaveRequest() {
 														const end = new Date(value);
 
 														const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-														if (diffDays > maxDays) return `(Bạn chỉ được nghỉ tối đa ${maxDays} ngày)`;
+														// Day offs = Start date - End Date + 1
+														if (diffDays + 1 > maxDays) return `(Bạn chỉ được nghỉ tối đa ${maxDays} ngày)`;
 													}
 												}
 											}

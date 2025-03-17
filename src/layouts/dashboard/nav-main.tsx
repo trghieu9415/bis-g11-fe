@@ -1,7 +1,8 @@
 'use client';
-import { ChevronRight, CalendarDays, UsersRound, Hourglass } from 'lucide-react';
+import { CalendarDays, ChevronRight, Hourglass, UsersRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
 	SidebarGroup,
@@ -13,10 +14,38 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem
 } from '@/components/ui/sidebar';
-import { Badge } from '@/components/ui/badge';
+
+import { fetchAllLeaveRequests } from '@/redux/slices/leaveRequestsSlice';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { ElementType, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 export function NavMain() {
-	const data = [
+	const dispatch = useAppDispatch();
+	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
+
+	useEffect(() => {
+		if (leaveRequests?.length == 0) {
+			dispatch(fetchAllLeaveRequests());
+		}
+	}, [dispatch]);
+
+	const leaveStats = {
+		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,
+		leave: leaveRequests.filter(req => req.leaveReason === 1 && req.status === 2).length,
+		maternity: leaveRequests.filter(req => req.leaveReason === 2 && req.status === 2).length,
+		all: leaveRequests.filter(req => req.status === 2).length
+	};
+
+	console.log(leaveRequests);
+
+	const data: {
+		title: string;
+		url: string;
+		icon?: ElementType;
+		isActive: boolean;
+		items: { title: string; url: string; total?: number }[];
+	}[] = [
 		{
 			title: 'Nhân viên',
 			url: '#',
@@ -29,7 +58,7 @@ export function NavMain() {
 				},
 				{
 					title: 'Hợp đồng lao động',
-					url: '/employee'
+					url: '/contracts'
 				},
 				{
 					title: 'Vi phạm',
@@ -47,24 +76,25 @@ export function NavMain() {
 			icon: Hourglass,
 			isActive: true,
 			items: [
-				{
-					title: 'Nghỉ phép',
-					url: '#',
-					total: 1
-				},
-				{
-					title: 'Nghỉ thai sản',
-					url: '#',
-					total: 0
-				},
-				{
-					title: 'Nghỉ ốm',
-					url: '#',
-					total: 2
-				},
+				// {
+				// 	title: 'Nghỉ phép',
+				// 	url: '/leave-requests/paid',
+				// 	total: leaveStats.leave
+				// },
+				// {
+				// 	title: 'Nghỉ thai sản',
+				// 	url: '/leave-requests/maternity',
+				// 	total: leaveStats.maternity
+				// },
+				// {
+				// 	title: 'Nghỉ bệnh',
+				// 	url: '/leave-requests/sick',
+				// 	total: leaveStats.sick
+				// },
 				{
 					title: 'Tất cả đơn',
-					url: '#'
+					url: '/leave-requests',
+					total: leaveStats.all
 				}
 			]
 		},
@@ -76,7 +106,7 @@ export function NavMain() {
 			items: [
 				{
 					title: 'Hôm nay',
-					url: '#'
+					url: '/time-tracking/today'
 				},
 				{
 					title: 'Tháng này',
@@ -107,7 +137,7 @@ export function NavMain() {
 											<SidebarMenuSubButton asChild>
 												<NavLink to={subItem.url} className='flex justify-between'>
 													<span>{subItem.title}</span>
-													{subItem.total ? (
+													{subItem?.total ? (
 														<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
 													) : null}
 												</NavLink>
