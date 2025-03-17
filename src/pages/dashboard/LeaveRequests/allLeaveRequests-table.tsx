@@ -134,20 +134,21 @@ export default function AllLeaveRequestsTable() {
 			cell: ({ row }) => (
 				<span className='flex justify-center gap-2'>
 					{row.getValue('status') === 1 ? (
-						<p className='text-green-600 flex items-center gap-1'>
-							<CheckCircle className='w-4 h-4 text-green-600 mr-1' /> Đã duyệt
+						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-green-500 rounded-sm p-1'>
+							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							Đã duyệt
 						</p>
 					) : row.getValue('status') === 2 ? (
-						<p className='text-yellow-500  flex items-center gap-1'>
-							<Clock className='w-4 h-4 text-yellow-500 mr-1' /> Chờ duyệt
+						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-yellow-500 rounded-sm p-1'>
+							<Clock className='w-4 h-4 mr-1' stroke='white' /> Chờ duyệt
 						</p>
 					) : row.getValue('status') === 3 ? (
-						<p className='text-red-500 flex items-center gap-1'>
-							<XCircle className='w-4 h-4 text-red-500 mr-1' /> Đã từ chối
+						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-red-500 rounded-sm p-1'>
+							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Đã từ chối
 						</p>
 					) : (
-						<p className='text-gray-400 flex items-center gap-1'>
-							<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
+						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-gray-500 rounded-sm p-1'>
+							<HelpCircle className='w-4 h-4 mr-1' stroke='white' /> Không xác định
 						</p>
 					)}
 				</span>
@@ -225,7 +226,9 @@ export default function AllLeaveRequestsTable() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error(
+					`${(err.response?.data as { message?: string })?.message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'}`
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy đơn nghỉ phép.');
 			} else if (err.response?.status === 500) {

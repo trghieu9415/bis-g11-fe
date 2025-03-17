@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ban, CircleCheckBig, Ellipsis, UserRoundPen } from 'lucide-react';
+import { ArrowUpDown, XCircle, CheckCircle, Ellipsis, UserRoundPen } from 'lucide-react';
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions } from 'react-hook-form';
@@ -136,9 +136,14 @@ export default function ContractTable() {
 			cell: ({ row }) => (
 				<span className='flex justify-center'>
 					{row.getValue('statusLabel') === 'Hiệu lực' ? (
-						<CircleCheckBig color='#31843f' strokeWidth={3} />
+						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
+							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							Hiệu lực
+						</p>
 					) : (
-						<Ban color='#ef5350' strokeWidth={3} />
+						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-red-500 rounded-sm p-1'>
+							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Hết hiệu lực
+						</p>
 					)}
 				</span>
 			),

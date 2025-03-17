@@ -1,7 +1,8 @@
 'use client';
-import { ChevronRight, CalendarDays, UsersRound, Hourglass } from 'lucide-react';
+import { CalendarDays, ChevronRight, Hourglass, UsersRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
 	SidebarGroup,
@@ -13,13 +14,11 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem
 } from '@/components/ui/sidebar';
-import { Badge } from '@/components/ui/badge';
 
-import { RootState, useAppDispatch } from '@/redux/store';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { fetchAllLeaveRequests } from '@/redux/slices/leaveRequestsSlice';
-import { ElementType } from 'react';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { ElementType, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 export function NavMain() {
 	const dispatch = useAppDispatch();
@@ -32,11 +31,13 @@ export function NavMain() {
 	}, [dispatch]);
 
 	const leaveStats = {
-		sick: leaveRequests.filter(req => req.leaveReason === 0).length,
-		leave: leaveRequests.filter(req => req.leaveReason === 1).length,
-		maternity: leaveRequests.filter(req => req.leaveReason === 2).length,
-		all: leaveRequests.length
+		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,
+		leave: leaveRequests.filter(req => req.leaveReason === 1 && req.status === 2).length,
+		maternity: leaveRequests.filter(req => req.leaveReason === 2 && req.status === 2).length,
+		all: leaveRequests.filter(req => req.status === 2).length
 	};
+
+	console.log(leaveRequests);
 
 	const data: {
 		title: string;
@@ -105,7 +106,7 @@ export function NavMain() {
 			items: [
 				{
 					title: 'Hôm nay',
-					url: '#'
+					url: '/time-tracking/today'
 				},
 				{
 					title: 'Tháng này',

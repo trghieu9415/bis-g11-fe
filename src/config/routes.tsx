@@ -4,7 +4,8 @@ const routes = {
 	hremployee: '/hremployee',
 	contracts: '/contracts',
 	leaveRequests: '/leave-requests',
-	leaveRequestsByType: '/leave-requests/:type'
+	leaveRequestsByType: '/leave-requests/:type',
+	timeTrackingToday: '/time-tracking/today'
 };
 
 export default routes;

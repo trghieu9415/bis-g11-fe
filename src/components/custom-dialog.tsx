@@ -17,15 +17,18 @@ import {
 	AlertDialogCancel,
 	AlertDialogAction
 } from '@/components/ui/alert-dialog';
+import 'react-time-picker/dist/TimePicker.css';
+import 'react-clock/dist/Clock.css';
 
 interface FieldConfig {
 	label: string;
 	key: string;
-	type: 'input' | 'select' | 'date' | 'number';
+	type: 'input' | 'select' | 'date' | 'number' | 'time';
 	disabled?: boolean;
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	validation?: RegisterOptions;
 	showOnly?: 'view' | 'edit' | 'delete';
+	isShow?: boolean;
 }
 
 // Cập nhật kiểu cho CustomDialogProps để xác định rõ kiểu của entity và formData
@@ -108,10 +111,10 @@ export default function CustomDialog<T extends Record<string, string | number | 
 								{fieldGroup.map((childFieldGroup, childIndex) => (
 									<div key={childIndex} className={`grid gap-4 grid-cols-${childFieldGroup.length} mb-4`}>
 										{childFieldGroup.map(
-											({ label, key, type, options, disabled, validation, showOnly }, fieldIndex) => (
+											({ label, key, type, options, disabled, validation, showOnly, isShow = true }, fieldIndex) => (
 												<div key={key} className='flex items-center flex-col'>
 													<div className='flex items-start flex-col space-x-2 flex-1 w-full'>
-														{(!showOnly || showOnly === mode) && (
+														{isShow && (!showOnly || showOnly === mode) && (
 															<>
 																<label className='w-full text-sm mb-1 text-start font-semibold'>{label}</label>
 																{type === 'input' || type === 'number' ? (
@@ -183,6 +186,27 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																			</div>
 																		)}
 																	</div>
+																) : type === 'time' ? (
+																	<div className='!ml-0 w-full'>
+																		<Input
+																			type='text'
+																			className='w-full'
+																			disabled={disabled || isReadOnly || isDelete}
+																			readOnly={isReadOnly || isDelete}
+																			{...register(key as Path<T>, {
+																				required: validation?.required || false,
+																				pattern: validation?.pattern,
+																				validate: validation?.validate
+																			})}
+																		/>
+																		{errors[key as Path<T>] && (
+																			<div className='flex justify-start w-full'>
+																				<p className='text-red-500 text-sm'>
+																					{(errors[key as keyof T] as FieldError)?.message || ''}
+																				</p>
+																			</div>
+																		)}
+																	</div>
 																) : null}
 															</>
 														)}
@@ -204,7 +228,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 							<AlertDialogTrigger asChild>
 								<button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'>
 									<Trash2 />
-									Delete
+									Xóa
 								</button>
 							</AlertDialogTrigger>
 							<AlertDialogContent>
@@ -221,7 +245,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 											if (onDelete && formData) onDelete(formData);
 										}}
 									>
-										Continue
+										Tiếp
 									</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>
@@ -232,13 +256,13 @@ export default function CustomDialog<T extends Record<string, string | number | 
 							className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
 							onClick={onClose}
 						>
-							Cancel
+							Thoát
 						</button>
 						{isSave && (
 							<AlertDialog>
 								<AlertDialogTrigger asChild>
 									<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
-										Save changes
+										Lưu
 									</button>
 								</AlertDialogTrigger>
 								<AlertDialogContent>
@@ -247,8 +271,8 @@ export default function CustomDialog<T extends Record<string, string | number | 
 										<AlertDialogDescription>Bạn có chắc chắn muốn lưu những thay đổi này không?</AlertDialogDescription>
 									</AlertDialogHeader>
 									<AlertDialogFooter>
-										<AlertDialogCancel>Cancel</AlertDialogCancel>
-										<AlertDialogAction onClick={handleSaveClick}>Confirm</AlertDialogAction>
+										<AlertDialogCancel>Thoát</AlertDialogCancel>
+										<AlertDialogAction onClick={handleSaveClick}>Xác nhận</AlertDialogAction>
 									</AlertDialogFooter>
 								</AlertDialogContent>
 							</AlertDialog>
