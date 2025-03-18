@@ -1,0 +1,145 @@
+'use client';
+
+import { BadgeCheck, ShieldQuestion, ChevronsUpDown, CalendarCheck, LogOut, SquareUser } from 'lucide-react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+
+import { Button } from '@/components/ui/button';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from '@/components/ui/dialog';
+
+import EmployeeCalendar from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-calendar';
+import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-time-tracking';
+import { useState, useEffect } from 'react';
+
+export function NavUser({
+	user
+}: {
+	user: {
+		name: string;
+		email: string;
+		avatar: string;
+	};
+}) {
+	const { isMobile } = useSidebar();
+
+	// const [test, setTest] = useState('');
+
+	// const clickTest = () => {
+	// 	if (test === 'TEST') {
+	// 		setTest('TEST LOAD');
+	// 		return;
+	// 	}
+	// 	setTest('TEST');
+	// };
+
+	// useEffect(() => {
+	// 	console.log('Updated test:', test);
+	// }, [test]);
+
+	return (
+		<SidebarMenu>
+			<SidebarMenuItem>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<SidebarMenuButton
+							size='lg'
+							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+						>
+							<Avatar className='h-8 w-8 rounded-lg'>
+								<AvatarImage src={user.avatar} alt={user.name} />
+								<AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+							</Avatar>
+							<div className='grid flex-1 text-left text-sm leading-tight'>
+								<span className='truncate font-semibold'>{user.name}</span>
+								<span className='truncate text-xs'>{user.email}</span>
+							</div>
+							<ChevronsUpDown className='ml-auto size-4' />
+						</SidebarMenuButton>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						className='w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg'
+						side={isMobile ? 'bottom' : 'right'}
+						align='end'
+						sideOffset={4}
+					>
+						<DropdownMenuLabel className='p-0 font-normal'>
+							<div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
+								<Avatar className='h-8 w-8 rounded-lg'>
+									<AvatarImage src={user.avatar} alt={user.name} />
+									<AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+								</Avatar>
+								<div className='grid flex-1 text-left text-sm leading-tight'>
+									<span className='truncate font-semibold'>{user.name}</span>
+									<span className='truncate text-xs'>{user.email}</span>
+								</div>
+							</div>
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							<DropdownMenuItem>
+								<SquareUser />
+								Thông tin cá nhân
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							<DropdownMenuItem>
+								<BadgeCheck />
+								Xin nghỉ phép
+							</DropdownMenuItem>
+							<EmployeeTimeTracking />
+							{/* <Dialog>
+								<DialogTrigger asChild>
+									<Button
+										variant='outline'
+										className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'
+									>
+										<CalendarCheck />
+										Chấm công
+									</Button>
+								</DialogTrigger>
+								<DialogContent className='!w-[50vw] !max-w-none'>
+									<DialogHeader>
+										<DialogTitle>Bảng chấm công</DialogTitle>
+										<DialogDescription>
+											Đảm bảo bạn luôn nhớ check-in và check-out đúng giờ để theo dõi thời gian làm việc chính xác và
+											tránh sai sót trong bảng chấm công!
+										</DialogDescription>
+									</DialogHeader>
+
+									<EmployeeCalendar onTest={clickTest} />
+								</DialogContent>
+							</Dialog> */}
+							<DropdownMenuItem>
+								<ShieldQuestion />
+								Quyền lợi nhân viên
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem>
+							<LogOut />
+							Đăng xuất
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</SidebarMenuItem>
+		</SidebarMenu>
+	);
+}

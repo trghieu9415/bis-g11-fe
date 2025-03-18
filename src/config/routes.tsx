@@ -7,7 +7,10 @@ const routes = {
 	leaveRequestsByType: '/leave-requests/:type',
 	timeTrackingToday: '/time-tracking/today',
 	products: '/products',
-	supplier: '/supplier'
+	supplier: '/supplier',
+	newOrder: 'new-order',
+	orders: 'orders',
+	customers: 'customers'
 };
 
 export default routes;
