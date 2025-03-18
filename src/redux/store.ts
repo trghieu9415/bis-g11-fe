@@ -5,6 +5,10 @@ import rolesReducer from './slices/rolesSlice';
 import userDetailReducer from './slices/userDetailSlice';
 import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
 import contractsByUserIDReducer from './slices/contractsByUserIDSlice';
+import attendanceDetailsByUserIDReducer from './slices/attendanceDetailByUserIDSlice';
+import contractsReducer from './slices/contractsSlice';
+import leaveRequestsReducer from './slices/leaveRequestsSlice';
+import timeTrackingTodayReducer from './slices/timeTrackingTodaySlice';
 
 export const store = configureStore({
 	reducer: {
@@ -12,7 +16,11 @@ export const store = configureStore({
 		roles: rolesReducer,
 		user: userDetailReducer,
 		leaveRequestByUserID: leaveRequestByUserIDReducer,
-		contractsByUserID: contractsByUserIDReducer
+		contractsByUserID: contractsByUserIDReducer,
+		attendanceDetailsByUserID: attendanceDetailsByUserIDReducer,
+		contracts: contractsReducer,
+		leaveRequests: leaveRequestsReducer,
+		timeTrackingToday: timeTrackingTodayReducer
 	}
 });
 

@@ -44,13 +44,13 @@ function Header<DType>({
 	);
 }
 
-function CTableHeader<DType>({ table }: { table: ReactTable<DType> }) {
+function CTableHeader<DType>({ table, stickyClassIndex = 1 }: { table: ReactTable<DType>; stickyClassIndex?: number }) {
 	return (
 		<TableHeader>
 			{table.getHeaderGroups().map(headerGroup => (
 				<TableRow key={headerGroup.id}>
 					{headerGroup.headers.map((header, index) => {
-						const stickyClass = index === 1 ? 'sticky left-0 z-10' : '';
+						const stickyClass = index === stickyClassIndex ? 'sticky left-0 z-10' : '';
 						return (
 							<TableHead
 								key={header.id}
@@ -66,14 +66,14 @@ function CTableHeader<DType>({ table }: { table: ReactTable<DType> }) {
 	);
 }
 
-function CTableBody<DType>({ table }: { table: ReactTable<DType> }) {
+function CTableBody<DType>({ table, stickyClassIndex = 1 }: { table: ReactTable<DType>; stickyClassIndex?: number }) {
 	return (
 		<TableBody>
 			{table.getRowModel().rows?.length ? (
 				table.getRowModel().rows.map(row => (
 					<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 						{row.getVisibleCells().map((cell, index) => {
-							const stickyClass = index === 1 ? 'sticky left-0 bg-white z-10' : '';
+							const stickyClass = index === stickyClassIndex ? 'sticky left-0 bg-white z-10' : '';
 							return (
 								<TableCell key={cell.id} className={`whitespace-nowrap border border-gray-200 py-2 ${stickyClass}`}>
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -93,12 +93,12 @@ function CTableBody<DType>({ table }: { table: ReactTable<DType> }) {
 	);
 }
 
-function Body<DType>({ table }: { table: ReactTable<DType> }) {
+function Body<DType>({ table, stickyClassIndex }: { table: ReactTable<DType>; stickyClassIndex: number }) {
 	return (
 		<div className='flex w-full overflow-x-auto border-l-2 border-r-2 border-gray-100'>
 			<Table>
-				<CTableHeader table={table} />
-				<CTableBody table={table} />
+				<CTableHeader table={table} stickyClassIndex={stickyClassIndex} />
+				<CTableBody table={table} stickyClassIndex={stickyClassIndex} />
 			</Table>
 		</div>
 	);
@@ -195,14 +195,12 @@ export default function CustomTable<DType>({
 	columns,
 	data,
 	hiddenColumns = {},
-	hideFooter = false,
-	hideHeader = false
+	stickyClassIndex = 1
 }: {
 	columns: ColumnDef<DType>[];
 	data: DType[];
 	hiddenColumns?: VisibilityState;
-	hideFooter?: boolean;
-	hideHeader?: boolean;
+	stickyClassIndex?: number;
 }) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -232,9 +230,9 @@ export default function CustomTable<DType>({
 	});
 	return (
 		<div className='text-xs border-2 px-4 border-[#e4e4e4]'>
-			{!hideHeader && <Header table={table} setGlobalFilter={setGlobalFilter} />}
-			<Body table={table} />
-			{!hideFooter && <Footer table={table} />}
+			<Header table={table} setGlobalFilter={setGlobalFilter} />
+			<Body table={table} stickyClassIndex={stickyClassIndex} />
+			<Footer table={table} />
 		</div>
 	);
 }

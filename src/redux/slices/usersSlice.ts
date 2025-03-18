@@ -63,23 +63,25 @@ const initialState: UsersState = {
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
 	const response = await axios.get<ApiResponse[]>('/api/v1/users');
 
-	const formattedData: Employee[] = response.data.map(user => ({
-		id: user.id,
-		idString: user.idString,
-		full_name: user.fullName,
-		role: user.resContractDTO?.roleName || '',
-		status: user.status === 1,
-		base_salary: user.resContractDTO?.baseSalary || 0,
-		level: user.resContractDTO?.levelName || '',
-		salary_coefficient: user.resContractDTO?.salaryCoefficient || 1,
-		gender: user.gender === 'MALE',
-		email: user.email,
-		phone: user.phoneNumber,
-		date_of_birth: user.dateOfBirth,
-		address: user.address,
-		username: user.username,
-		password: ''
-	}));
+	const formattedData: Employee[] = response.data
+		.filter(user => user.username.toLowerCase() !== 'admin')
+		.map(user => ({
+			id: user.id,
+			idString: user.idString,
+			full_name: user.fullName,
+			role: user.resContractDTO?.roleName || '',
+			status: user.status === 1,
+			base_salary: user.resContractDTO?.baseSalary || 0,
+			level: user.resContractDTO?.levelName || '',
+			salary_coefficient: user.resContractDTO?.salaryCoefficient || 1,
+			gender: user.gender === 'MALE',
+			email: user.email,
+			phone: user.phoneNumber,
+			date_of_birth: user.dateOfBirth,
+			address: user.address,
+			username: user.username,
+			password: ''
+		}));
 
 	return formattedData;
 });
