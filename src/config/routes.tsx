@@ -10,7 +10,10 @@ const routes = {
 	supplier: '/supplier',
 	newOrder: 'new-order',
 	orders: 'orders',
-	customers: 'customers'
+	customers: 'customers',
+
+	eLogin: '/login',
+	hrLogin: '/hr-login'
 };
 
 export default routes;
