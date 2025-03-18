@@ -81,10 +81,10 @@ export function NavUser({
 						<DropdownMenuGroup>
 							<EmployeeLeaveRequest />
 							<EmployeeTimeTracking />
-							<DropdownMenuItem>
+							{/* <DropdownMenuItem>
 								<ShieldQuestion />
 								Quyền lợi nhân viên
-							</DropdownMenuItem>
+							</DropdownMenuItem> */}
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem>

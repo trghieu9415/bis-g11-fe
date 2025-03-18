@@ -1,0 +1,495 @@
+import CustomTable from '@/components/custom-table';
+import { Button } from '@/components/ui/button';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
+import CustomDialog from '@/components/custom-dialog';
+import { ColumnDef } from '@tanstack/react-table';
+import {
+	AlertTriangle,
+	ArrowUpDown,
+	Baby,
+	CalendarCheck,
+	CheckCircle,
+	Ellipsis,
+	Hospital,
+	PartyPopper,
+	XCircle
+} from 'lucide-react';
+import { useState } from 'react';
+import { RegisterOptions } from 'react-hook-form';
+
+import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { format } from 'date-fns';
+type TimeTrackingToday = {
+	id: number;
+	idString: string;
+	checkIn: string;
+	checkOut: string;
+	workingDay: string;
+	attendanceStatus: string;
+	leaveTypeEnum: number | null;
+	userId: number;
+	userIdString: string;
+	fullName: string;
+	attendanceId: number;
+	leaveTypeEnumLabel?: string;
+	attendanceStatusLabel?: string;
+};
+
+type FieldConfig = {
+	label: string;
+	key: keyof TimeTrackingToday;
+	type: 'input' | 'select' | 'number' | 'date' | 'time';
+	options?: { value: string; label: string; isBoolean?: boolean }[];
+	disabled?: boolean;
+	validation?: RegisterOptions;
+	showOnly?: 'view' | 'edit' | 'delete';
+	isShow?: boolean;
+};
+
+export default function TimeTrackingTodayTable() {
+	const [selectedTimeTrackingToday, setSelectedTimeTrackingToday] = useState<TimeTrackingToday | null>(null);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
+
+	console.log(selectedTimeTrackingToday);
+
+	const dispatch = useAppDispatch();
+	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
+
+	useEffect(() => {
+		const formattedDate = format(new Date(), 'yyyy-MM-dd');
+		dispatch(fetchAllTimeTrackingToday(formattedDate));
+	}, [dispatch]);
+
+	const columns: ColumnDef<TimeTrackingToday>[] = [
+		{
+			accessorKey: 'idString',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-16'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					ID <ArrowUpDown />
+				</Button>
+			),
+			enableHiding: false
+		},
+		{
+			accessorKey: 'userIdString',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-40'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					ID nhân viên <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userIdString')}</span>,
+			enableHiding: false
+		},
+		{
+			accessorKey: 'fullName',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-40'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Họ và tên <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
+			enableHiding: false
+		},
+		{
+			accessorKey: 'attendanceStatus',
+			header: ({ column }) => (
+				<Select
+					onValueChange={value => {
+						const newValue = value === 'all' ? undefined : value;
+						column.setFilterValue(newValue);
+					}}
+				>
+					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+						<SelectValue placeholder='Trạng thái' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='all'>Trạng thái</SelectItem>
+						<SelectItem value='PRESENT'>Có mặt</SelectItem>
+						<SelectItem value='ON_LEAVE'>Vắng có phép</SelectItem>
+						<SelectItem value='ABSENT'>Vắng mặt</SelectItem>
+					</SelectContent>
+				</Select>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-center'>
+					{row.getValue('attendanceStatus') === 'PRESENT' ? (
+						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-green-500 rounded-sm p-1'>
+							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							Có mặt
+						</p>
+					) : row.getValue('attendanceStatus') === 'ON_LEAVE' ? (
+						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
+							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
+						</p>
+					) : (
+						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
+							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
+						</p>
+					)}
+				</span>
+			)
+		},
+		{
+			accessorKey: 'leaveTypeEnum',
+			header: ({ column }) => (
+				<Select
+					onValueChange={value => {
+						const newValue = value === 'all' ? undefined : Number(value);
+						column.setFilterValue(newValue);
+					}}
+				>
+					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+						<SelectValue placeholder='Loại nghỉ' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='all'>Loại nghỉ</SelectItem>
+						<SelectItem value='0'>Nghỉ bệnh</SelectItem>
+						<SelectItem value='1'>Nghỉ phép</SelectItem>
+						<SelectItem value='2'>Nghỉ thai sản</SelectItem>
+						<SelectItem value='3'>Nghỉ lễ</SelectItem>
+					</SelectContent>
+				</Select>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-center'>
+					{row.getValue('leaveTypeEnum') === 0 ? (
+						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-blue-500 rounded-sm p-1'>
+							<Hospital className='w-4 h-4 mr-1' stroke='white' />
+							Nghỉ bệnh
+						</p>
+					) : row.getValue('leaveTypeEnum') === 1 ? (
+						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-orange-500 rounded-sm p-1'>
+							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Nghỉ phép
+						</p>
+					) : row.getValue('leaveTypeEnum') === 2 ? (
+						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
+							<Baby className='w-6 h-4 mr-1' stroke='white' /> Nghỉ thai sản
+						</p>
+					) : row.getValue('leaveTypeEnum') === 3 ? (
+						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
+							<PartyPopper className='w-4 h-4 mr-1' stroke='white' /> Nghỉ lễ
+						</p>
+					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
+						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-red-500 rounded-sm p-1'>
+							<AlertTriangle className='w-4 h-4 mr-1' stroke='white' /> Không phép
+						</p>
+					) : (
+						'--'
+					)}
+				</span>
+			),
+			filterFn: (row, columnId, filterValue) => {
+				if (filterValue === undefined) return true;
+				return row.getValue(columnId) == filterValue;
+			}
+		},
+		{
+			accessorKey: 'checkIn',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Giờ check-in <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const checkIn = row.original.checkIn;
+				if (!checkIn) return <span className='flex justify-center'>--</span>;
+
+				const [hour, minute] = checkIn.split(':');
+				return (
+					<span className='flex justify-center'>
+						{parseInt(hour)} giờ {minute} phút
+					</span>
+				);
+			}
+		},
+		{
+			accessorKey: 'checkOut',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Giờ check-out <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const checkOut = row.original.checkOut;
+				if (row.original.checkIn && !checkOut) {
+					return <span className='flex justify-center text-gray-400'>Chưa cập nhật</span>;
+				}
+				if (!checkOut) return <span className='flex justify-center'>--</span>;
+
+				const [hour, minute] = checkOut.split(':');
+				return (
+					<span className='flex justify-center'>
+						{parseInt(hour)} giờ {minute} phút
+					</span>
+				);
+			}
+		},
+		{
+			id: 'actions',
+			header: 'Thao tác',
+			cell: ({ row }) => (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant='ghost' size='icon'>
+							<Ellipsis className='w-4 h-4' />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align='end'>
+						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
+						{row.original.attendanceStatus === 'PRESENT' && (
+							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						)}
+						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			)
+		}
+	];
+
+	const handleOpenDialog = (timeTrackingToday: TimeTrackingToday, mode: 'view' | 'edit' | 'delete') => {
+		const leaveTypeMap: Record<number, string> = {
+			0: 'Nghỉ bệnh',
+			1: 'Nghỉ phép',
+			2: 'Nghỉ thai sản',
+			3: 'Nghỉ lễ'
+		};
+
+		const attendanceStatusMap: Record<string, string> = {
+			PRESENT: 'Có mặt',
+			ON_LEAVE: 'Vắng có phép',
+			ABSENT: 'Vắng mặt'
+		};
+
+		const data = {
+			...timeTrackingToday,
+			leaveTypeEnumLabel:
+				timeTrackingToday?.leaveTypeEnum !== null ? leaveTypeMap[timeTrackingToday.leaveTypeEnum as number] : '--',
+			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Không xác định'
+		};
+		setSelectedTimeTrackingToday(data);
+		setDialogMode(mode);
+		setIsDialogOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setIsDialogOpen(false);
+		setSelectedTimeTrackingToday(null);
+	};
+
+	const hiddenColumns = {
+		date_of_birth: false,
+		gender: false,
+		address: false,
+		base_salary: false,
+		salary_coefficient: false
+	};
+
+	const employeeFields: FieldConfig[][][] = [
+		[
+			[
+				{
+					label: 'Mã chấm công',
+					key: 'idString',
+					type: 'input',
+					disabled: true
+				},
+				{
+					label: 'Mã NV',
+					key: 'userIdString',
+					type: 'input',
+					disabled: true
+				}
+			],
+			[{ label: 'Ngày chấm công', key: 'workingDay', type: 'date', disabled: true }]
+		],
+		[
+			[
+				{
+					label: 'Họ và tên',
+					key: 'fullName',
+					type: 'input',
+					disabled: true
+				}
+			],
+			[
+				{
+					label: 'Trạng thái',
+					key: 'attendanceStatusLabel',
+					type: 'input',
+					disabled: true
+				},
+				{
+					label: 'Loại nghỉ',
+					key: 'leaveTypeEnumLabel',
+					type: 'input',
+					disabled: true
+				}
+			]
+		],
+		[
+			[],
+			[
+				{
+					label: 'Giờ check-in',
+					key: 'checkIn',
+					type: 'time',
+					validation: {
+						required: 'Vui lòng nhập giờ check-in',
+						pattern: {
+							value: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+							message: 'Định dạng không hợp lệ (HH:mm:ss)'
+						},
+						validate: value => {
+							if (!selectedTimeTrackingToday?.checkIn) return true;
+							const [hh, mm, ss] = value.split(':').map(Number);
+							if (hh > 23 || mm > 59 || ss > 59) {
+								return 'Giờ nhập vào không hợp lệ';
+							}
+						}
+					},
+					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+				},
+				{
+					label: 'Giờ check-out',
+					key: 'checkOut',
+					type: 'time',
+					validation: {
+						required: 'Vui lòng nhập giờ check-out',
+						pattern: {
+							value: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+							message: 'Định dạng không hợp lệ (HH:mm:ss)'
+						},
+						validate: value => {
+							if (!selectedTimeTrackingToday?.checkIn) return true;
+							const [hh, mm, ss] = value.split(':').map(Number);
+							if (hh > 23 || mm > 59 || ss > 59) {
+								return 'Giờ nhập vào không hợp lệ';
+							}
+
+							const checkInTime = selectedTimeTrackingToday?.checkIn.split(':').map(Number);
+							const checkOutTime = value.split(':').map(Number);
+
+							const checkInSeconds = checkInTime[0] * 3600 + checkInTime[1] * 60 + checkInTime[2];
+							const checkOutSeconds = checkOutTime[0] * 3600 + checkOutTime[1] * 60 + checkOutTime[2];
+
+							console.log(checkInSeconds, checkOutSeconds);
+
+							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
+						}
+					},
+					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+				}
+			]
+		]
+	];
+
+	const handleSave = async (data: TimeTrackingToday) => {
+		console.log(data);
+		// const userId = data.id;
+		// const updatedUserData = {
+		// 	fullName: data.full_name,
+		// 	phoneNumber: data.phone,
+		// 	email: data.email,
+		// 	dateOfBirth: data.date_of_birth,
+		// 	address: data.address,
+		// 	gender: data.gender ? 'MALE' : 'FEMALE',
+		// 	username: data.username,
+		// 	password: ''
+		// };
+		// if (data.password) {
+		// 	updatedUserData.password = data.password;
+		// }
+		// // Call API for update user info
+		// try {
+		// 	await updateUser(userId, updatedUserData);
+		// 	toast.success('Cập nhật thông tin nhân viên thành công!');
+		// 	dispatch(fetchUsers());
+		// 	setIsDialogOpen(false);
+		// } catch (error: unknown) {
+		// 	const err = error as AxiosError;
+		// 	if (err.response?.status === 400) {
+		// 		toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+		// 	} else if (err.response?.status === 404) {
+		// 		toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+		// 	} else if (err.response?.status === 500) {
+		// 		toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+		// 	} else {
+		// 		toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+		// 	}
+		// }
+	};
+
+	// const handleDelete = async (data: Employee) => {
+	// 	const userId = data.id;
+
+	// 	try {
+	// 		await deleteUser(userId);
+	// 		toast.success('Cập nhật thông tin nhân viên thành công!');
+	// 		dispatch(fetchUsers());
+	// 		setIsDialogOpen(false);
+	// 	} catch (error) {
+	// 		const err = error as AxiosError;
+
+	// 		if (err.response?.status === 400) {
+	// 			toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+	// 		} else if (err.response?.status === 404) {
+	// 			toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+	// 		} else if (err.response?.status === 500) {
+	// 			toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+	// 		} else {
+	// 			toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+	// 		}
+	// 	}
+	// };
+
+	return (
+		<div>
+			<CustomTable columns={columns} data={timeTrackingToday} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
+			{selectedTimeTrackingToday && (
+				<CustomDialog
+					entity={{
+						...selectedTimeTrackingToday,
+						leaveTypeEnum: selectedTimeTrackingToday.leaveTypeEnum ? selectedTimeTrackingToday.leaveTypeEnum : 5 // 5 == null
+					}}
+					isOpen={isDialogOpen}
+					onClose={handleCloseDialog}
+					mode={dialogMode}
+					fields={employeeFields}
+					onSave={handleSave}
+					// onDelete={handleDelete}
+				/>
+			)}
+		</div>
+	);
+}
