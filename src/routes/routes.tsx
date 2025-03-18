@@ -8,6 +8,7 @@ import Supplier from '@/pages/dashboard/Supplier';
 import UserInfomation from '@/pages/dashboard/UserInfomation';
 import NewOrder from '@/pages/commerce/NewOrder';
 import CommerceLayout from '@/layouts/commerce-layout';
+import Orders from '@/pages/commerce/Orders';
 
 const publicRoutes = [
 	// {path: config.routes.home, component: Home}
@@ -18,7 +19,7 @@ const publicRoutes = [
 	{ path: config.routes.userInfomation, component: UserInfomation, layout: DashboardLayout },
 
 	{ path: config.routes.newOrder, component: NewOrder, layout: CommerceLayout },
-	{ path: config.routes.orders, component: NewOrder, layout: CommerceLayout },
+	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
 	{ path: config.routes.customers, component: NewOrder, layout: CommerceLayout }
 ];
 

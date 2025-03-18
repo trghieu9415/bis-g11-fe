@@ -7,7 +7,7 @@ import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports';
 
 export default tseslint.config(
-	{ ignores: ['dist', 'vite.config.ts'] },
+	{ ignores: ['dist', 'vite.config.ts', 'src/components/ui/**'] },
 	{
 		extends: [js.configs.recommended, ...tseslint.configs.recommended],
 		files: ['**/*.{ts,tsx}'],
