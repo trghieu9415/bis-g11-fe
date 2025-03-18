@@ -60,10 +60,10 @@ export function NavMain() {
 					title: 'Hợp đồng lao động',
 					url: '/contracts'
 				},
-				{
-					title: 'Vi phạm',
-					url: '#'
-				},
+				// {
+				// 	title: 'Vi phạm',
+				// 	url: '#'
+				// },
 				{
 					title: 'Báo cáo nhân sự',
 					url: '#'
