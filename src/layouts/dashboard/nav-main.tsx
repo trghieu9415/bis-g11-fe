@@ -1,5 +1,5 @@
 'use client';
-import { CalendarDays, ChevronRight, Hourglass, UsersRound } from 'lucide-react';
+import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -36,8 +36,6 @@ export function NavMain() {
 		maternity: leaveRequests.filter(req => req.leaveReason === 2 && req.status === 2).length,
 		all: leaveRequests.filter(req => req.status === 2).length
 	};
-
-	console.log(leaveRequests);
 
 	const data: {
 		title: string;
@@ -111,6 +109,18 @@ export function NavMain() {
 				{
 					title: 'Tháng này',
 					url: '#'
+				}
+			]
+		},
+		{
+			title: 'Lịch nghỉ lễ',
+			url: '#',
+			icon: PartyPopper,
+			isActive: true,
+			items: [
+				{
+					title: 'Tất cả lịch',
+					url: '/holiday'
 				}
 			]
 		}

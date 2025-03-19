@@ -8,6 +8,7 @@ const routes = {
 	timeTrackingToday: '/time-tracking/today',
 	products: '/products',
 	supplier: '/supplier',
+	holiday: '/holiday',
 	newOrder: 'new-order',
 	orders: 'orders',
 	customers: 'customers',

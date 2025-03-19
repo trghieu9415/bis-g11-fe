@@ -9,6 +9,7 @@ import attendanceDetailsByUserIDReducer from './slices/attendanceDetailByUserIDS
 import contractsReducer from './slices/contractsSlice';
 import leaveRequestsReducer from './slices/leaveRequestsSlice';
 import timeTrackingTodayReducer from './slices/timeTrackingTodaySlice';
+import holidaysReducer from './slices/holidaysSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -20,7 +21,8 @@ export const store = configureStore({
 		attendanceDetailsByUserID: attendanceDetailsByUserIDReducer,
 		contracts: contractsReducer,
 		leaveRequests: leaveRequestsReducer,
-		timeTrackingToday: timeTrackingTodayReducer
+		timeTrackingToday: timeTrackingTodayReducer,
+		holidays: holidaysReducer
 	}
 });
 
