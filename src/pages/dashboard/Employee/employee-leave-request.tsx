@@ -40,7 +40,7 @@ export default function EmployeeLeaveRequest() {
 
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
-
+	console.log(user);
 	const {
 		register,
 		watch,
@@ -82,6 +82,9 @@ export default function EmployeeLeaveRequest() {
 			case 'PAID_LEAVE':
 				return 1;
 			case 'MATERNITY_LEAVE':
+				if (user.gender === 'MALE') {
+					return 7;
+				}
 				return 180;
 			case 'SICK_LEAVE':
 				return 7;
@@ -226,7 +229,7 @@ export default function EmployeeLeaveRequest() {
 
 														const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
 														// Day offs = Start date - End Date + 1
-														if (diffDays + 1 > maxDays) return `(Bạn chỉ được nghỉ tối đa ${maxDays} ngày)`;
+														if (diffDays + 1 > maxDays) return `Bạn chỉ được nghỉ tối đa ${maxDays} ngày`;
 													}
 												}
 											}

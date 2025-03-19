@@ -7,7 +7,8 @@ const routes = {
 	leaveRequestsByType: '/leave-requests/:type',
 	timeTrackingToday: '/time-tracking/today',
 	products: '/products',
-	supplier: '/supplier'
+	supplier: '/supplier',
+	holiday: '/holiday'
 };
 
 export default routes;
