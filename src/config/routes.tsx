@@ -11,7 +11,10 @@ const routes = {
 	holiday: '/holiday',
 	newOrder: 'new-order',
 	orders: 'orders',
-	customers: 'customers'
+	customers: 'customers',
+
+	eLogin: '/login',
+	hrLogin: '/hr-login'
 };
 
 export default routes;

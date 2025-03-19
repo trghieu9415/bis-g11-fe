@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { CirclePlus, Plus } from 'lucide-react';
+import { RotateCcw, Plus } from 'lucide-react';
 import { SelectProduct } from './select-product';
 import ProductsTable from './products-table';
 
@@ -13,9 +13,9 @@ export default function OrderProduct() {
 					</Button>
 					<SelectProduct />
 				</div>
-				<Button variant={'outline'} className='hover:bg-green-800 hover:text-white'>
-					<CirclePlus />
-					<span>Tạo hóa đơn</span>
+				<Button variant={'outline'} className='hover:bg-red-600 hover:text-white'>
+					<RotateCcw />
+					<span>Đặt lại</span>
 				</Button>
 			</div>
 			<div>
