@@ -24,11 +24,11 @@ import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 
 interface EventType {
-	calendarId: string;
 	end: string;
 	id: number;
 	start: string;
 	title: string;
+	description: string;
 }
 
 type Holiday = {
@@ -51,7 +51,11 @@ type FieldConfig = {
 	showOnly?: 'view' | 'edit' | 'delete';
 };
 
-export default function HolidayTable() {
+interface HolidayCalendarProps {
+	newEvent: EventType | null;
+}
+
+export default function HolidayTable({ newEvent }: HolidayCalendarProps) {
 	const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
@@ -67,8 +71,6 @@ export default function HolidayTable() {
 	useEffect(() => {
 		dispatch(fetchHolidays());
 	}, [dispatch]);
-
-	console.log(holidays);
 
 	const columns: ColumnDef<Holiday>[] = [
 		{
@@ -260,11 +262,11 @@ export default function HolidayTable() {
 	const handleSave = async (data: Holiday) => {
 		const holidayId = data.id;
 		const eventData = {
-			calendarId: data.idString,
 			end: data.endDate,
 			id: data.id,
 			start: data.startDate,
-			title: data.name
+			title: data.name,
+			description: data.description
 		};
 
 		const holidayData = {
@@ -274,8 +276,6 @@ export default function HolidayTable() {
 			name: data.name,
 			description: data.description
 		};
-
-		console.log(holidayId, holidayData);
 
 		try {
 			await updateHoliday(holidayId, holidayData);
@@ -336,8 +336,10 @@ export default function HolidayTable() {
 
 				<PanelResizeHandle className='w-2 cursor-ew-resize' />
 
-				<Panel defaultSize={38} minSize={38} maxSize={80} className='overflow-auto'>
-					{events?.length > 0 && <HolidayCalendar events={events} onDelete={deleteEventId} onSave={saveEventId} />}
+				<Panel defaultSize={30} minSize={38} maxSize={80} className='overflow-auto'>
+					{events?.length > 0 && (
+						<HolidayCalendar events={events} onDelete={deleteEventId} onSave={saveEventId} onAdd={newEvent} />
+					)}
 				</Panel>
 			</PanelGroup>
 

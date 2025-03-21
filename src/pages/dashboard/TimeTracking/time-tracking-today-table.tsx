@@ -61,8 +61,6 @@ export default function TimeTrackingTodayTable() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
 
-	console.log(selectedTimeTrackingToday);
-
 	const dispatch = useAppDispatch();
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
 
@@ -402,8 +400,6 @@ export default function TimeTrackingTodayTable() {
 
 							const checkInSeconds = checkInTime[0] * 3600 + checkInTime[1] * 60 + checkInTime[2];
 							const checkOutSeconds = checkOutTime[0] * 3600 + checkOutTime[1] * 60 + checkOutTime[2];
-
-							console.log(checkInSeconds, checkOutSeconds);
 
 							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
 						}

@@ -79,8 +79,8 @@ export function NavUser({
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<EmployeeLeaveRequest />
 							<EmployeeTimeTracking />
+							<EmployeeLeaveRequest />
 							{/* <DropdownMenuItem>
 								<ShieldQuestion />
 								Quyền lợi nhân viên

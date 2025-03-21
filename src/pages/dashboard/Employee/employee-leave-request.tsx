@@ -40,7 +40,6 @@ export default function EmployeeLeaveRequest() {
 
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
-	console.log(user);
 	const {
 		register,
 		watch,

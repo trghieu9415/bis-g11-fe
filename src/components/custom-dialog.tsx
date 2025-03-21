@@ -237,13 +237,13 @@ export default function CustomDialog<T extends Record<string, string | number | 
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogCancel>Thoát</AlertDialogCancel>
 									<AlertDialogAction
 										onClick={() => {
 											if (onDelete && formData) onDelete(formData);
 										}}
 									>
-										Tiếp
+										Xác nhận
 									</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>
