@@ -142,10 +142,12 @@ export default function TimeTrackingTodayTable() {
 						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
 							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
 						</p>
-					) : (
+					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
 						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
 							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
 						</p>
+					) : (
+						<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
 					)}
 				</span>
 			)
@@ -293,7 +295,7 @@ export default function TimeTrackingTodayTable() {
 			...timeTrackingToday,
 			leaveTypeEnumLabel:
 				timeTrackingToday?.leaveTypeEnum !== null ? leaveTypeMap[timeTrackingToday.leaveTypeEnum as number] : '--',
-			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Không xác định'
+			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Chưa cập nhật'
 		};
 		setSelectedTimeTrackingToday(data);
 		setDialogMode(mode);
