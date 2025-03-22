@@ -16,46 +16,47 @@ interface ApiResponse {
 	attendanceId: number;
 }
 
-interface TimeTrackingTodayStates {
-	timeTrackingToday: ApiResponse[];
+interface TimeTrackingMonthStates {
+	timeTrackingMonth: ApiResponse[];
 	isLoading: boolean;
 	isError: boolean;
 }
 
-const initialState: TimeTrackingTodayStates = {
-	timeTrackingToday: [],
+const initialState: TimeTrackingMonthStates = {
+	timeTrackingMonth: [],
 	isLoading: false,
 	isError: false
 };
 
-export const fetchAllTimeTrackingToday = createAsyncThunk(
-	'time-tracking-today/fetchAllTimeTrackingToday',
-	async (date: string) => {
-		const response = await axios.get<ApiResponse[]>(`/api/v1/attendanceDetails/date?date=${date}`);
+export const fetchAllTimeTrackingMonth = createAsyncThunk(
+	'time-tracking-month/fetchAllTimeTrackingMonth',
+	async (month: string) => {
+		const response = await axios.get<ApiResponse[]>(`/api/v1/attendances/yearMonth?yearMonth=${month}`);
+		console.log(response.data);
 		return response.data;
 	}
 );
 
-const timeTrackingTodaySlice = createSlice({
-	name: 'timeTrackingToday',
+const timeTrackingMonthSlice = createSlice({
+	name: 'timeTrackingMonth',
 	initialState,
 	reducers: {},
 	extraReducers: builder => {
 		builder
-			.addCase(fetchAllTimeTrackingToday.pending, state => {
+			.addCase(fetchAllTimeTrackingMonth.pending, state => {
 				state.isLoading = true;
 				state.isError = false;
 			})
-			.addCase(fetchAllTimeTrackingToday.fulfilled, (state, action) => {
+			.addCase(fetchAllTimeTrackingMonth.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.isError = false;
-				state.timeTrackingToday = action.payload;
+				state.timeTrackingMonth = action.payload;
 			})
-			.addCase(fetchAllTimeTrackingToday.rejected, state => {
+			.addCase(fetchAllTimeTrackingMonth.rejected, state => {
 				state.isLoading = false;
 				state.isError = true;
 			});
 	}
 });
 
-export default timeTrackingTodaySlice.reducer;
+export default timeTrackingMonthSlice.reducer;

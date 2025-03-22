@@ -7,15 +7,11 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import CustomDialog from '@/components/custom-dialog';
-import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
-import { RootState, useAppDispatch } from '@/redux/store';
-import { updateAttendanceDetail } from '@/services/attendanceDetailService';
 import { ColumnDef } from '@tanstack/react-table';
-import { AxiosError } from 'axios';
-import { format } from 'date-fns';
 import {
 	AlertTriangle,
 	ArrowUpDown,
@@ -29,9 +25,12 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { RegisterOptions } from 'react-hook-form';
-import { toast } from 'react-toastify';
 
-type TimeTrackingToday = {
+import { fetchAllTimeTrackingMonth } from '@/redux/slices/timeTrackingMonthSlice';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { format } from 'date-fns';
+
+type TimeTrackingMonth = {
 	id: number;
 	idString: string;
 	checkIn: string;
@@ -49,7 +48,7 @@ type TimeTrackingToday = {
 
 type FieldConfig = {
 	label: string;
-	key: keyof TimeTrackingToday;
+	key: keyof TimeTrackingMonth;
 	type: 'input' | 'select' | 'number' | 'date' | 'time';
 	options?: { value: string; label: string; isBoolean?: boolean }[];
 	disabled?: boolean;
@@ -58,20 +57,23 @@ type FieldConfig = {
 	isShow?: boolean;
 };
 
-export default function TimeTrackingTodayTable() {
-	const [selectedTimeTrackingToday, setSelectedTimeTrackingToday] = useState<TimeTrackingToday | null>(null);
+export default function TimeTrackingMonthTable() {
+	const [selectedTimeTrackingMonth, setSelectedTimeTrackingMonth] = useState<TimeTrackingMonth | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
 
 	const dispatch = useAppDispatch();
-	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
-	const formattedDate = format(new Date(), 'yyyy-MM-dd');
+	const { timeTrackingMonth } = useSelector((state: RootState) => state.timeTrackingMonth);
 
-	// useEffect(() => {
-	// 	dispatch(fetchAllTimeTrackingToday(formattedDate));
-	// }, [dispatch]);
+	useEffect(() => {
+		const formattedDate = format(new Date(), 'yyyy-MM');
+		console.log(formattedDate);
+		dispatch(fetchAllTimeTrackingMonth(formattedDate));
+	}, [dispatch]);
 
-	const columns: ColumnDef<TimeTrackingToday>[] = [
+	console.log(timeTrackingMonth);
+
+	const columns: ColumnDef<TimeTrackingMonth>[] = [
 		{
 			accessorKey: 'idString',
 			header: ({ column }) => (
@@ -272,14 +274,14 @@ export default function TimeTrackingTodayTable() {
 						{row.original.attendanceStatus === 'PRESENT' && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
-						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
+						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
 		}
 	];
 
-	const handleOpenDialog = (timeTrackingToday: TimeTrackingToday, mode: 'view' | 'edit' | 'delete') => {
+	const handleOpenDialog = (TimeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
 		const leaveTypeMap: Record<number, string> = {
 			0: 'Nghỉ bệnh',
 			1: 'Nghỉ phép',
@@ -294,22 +296,30 @@ export default function TimeTrackingTodayTable() {
 		};
 
 		const data = {
-			...timeTrackingToday,
+			...TimeTrackingMonth,
 			leaveTypeEnumLabel:
-				timeTrackingToday?.leaveTypeEnum !== null ? leaveTypeMap[timeTrackingToday.leaveTypeEnum as number] : '--',
-			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Chưa cập nhật'
+				TimeTrackingMonth?.leaveTypeEnum !== null ? leaveTypeMap[TimeTrackingMonth.leaveTypeEnum as number] : '--',
+			attendanceStatusLabel: attendanceStatusMap[TimeTrackingMonth?.attendanceStatus ?? ''] || 'Chưa cập nhật'
 		};
-		setSelectedTimeTrackingToday(data);
+		setSelectedTimeTrackingMonth(data);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
 
 	const handleCloseDialog = () => {
 		setIsDialogOpen(false);
-		setSelectedTimeTrackingToday(null);
+		setSelectedTimeTrackingMonth(null);
 	};
 
-	const timeTrackingTodayFields: FieldConfig[][][] = [
+	const hiddenColumns = {
+		date_of_birth: false,
+		gender: false,
+		address: false,
+		base_salary: false,
+		salary_coefficient: false
+	};
+
+	const employeeFields: FieldConfig[][][] = [
 		[
 			[
 				{
@@ -365,14 +375,14 @@ export default function TimeTrackingTodayTable() {
 							message: 'Định dạng không hợp lệ (HH:mm:ss)'
 						},
 						validate: value => {
-							if (!selectedTimeTrackingToday?.checkIn) return true;
+							if (!selectedTimeTrackingMonth?.checkIn) return true;
 							const [hh, mm, ss] = value.split(':').map(Number);
 							if (hh > 23 || mm > 59 || ss > 59) {
 								return 'Giờ nhập vào không hợp lệ';
 							}
 						}
 					},
-					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+					isShow: selectedTimeTrackingMonth?.attendanceStatus === 'PRESENT' && true
 				},
 				{
 					label: 'Giờ check-out',
@@ -385,13 +395,13 @@ export default function TimeTrackingTodayTable() {
 							message: 'Định dạng không hợp lệ (HH:mm:ss)'
 						},
 						validate: value => {
-							if (!selectedTimeTrackingToday?.checkIn) return true;
+							if (!selectedTimeTrackingMonth?.checkIn) return true;
 							const [hh, mm, ss] = value.split(':').map(Number);
 							if (hh > 23 || mm > 59 || ss > 59) {
 								return 'Giờ nhập vào không hợp lệ';
 							}
 
-							const checkInTime = selectedTimeTrackingToday?.checkIn.split(':').map(Number);
+							const checkInTime = selectedTimeTrackingMonth?.checkIn.split(':').map(Number);
 							const checkOutTime = value.split(':').map(Number);
 
 							const checkInSeconds = checkInTime[0] * 3600 + checkInTime[1] * 60 + checkInTime[2];
@@ -400,44 +410,46 @@ export default function TimeTrackingTodayTable() {
 							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
 						}
 					},
-					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+					isShow: selectedTimeTrackingMonth?.attendanceStatus === 'PRESENT' && true
 				}
 			]
 		]
 	];
 
-	const formatToFake7Z = (date: string, time: string): string => {
-		return `${date}T${time}.000Z`;
-	};
-
-	const handleSave = async (data: TimeTrackingToday) => {
-		const attendanceDetail = {
-			userId: data.userId,
-			checkIn: formatToFake7Z(data.workingDay, data.checkIn),
-			checkOut: formatToFake7Z(data.workingDay, data.checkOut)
-		};
-
-		console.log(attendanceDetail);
-
-		try {
-			await updateAttendanceDetail(attendanceDetail);
-			toast.success('Cập nhật chấm công thành công!');
-			dispatch(fetchAllTimeTrackingToday(formattedDate));
-			setIsDialogOpen(false);
-		} catch (error: unknown) {
-			const err = error as AxiosError;
-			if (err.response?.status === 400) {
-				toast.error(
-					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
-				);
-			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy chấm công.');
-			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-			} else {
-				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-			}
-		}
+	const handleSave = async (data: TimeTrackingMonth) => {
+		console.log(data);
+		// const userId = data.id;
+		// const updatedUserData = {
+		// 	fullName: data.full_name,
+		// 	phoneNumber: data.phone,
+		// 	email: data.email,
+		// 	dateOfBirth: data.date_of_birth,
+		// 	address: data.address,
+		// 	gender: data.gender ? 'MALE' : 'FEMALE',
+		// 	username: data.username,
+		// 	password: ''
+		// };
+		// if (data.password) {
+		// 	updatedUserData.password = data.password;
+		// }
+		// // Call API for update user info
+		// try {
+		// 	await updateUser(userId, updatedUserData);
+		// 	toast.success('Cập nhật thông tin nhân viên thành công!');
+		// 	dispatch(fetchUsers());
+		// 	setIsDialogOpen(false);
+		// } catch (error: unknown) {
+		// 	const err = error as AxiosError;
+		// 	if (err.response?.status === 400) {
+		// 		toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+		// 	} else if (err.response?.status === 404) {
+		// 		toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+		// 	} else if (err.response?.status === 500) {
+		// 		toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+		// 	} else {
+		// 		toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+		// 	}
+		// }
 	};
 
 	// const handleDelete = async (data: Employee) => {
@@ -465,17 +477,17 @@ export default function TimeTrackingTodayTable() {
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={timeTrackingToday} stickyClassIndex={0} />
-			{selectedTimeTrackingToday && (
+			<CustomTable columns={columns} data={timeTrackingMonth} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
+			{selectedTimeTrackingMonth && (
 				<CustomDialog
 					entity={{
-						...selectedTimeTrackingToday,
-						leaveTypeEnum: selectedTimeTrackingToday.leaveTypeEnum ? selectedTimeTrackingToday.leaveTypeEnum : 5 // 5 == null
+						...selectedTimeTrackingMonth,
+						leaveTypeEnum: selectedTimeTrackingMonth.leaveTypeEnum ? selectedTimeTrackingMonth.leaveTypeEnum : 5 // 5 == null
 					}}
 					isOpen={isDialogOpen}
 					onClose={handleCloseDialog}
 					mode={dialogMode}
-					fields={timeTrackingTodayFields}
+					fields={employeeFields}
 					onSave={handleSave}
 					// onDelete={handleDelete}
 				/>
