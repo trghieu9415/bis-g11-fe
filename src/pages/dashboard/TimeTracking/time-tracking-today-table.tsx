@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSelector } from 'react-redux';
+import classNames from 'classnames';
 
 import CustomDialog from '@/components/custom-dialog';
 import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
@@ -25,7 +26,9 @@ import {
 	Ellipsis,
 	Hospital,
 	PartyPopper,
-	XCircle
+	XCircle,
+	Minus,
+	Dot
 } from 'lucide-react';
 import { useState } from 'react';
 import { RegisterOptions } from 'react-hook-form';
@@ -90,7 +93,7 @@ export default function TimeTrackingTodayTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='text-white w-28'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID nhân viên <ArrowUpDown />
@@ -112,6 +115,105 @@ export default function TimeTrackingTodayTable() {
 			),
 			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
 			enableHiding: false
+		},
+		{
+			accessorKey: 'workingHours',
+			header: ({ column }) => (
+				// <Button
+				// 	variant='link'
+				// 	className='text-white min-w-[200px]'
+				// 	onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				// >
+				// 	Giờ làm việc <ArrowUpDown />
+				// </Button>
+				<Select
+					onValueChange={value => {
+						const newValue = value === 'all' ? undefined : value;
+						column.setFilterValue(newValue);
+					}}
+				>
+					<SelectTrigger className='w-full text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+						<SelectValue placeholder='Giờ làm việc' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='all'>Giờ làm việc</SelectItem>
+						<SelectItem value='early'>Đi sớm</SelectItem>
+						<SelectItem value='onTime'>Đúng giờ</SelectItem>
+						<SelectItem value='late'>Đi trễ</SelectItem>
+						<SelectItem value='leaveEarly'>Về sớm</SelectItem>
+						<SelectItem value='leaveLate'>Về trễ</SelectItem>
+					</SelectContent>
+				</Select>
+			),
+			filterFn: (row, columnId, filterValue) => {
+				const checkIn = row.original.checkIn;
+				const checkOut = row.original.checkOut;
+
+				if (!checkIn) return filterValue === 'late'; //If not checkin => Late
+
+				const [inHour, inMinute] = checkIn.split(':').map(Number);
+				const totalCheckInMinutes = inHour * 60 + inMinute;
+
+				if (filterValue === 'early') return totalCheckInMinutes < 480; // Before 8AM
+				if (filterValue === 'onTime') return totalCheckInMinutes >= 480 && totalCheckInMinutes <= 495; // 08:00 - 08:15
+				if (filterValue === 'late') return totalCheckInMinutes > 495; // After 8:15AM
+
+				if (!checkOut) return false;
+
+				const [outHour, outMinute] = checkOut.split(':').map(Number);
+				const totalCheckOutMinutes = outHour * 60 + outMinute;
+				if (filterValue === 'leaveEarly') return totalCheckInMinutes <= 1050; // Before 5:30PM
+				if (filterValue === 'leaveLate') return totalCheckOutMinutes >= 1080; // After 6PM
+
+				return true;
+			},
+			cell: ({ row }) => {
+				const checkIn = row.original.checkIn;
+				const checkOut = row.original.checkOut;
+
+				const formatTime = (time: string | null): string => {
+					if (!time) return '--:--';
+					const [hour, minute] = time.split(':').map(Number);
+					const ampm = hour >= 12 ? 'PM' : 'AM';
+					const formattedHour = (hour % 12 || 12).toString().padStart(2, '0');
+					const formattedMinute = minute.toString().padStart(2, '0');
+					return `${formattedHour}:${formattedMinute} ${ampm}`;
+				};
+
+				const getCheckInColorCheckIn = (checkIn: string | null) => {
+					if (!checkIn) return 'text-gray-400';
+
+					const [hour, minute] = checkIn.split(':').map(Number);
+					const totalMinutes = hour * 60 + minute;
+
+					if (totalMinutes < 480) return 'text-blue-500';
+					if (totalMinutes <= 495) return 'text-black';
+					return 'text-red-500';
+				};
+
+				const getCheckOutColorCheckOut = (checkOut: string | null) => {
+					if (!checkOut) return 'text-gray-400';
+
+					const [hour, minute] = checkOut.split(':').map(Number);
+					const totalMinutes = hour * 60 + minute;
+
+					if (totalMinutes < 1050) return 'text-red-500';
+					if (totalMinutes < 1080) return 'text-black';
+					return 'text-orange-500';
+				};
+
+				return (
+					<div className='grid grid-cols-3 items-center text-sm font-semibold text-gray-700'>
+						<span className={classNames('text-center', getCheckInColorCheckIn(checkIn))}>{formatTime(checkIn)}</span>
+						<div className='flex justify-center'>
+							<Minus className='text-gray-300 w-6' stroke='currentColor' />
+						</div>
+						<span className={classNames('text-center', getCheckOutColorCheckOut(checkOut))}>
+							{formatTime(checkOut)}
+						</span>
+					</div>
+				);
+			}
 		},
 		{
 			accessorKey: 'attendanceStatus',
@@ -188,7 +290,7 @@ export default function TimeTrackingTodayTable() {
 						</p>
 					) : row.getValue('leaveTypeEnum') === 2 ? (
 						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
-							<Baby className='w-6 h-4 mr-1' stroke='white' /> Nghỉ thai sản
+							<Baby className='w-6 h-4' stroke='white' /> Nghỉ thai sản
 						</p>
 					) : row.getValue('leaveTypeEnum') === 3 ? (
 						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
@@ -206,55 +308,6 @@ export default function TimeTrackingTodayTable() {
 			filterFn: (row, columnId, filterValue) => {
 				if (filterValue === undefined) return true;
 				return row.getValue(columnId) == filterValue;
-			}
-		},
-		{
-			accessorKey: 'checkIn',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Giờ check-in <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ row }) => {
-				const checkIn = row.original.checkIn;
-				if (!checkIn) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkIn.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
-			}
-		},
-		{
-			accessorKey: 'checkOut',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Giờ check-out <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ row }) => {
-				const checkOut = row.original.checkOut;
-				if (row.original.checkIn && !checkOut) {
-					return <span className='flex justify-center text-gray-400'>Chưa cập nhật</span>;
-				}
-				if (!checkOut) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkOut.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
 			}
 		},
 		{

@@ -74,7 +74,13 @@ export default function TimeTrackingToday() {
 	const fetchPrevDate = async (today: Date) => {
 		try {
 			const yesterday = new Date(today);
-			yesterday.setDate(today.getDate() - 1);
+
+			// Check if today is Monday, then yesterday is Friday
+			if (today.getDay() === 1) {
+				yesterday.setDate(today.getDate() - 3);
+			} else {
+				yesterday.setDate(today.getDate() - 1);
+			}
 
 			const day = yesterday.toLocaleDateString('vi-VN', { day: '2-digit' });
 			const month = yesterday.toLocaleDateString('vi-VN', { month: '2-digit' });
@@ -127,8 +133,8 @@ export default function TimeTrackingToday() {
 					{ yesterdayOnTime: 0, yesterdayLate: 0, yesterdayEarly: 0 }
 				);
 
-				// console.log({ onTime, late, early });
-				// console.log({ yesterdayOnTime, yesterdayLate, yesterdayEarly });
+				console.log({ onTime, late, early });
+				console.log({ yesterdayOnTime, yesterdayLate, yesterdayEarly });
 
 				const { unpaidLeave, notCheckIn, notCheckOut } = timeTrackingToday.reduce(
 					(acc, item) => {

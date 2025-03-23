@@ -19,7 +19,7 @@ export default function PresentSummary({
 	earlyGTEorLTE = 0
 }: PresentSummaryProps) {
 	return (
-		<Card className='px-2 py-4 bg-transparent shadow-none flex-2'>
+		<Card className='px-2 py-4 bg-transparent shadow-none flex-2 bg-white'>
 			<CardHeader className='pt-1 pb-6 px-1'>
 				<CardTitle className='flex items-center gap-2'>📋 Tổng kết chấm công</CardTitle>
 			</CardHeader>
