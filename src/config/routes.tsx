@@ -13,6 +13,7 @@ const routes = {
 	customers: 'customers',
 
 	eLogin: '/login',
+	eForgot: '/forgot-password',
 	hrLogin: '/hr-login'
 };
 
