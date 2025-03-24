@@ -15,7 +15,7 @@ const Login = () => {
 			>
 				<div className='flex flex-col items-center gap-2 text-white mb-3'>
 					<span className='text-4xl font-bold'>Đăng nhập InkVerse</span>
-					<span className='text'>Sử dụng email và mật khẩu của bạn để đăng nhập</span>
+					<span className='text'>Sử dụng Username và mật khẩu của bạn để đăng nhập</span>
 				</div>
 				<LoginForm />
 				<div className='text-white w-full text-center'>
