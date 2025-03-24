@@ -1,0 +1,15 @@
+.time-tracking-month-dialog .sx__ripple,
+.time-tracking-month-dialog .sx__date-input,
+.time-tracking-month-dialog .sx__view-selection,
+.time-tracking-month-dialog .sx__date-picker-wrapper {
+	display: none !important;
+}
+
+.time-tracking-month-dialog .sx__calendar-header {
+	margin: auto;
+	font-weight: bold;
+}
+
+.time-tracking-month-dialog .sx__range-heading {
+	font-size: 24px !important;
+}

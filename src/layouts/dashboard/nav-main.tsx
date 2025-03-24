@@ -103,12 +103,12 @@ export function NavMain() {
 			isActive: true,
 			items: [
 				{
-					title: 'Hôm nay',
+					title: 'Theo ngày',
 					url: '/time-tracking/today'
 				},
 				{
-					title: 'Tháng này',
-					url: '#'
+					title: 'Theo tháng',
+					url: '/time-tracking/month'
 				}
 			]
 		},

@@ -21,3 +21,14 @@ export const updateHoliday = async (holidayID: number, holidayData: object) => {
 		throw error;
 	}
 };
+
+export const addHoliday = async (holidayData: object) => {
+	try {
+		const response = await axios.post(`/api/v1/holidays`, holidayData);
+		console.log('Thêm lịch nghỉ lễ thành công:', response);
+		return response;
+	} catch (error) {
+		console.error('Lỗi khi thêm lịch nghỉ lễ:', error);
+		throw error;
+	}
+};

@@ -14,6 +14,8 @@ interface ApiResponse {
 	updatedAt: string;
 	status: number;
 	userId: number;
+	fullName: string;
+	roleName: string;
 }
 
 interface LeaveRequestStates {

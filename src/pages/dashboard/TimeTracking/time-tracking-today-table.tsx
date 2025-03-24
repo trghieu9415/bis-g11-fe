@@ -7,11 +7,16 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import classNames from 'classnames';
 
 import CustomDialog from '@/components/custom-dialog';
+import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { updateAttendanceDetail } from '@/services/attendanceDetailService';
 import { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
+import { format } from 'date-fns';
 import {
 	AlertTriangle,
 	ArrowUpDown,
@@ -21,14 +26,14 @@ import {
 	Ellipsis,
 	Hospital,
 	PartyPopper,
-	XCircle
+	XCircle,
+	Minus,
+	Dot
 } from 'lucide-react';
 import { useState } from 'react';
 import { RegisterOptions } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
-import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
-import { RootState, useAppDispatch } from '@/redux/store';
-import { format } from 'date-fns';
 type TimeTrackingToday = {
 	id: number;
 	idString: string;
@@ -61,15 +66,13 @@ export default function TimeTrackingTodayTable() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
 
-	console.log(selectedTimeTrackingToday);
-
 	const dispatch = useAppDispatch();
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
+	const formattedDate = format(new Date(), 'yyyy-MM-dd');
 
-	useEffect(() => {
-		const formattedDate = format(new Date(), 'yyyy-MM-dd');
-		dispatch(fetchAllTimeTrackingToday(formattedDate));
-	}, [dispatch]);
+	// useEffect(() => {
+	// 	dispatch(fetchAllTimeTrackingToday(formattedDate));
+	// }, [dispatch]);
 
 	const columns: ColumnDef<TimeTrackingToday>[] = [
 		{
@@ -90,7 +93,7 @@ export default function TimeTrackingTodayTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='text-white w-28'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID nhân viên <ArrowUpDown />
@@ -112,6 +115,105 @@ export default function TimeTrackingTodayTable() {
 			),
 			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
 			enableHiding: false
+		},
+		{
+			accessorKey: 'workingHours',
+			header: ({ column }) => (
+				// <Button
+				// 	variant='link'
+				// 	className='text-white min-w-[200px]'
+				// 	onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				// >
+				// 	Giờ làm việc <ArrowUpDown />
+				// </Button>
+				<Select
+					onValueChange={value => {
+						const newValue = value === 'all' ? undefined : value;
+						column.setFilterValue(newValue);
+					}}
+				>
+					<SelectTrigger className='w-full text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+						<SelectValue placeholder='Giờ làm việc' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='all'>Giờ làm việc</SelectItem>
+						<SelectItem value='early'>Đi sớm</SelectItem>
+						<SelectItem value='onTime'>Đúng giờ</SelectItem>
+						<SelectItem value='late'>Đi trễ</SelectItem>
+						<SelectItem value='leaveEarly'>Về sớm</SelectItem>
+						<SelectItem value='leaveLate'>Về trễ</SelectItem>
+					</SelectContent>
+				</Select>
+			),
+			filterFn: (row, columnId, filterValue) => {
+				const checkIn = row.original.checkIn;
+				const checkOut = row.original.checkOut;
+
+				if (!checkIn) return filterValue === 'late'; //If not checkin => Late
+
+				const [inHour, inMinute] = checkIn.split(':').map(Number);
+				const totalCheckInMinutes = inHour * 60 + inMinute;
+
+				if (filterValue === 'early') return totalCheckInMinutes < 480; // Before 8AM
+				if (filterValue === 'onTime') return totalCheckInMinutes >= 480 && totalCheckInMinutes <= 495; // 08:00 - 08:15
+				if (filterValue === 'late') return totalCheckInMinutes > 495; // After 8:15AM
+
+				if (!checkOut) return false;
+
+				const [outHour, outMinute] = checkOut.split(':').map(Number);
+				const totalCheckOutMinutes = outHour * 60 + outMinute;
+				if (filterValue === 'leaveEarly') return totalCheckInMinutes <= 1050; // Before 5:30PM
+				if (filterValue === 'leaveLate') return totalCheckOutMinutes >= 1080; // After 6PM
+
+				return true;
+			},
+			cell: ({ row }) => {
+				const checkIn = row.original.checkIn;
+				const checkOut = row.original.checkOut;
+
+				const formatTime = (time: string | null): string => {
+					if (!time) return '--:--';
+					const [hour, minute] = time.split(':').map(Number);
+					const ampm = hour >= 12 ? 'PM' : 'AM';
+					const formattedHour = (hour % 12 || 12).toString().padStart(2, '0');
+					const formattedMinute = minute.toString().padStart(2, '0');
+					return `${formattedHour}:${formattedMinute} ${ampm}`;
+				};
+
+				const getCheckInColorCheckIn = (checkIn: string | null) => {
+					if (!checkIn) return 'text-gray-400';
+
+					const [hour, minute] = checkIn.split(':').map(Number);
+					const totalMinutes = hour * 60 + minute;
+
+					if (totalMinutes < 480) return 'text-blue-500';
+					if (totalMinutes <= 495) return 'text-black';
+					return 'text-red-500';
+				};
+
+				const getCheckOutColorCheckOut = (checkOut: string | null) => {
+					if (!checkOut) return 'text-gray-400';
+
+					const [hour, minute] = checkOut.split(':').map(Number);
+					const totalMinutes = hour * 60 + minute;
+
+					if (totalMinutes < 1050) return 'text-red-500';
+					if (totalMinutes < 1080) return 'text-black';
+					return 'text-orange-500';
+				};
+
+				return (
+					<div className='grid grid-cols-3 items-center text-sm font-semibold text-gray-700'>
+						<span className={classNames('text-center', getCheckInColorCheckIn(checkIn))}>{formatTime(checkIn)}</span>
+						<div className='flex justify-center'>
+							<Minus className='text-gray-300 w-6' stroke='currentColor' />
+						</div>
+						<span className={classNames('text-center', getCheckOutColorCheckOut(checkOut))}>
+							{formatTime(checkOut)}
+						</span>
+					</div>
+				);
+			}
 		},
 		{
 			accessorKey: 'attendanceStatus',
@@ -144,10 +246,12 @@ export default function TimeTrackingTodayTable() {
 						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
 							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
 						</p>
-					) : (
+					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
 						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
 							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
 						</p>
+					) : (
+						<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
 					)}
 				</span>
 			)
@@ -186,7 +290,7 @@ export default function TimeTrackingTodayTable() {
 						</p>
 					) : row.getValue('leaveTypeEnum') === 2 ? (
 						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
-							<Baby className='w-6 h-4 mr-1' stroke='white' /> Nghỉ thai sản
+							<Baby className='w-6 h-4' stroke='white' /> Nghỉ thai sản
 						</p>
 					) : row.getValue('leaveTypeEnum') === 3 ? (
 						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
@@ -207,55 +311,6 @@ export default function TimeTrackingTodayTable() {
 			}
 		},
 		{
-			accessorKey: 'checkIn',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Giờ check-in <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ row }) => {
-				const checkIn = row.original.checkIn;
-				if (!checkIn) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkIn.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
-			}
-		},
-		{
-			accessorKey: 'checkOut',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Giờ check-out <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ row }) => {
-				const checkOut = row.original.checkOut;
-				if (row.original.checkIn && !checkOut) {
-					return <span className='flex justify-center text-gray-400'>Chưa cập nhật</span>;
-				}
-				if (!checkOut) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkOut.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
-			}
-		},
-		{
 			id: 'actions',
 			header: 'Thao tác',
 			cell: ({ row }) => (
@@ -270,7 +325,7 @@ export default function TimeTrackingTodayTable() {
 						{row.original.attendanceStatus === 'PRESENT' && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
@@ -295,7 +350,7 @@ export default function TimeTrackingTodayTable() {
 			...timeTrackingToday,
 			leaveTypeEnumLabel:
 				timeTrackingToday?.leaveTypeEnum !== null ? leaveTypeMap[timeTrackingToday.leaveTypeEnum as number] : '--',
-			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Không xác định'
+			attendanceStatusLabel: attendanceStatusMap[timeTrackingToday?.attendanceStatus ?? ''] || 'Chưa cập nhật'
 		};
 		setSelectedTimeTrackingToday(data);
 		setDialogMode(mode);
@@ -307,15 +362,7 @@ export default function TimeTrackingTodayTable() {
 		setSelectedTimeTrackingToday(null);
 	};
 
-	const hiddenColumns = {
-		date_of_birth: false,
-		gender: false,
-		address: false,
-		base_salary: false,
-		salary_coefficient: false
-	};
-
-	const employeeFields: FieldConfig[][][] = [
+	const timeTrackingTodayFields: FieldConfig[][][] = [
 		[
 			[
 				{
@@ -403,8 +450,6 @@ export default function TimeTrackingTodayTable() {
 							const checkInSeconds = checkInTime[0] * 3600 + checkInTime[1] * 60 + checkInTime[2];
 							const checkOutSeconds = checkOutTime[0] * 3600 + checkOutTime[1] * 60 + checkOutTime[2];
 
-							console.log(checkInSeconds, checkOutSeconds);
-
 							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
 						}
 					},
@@ -414,40 +459,38 @@ export default function TimeTrackingTodayTable() {
 		]
 	];
 
+	const formatToFake7Z = (date: string, time: string): string => {
+		return `${date}T${time}.000Z`;
+	};
+
 	const handleSave = async (data: TimeTrackingToday) => {
-		console.log(data);
-		// const userId = data.id;
-		// const updatedUserData = {
-		// 	fullName: data.full_name,
-		// 	phoneNumber: data.phone,
-		// 	email: data.email,
-		// 	dateOfBirth: data.date_of_birth,
-		// 	address: data.address,
-		// 	gender: data.gender ? 'MALE' : 'FEMALE',
-		// 	username: data.username,
-		// 	password: ''
-		// };
-		// if (data.password) {
-		// 	updatedUserData.password = data.password;
-		// }
-		// // Call API for update user info
-		// try {
-		// 	await updateUser(userId, updatedUserData);
-		// 	toast.success('Cập nhật thông tin nhân viên thành công!');
-		// 	dispatch(fetchUsers());
-		// 	setIsDialogOpen(false);
-		// } catch (error: unknown) {
-		// 	const err = error as AxiosError;
-		// 	if (err.response?.status === 400) {
-		// 		toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
-		// 	} else if (err.response?.status === 404) {
-		// 		toast.error('Lỗi 404: Không tìm thấy nhân viên.');
-		// 	} else if (err.response?.status === 500) {
-		// 		toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-		// 	} else {
-		// 		toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-		// 	}
-		// }
+		const attendanceDetail = {
+			userId: data.userId,
+			checkIn: formatToFake7Z(data.workingDay, data.checkIn),
+			checkOut: formatToFake7Z(data.workingDay, data.checkOut)
+		};
+
+		console.log(attendanceDetail);
+
+		try {
+			await updateAttendanceDetail(attendanceDetail);
+			toast.success('Cập nhật chấm công thành công!');
+			dispatch(fetchAllTimeTrackingToday(formattedDate));
+			setIsDialogOpen(false);
+		} catch (error: unknown) {
+			const err = error as AxiosError;
+			if (err.response?.status === 400) {
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy chấm công.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
 	};
 
 	// const handleDelete = async (data: Employee) => {
@@ -475,7 +518,7 @@ export default function TimeTrackingTodayTable() {
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={timeTrackingToday} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
+			<CustomTable columns={columns} data={timeTrackingToday} stickyClassIndex={0} />
 			{selectedTimeTrackingToday && (
 				<CustomDialog
 					entity={{
@@ -485,7 +528,7 @@ export default function TimeTrackingTodayTable() {
 					isOpen={isDialogOpen}
 					onClose={handleCloseDialog}
 					mode={dialogMode}
-					fields={employeeFields}
+					fields={timeTrackingTodayFields}
 					onSave={handleSave}
 					// onDelete={handleDelete}
 				/>

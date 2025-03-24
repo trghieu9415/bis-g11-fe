@@ -4,7 +4,7 @@ import Header from '@/layouts/dashboard/header';
 
 export default function DashboardLayout({ mainContent }: { mainContent: React.ReactNode }) {
 	return (
-		<SidebarProvider className='max-w-full overflow-hidden'>
+		<SidebarProvider className='max-w-full overflow-hidden bg-[#F2F7FA]'>
 			<AppSidebar />
 			<main className='flex flex-col mx-3 overflow-hidden flex-grow'>
 				<div className='sticky top-0'>

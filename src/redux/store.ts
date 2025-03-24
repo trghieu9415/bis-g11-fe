@@ -10,6 +10,7 @@ import contractsReducer from './slices/contractsSlice';
 import leaveRequestsReducer from './slices/leaveRequestsSlice';
 import timeTrackingTodayReducer from './slices/timeTrackingTodaySlice';
 import holidaysReducer from './slices/holidaysSlice';
+import TimeTrackingMonth from './slices/timeTrackingMonthSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -22,7 +23,8 @@ export const store = configureStore({
 		contracts: contractsReducer,
 		leaveRequests: leaveRequestsReducer,
 		timeTrackingToday: timeTrackingTodayReducer,
-		holidays: holidaysReducer
+		holidays: holidaysReducer,
+		timeTrackingMonth: TimeTrackingMonth
 	}
 });
 

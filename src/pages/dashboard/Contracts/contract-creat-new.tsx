@@ -165,8 +165,6 @@ export default function ContractCreateNew() {
 		}
 	};
 
-	console.log(users);
-
 	// Person information
 	const personalInfo = [
 		{ label: 'Họ và tên', value: selectedUser?.full_name },
@@ -223,8 +221,6 @@ export default function ContractCreateNew() {
 			seniorityId: data.level_id,
 			userId: selectedUser.id
 		};
-
-		console.log(contractData);
 
 		try {
 			await addContract(contractData);

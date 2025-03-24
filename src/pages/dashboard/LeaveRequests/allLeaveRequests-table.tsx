@@ -36,6 +36,8 @@ type leaveRequests = {
 	updatedAt: string;
 	status: number;
 	userId: number;
+	roleName: string;
+	fullName: string;
 };
 
 export default function AllLeaveRequestsTable() {
@@ -251,7 +253,9 @@ export default function AllLeaveRequestsTable() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy đơn nghỉ phép.');
 			} else if (err.response?.status === 500) {
@@ -312,10 +316,10 @@ export default function AllLeaveRequestsTable() {
 												<strong className='italic underline'>Kính gửi:</strong> Trưởng phòng Nhân sự
 											</p>
 											<p className='text-gray-900'>
-												<strong>Tên tôi là:</strong>
+												<strong>Tên tôi là:</strong> {selectedLeaveRequest.fullName}
 											</p>
 											<p className='text-gray-900'>
-												<strong>Chức vụ:</strong>
+												<strong>Chức vụ:</strong> {selectedLeaveRequest.roleName}
 											</p>
 											<div className='flex items-center justify-start gap-2'>
 												<strong className='text-gray-900 text-base'>Loại nghỉ phép: </strong>
