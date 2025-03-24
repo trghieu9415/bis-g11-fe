@@ -5,15 +5,14 @@ import axios from '@/services/customize-axios';
 interface ApiResponse {
 	id: number;
 	idString: string;
-	checkIn: string;
-	checkOut: string;
-	workingDay: string;
-	attendanceStatus: string;
-	leaveTypeEnum: number | null;
+	monthOfYear: string;
+	totalWorkingDays: number;
+	totalSickLeaves: number;
+	totalPaidLeaves: number;
+	totalMaternityLeaves: number;
+	totalUnpaidLeaves: number;
+	totalHolidayLeaves: number;
 	userId: number;
-	userIdString: string;
-	fullName: string;
-	attendanceId: number;
 }
 
 interface TimeTrackingMonthStates {

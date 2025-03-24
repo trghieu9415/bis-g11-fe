@@ -116,7 +116,10 @@ export default function EmployeeLeaveRequest() {
 				const err = error as AxiosError;
 
 				if (err.response?.status === 400) {
-					toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+					toast.error(
+						(err.response.data as { message?: string }).message ||
+							'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+					);
 				} else if (err.response?.status === 404) {
 					toast.error('Lỗi 404: Không tìm thấy nhân viên.');
 				} else if (err.response?.status === 500) {

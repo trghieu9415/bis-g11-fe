@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import TimeTrackingTodayTable from './TimeTracking/time-tracking-today-table';
-import PresentSummary from './TimeTracking/present-summary';
-import AbsentSummary from './TimeTracking/absent-summary';
-import AwaySummary from './TimeTracking/away-summary';
+import PresentSummary from './TimeTracking/components/present-summary';
+import AbsentSummary from './TimeTracking/components/absent-summary';
+import AwaySummary from './TimeTracking/components/away-summary';
 import { Input } from '@/components/ui/input';
 
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
-import { getAllAttendanceDetail } from '@/services/attendanceDetailService';
+import { getAllAttendanceDetailByDate } from '@/services/attendanceDetailService';
 import { set } from 'date-fns';
 
 export default function TimeTrackingToday() {
@@ -86,7 +86,7 @@ export default function TimeTrackingToday() {
 			const month = yesterday.toLocaleDateString('vi-VN', { month: '2-digit' });
 			const year = yesterday.toLocaleDateString('vi-VN', { year: 'numeric' });
 
-			const prevDateData = await getAllAttendanceDetail(`${year}-${month}-${day}`);
+			const prevDateData = await getAllAttendanceDetailByDate(`${year}-${month}-${day}`);
 
 			if (prevDateData?.data?.length > 0) {
 				// console.log(prevDateData.data);

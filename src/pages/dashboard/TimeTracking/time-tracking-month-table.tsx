@@ -1,36 +1,45 @@
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle
+} from '@/components/ui/dialog';
+import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-
-import CustomDialog from '@/components/custom-dialog';
-import { ColumnDef } from '@tanstack/react-table';
-import {
-	AlertTriangle,
-	ArrowUpDown,
-	Baby,
-	CalendarCheck,
-	CheckCircle,
-	Ellipsis,
-	Hospital,
-	PartyPopper,
-	XCircle
-} from 'lucide-react';
-import { useState } from 'react';
-import { RegisterOptions } from 'react-hook-form';
-
 import { fetchAllTimeTrackingMonth } from '@/redux/slices/timeTrackingMonthSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
+import { getAllAttendanceDetailByUser } from '@/services/attendanceDetailService';
+import { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
+import { ArrowUpDown, Ellipsis } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import TimeTrackingMonthDialog from './components/time-tracking-month-dialog';
 
 type TimeTrackingMonth = {
+	id: number;
+	idString: string;
+	monthOfYear: string;
+	totalWorkingDays: number;
+	totalSickLeaves: number;
+	totalPaidLeaves: number;
+	totalMaternityLeaves: number;
+	totalUnpaidLeaves: number;
+	totalHolidayLeaves: number;
+	userId: number;
+};
+
+interface AttendanceDetail {
 	id: number;
 	idString: string;
 	checkIn: string;
@@ -38,40 +47,37 @@ type TimeTrackingMonth = {
 	workingDay: string;
 	attendanceStatus: string;
 	leaveTypeEnum: number | null;
+	lateTypeEnum: string | null;
 	userId: number;
 	userIdString: string;
 	fullName: string;
 	attendanceId: number;
-	leaveTypeEnumLabel?: string;
-	attendanceStatusLabel?: string;
-};
-
-type FieldConfig = {
-	label: string;
-	key: keyof TimeTrackingMonth;
-	type: 'input' | 'select' | 'number' | 'date' | 'time';
-	options?: { value: string; label: string; isBoolean?: boolean }[];
-	disabled?: boolean;
-	validation?: RegisterOptions;
-	showOnly?: 'view' | 'edit' | 'delete';
-	isShow?: boolean;
-};
+}
 
 export default function TimeTrackingMonthTable() {
 	const [selectedTimeTrackingMonth, setSelectedTimeTrackingMonth] = useState<TimeTrackingMonth | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
+	const [events, setEvents] = useState([]);
 
 	const dispatch = useAppDispatch();
 	const { timeTrackingMonth } = useSelector((state: RootState) => state.timeTrackingMonth);
 
+	const [open, setOpen] = useState(false);
+
+	const handleClickOpen = () => {
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
 	useEffect(() => {
 		const formattedDate = format(new Date(), 'yyyy-MM');
-		console.log(formattedDate);
-		dispatch(fetchAllTimeTrackingMonth(formattedDate));
+		// dispatch(fetchAllTimeTrackingMonth(formattedDate));
+		dispatch(fetchAllTimeTrackingMonth('2025-02'));
 	}, [dispatch]);
-
-	console.log(timeTrackingMonth);
 
 	const columns: ColumnDef<TimeTrackingMonth>[] = [
 		{
@@ -88,17 +94,17 @@ export default function TimeTrackingMonthTable() {
 			enableHiding: false
 		},
 		{
-			accessorKey: 'userIdString',
+			accessorKey: 'userId',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='text-white w-28'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID nhân viên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userIdString')}</span>,
+			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userId')}</span>,
 			enableHiding: false
 		},
 		{
@@ -106,159 +112,150 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='text-white w-20'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Họ và tên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('fullName')}</span>,
 			enableHiding: false
 		},
+
 		{
-			accessorKey: 'attendanceStatus',
-			header: ({ column }) => (
-				<Select
-					onValueChange={value => {
-						const newValue = value === 'all' ? undefined : value;
-						column.setFilterValue(newValue);
-					}}
-				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
-						<SelectValue placeholder='Trạng thái' />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value='all'>Trạng thái</SelectItem>
-						<SelectItem value='PRESENT'>Có mặt</SelectItem>
-						<SelectItem value='ON_LEAVE'>Vắng có phép</SelectItem>
-						<SelectItem value='ABSENT'>Vắng mặt</SelectItem>
-					</SelectContent>
-				</Select>
-			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('attendanceStatus') === 'PRESENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
-							Có mặt
-						</p>
-					) : row.getValue('attendanceStatus') === 'ON_LEAVE' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
-						</p>
-					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
-							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
-						</p>
-					) : (
-						<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
-					)}
-				</span>
-			)
-		},
-		{
-			accessorKey: 'leaveTypeEnum',
-			header: ({ column }) => (
-				<Select
-					onValueChange={value => {
-						const newValue = value === 'all' ? undefined : Number(value);
-						column.setFilterValue(newValue);
-					}}
-				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
-						<SelectValue placeholder='Loại nghỉ' />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value='all'>Loại nghỉ</SelectItem>
-						<SelectItem value='0'>Nghỉ bệnh</SelectItem>
-						<SelectItem value='1'>Nghỉ phép</SelectItem>
-						<SelectItem value='2'>Nghỉ thai sản</SelectItem>
-						<SelectItem value='3'>Nghỉ lễ</SelectItem>
-					</SelectContent>
-				</Select>
-			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('leaveTypeEnum') === 0 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-blue-500 rounded-sm p-1'>
-							<Hospital className='w-4 h-4 mr-1' stroke='white' />
-							Nghỉ bệnh
-						</p>
-					) : row.getValue('leaveTypeEnum') === 1 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-orange-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Nghỉ phép
-						</p>
-					) : row.getValue('leaveTypeEnum') === 2 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
-							<Baby className='w-6 h-4 mr-1' stroke='white' /> Nghỉ thai sản
-						</p>
-					) : row.getValue('leaveTypeEnum') === 3 ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
-							<PartyPopper className='w-4 h-4 mr-1' stroke='white' /> Nghỉ lễ
-						</p>
-					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-red-500 rounded-sm p-1'>
-							<AlertTriangle className='w-4 h-4 mr-1' stroke='white' /> Không phép
-						</p>
-					) : (
-						'--'
-					)}
-				</span>
-			),
-			filterFn: (row, columnId, filterValue) => {
-				if (filterValue === undefined) return true;
-				return row.getValue(columnId) == filterValue;
-			}
-		},
-		{
-			accessorKey: 'checkIn',
+			accessorKey: 'totalHolidayLeaves',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white'
+					className='text-white w-20'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Giờ check-in <ArrowUpDown />
+					Nghỉ lễ <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => {
-				const checkIn = row.original.checkIn;
-				if (!checkIn) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkIn.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
-			}
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalHolidayLeaves')}</span>,
+			enableHiding: true
 		},
 		{
-			accessorKey: 'checkOut',
+			accessorKey: 'totalSickLeaves',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white'
+					className='text-white w-20'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Giờ check-out <ArrowUpDown />
+					Nghỉ bệnh <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => {
-				const checkOut = row.original.checkOut;
-				if (row.original.checkIn && !checkOut) {
-					return <span className='flex justify-center text-gray-400'>Chưa cập nhật</span>;
-				}
-				if (!checkOut) return <span className='flex justify-center'>--</span>;
-
-				const [hour, minute] = checkOut.split(':');
-				return (
-					<span className='flex justify-center'>
-						{parseInt(hour)} giờ {minute} phút
-					</span>
-				);
-			}
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalSickLeaves')}</span>,
+			enableHiding: true
 		},
+		{
+			accessorKey: 'totalPaidLeaves',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-20'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Nghỉ phép <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalPaidLeaves')}</span>,
+			enableHiding: true
+		},
+		{
+			accessorKey: 'totalMaternityLeaves',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-[84px]'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Nghỉ thai sản <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalMaternityLeaves')}</span>,
+			enableHiding: true
+		},
+		{
+			accessorKey: 'totalWorkingDays',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-20'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Làm việc <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalWorkingDays')}</span>,
+			enableHiding: true
+		},
+		// {
+		// 	accessorKey: 'workDistribute',
+		// 	header: ({ column }) => (
+		// 		<Button
+		// 			variant='link'
+		// 			className='text-white w-24'
+		// 			onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+		// 		>
+		// 			Phân bổ CV <ArrowUpDown />
+		// 		</Button>
+		// 	),
+		// 	cell: ({ row }) => {
+		// 		const totalHolidayLeaves = row.original.totalHolidayLeaves;
+		// 		const totalSickLeaves = row.original.totalSickLeaves;
+		// 		const totalPaidLeaves = row.original.totalPaidLeaves;
+		// 		const totalUnpaidLeaves = row.original.totalUnpaidLeaves;
+		// 		const totalMaternityLeaves = row.original.totalMaternityLeaves;
+		// 		const totalWorkingDays = row.original.totalWorkingDays;
+
+		// 		const data = [
+		// 			{ name: 'Ngày làm việc', value: totalWorkingDays, fill: '#4CAF50' },
+		// 			{ name: 'Nghỉ lễ', value: totalHolidayLeaves, fill: '#FFEB3B' },
+		// 			{ name: 'Nghỉ bệnh', value: totalSickLeaves, fill: '#2196F3' },
+		// 			{ name: 'Nghỉ phép', value: totalPaidLeaves, fill: '#FF5722' },
+		// 			{ name: 'Nghỉ thai sản', value: totalMaternityLeaves, fill: '#9C27B0' },
+		// 			{ name: 'Nghỉ không phép', value: totalUnpaidLeaves, fill: '#F44336' }
+		// 		];
+
+		// 		return (
+		// 			<Dialog>
+		// 				<DialogTrigger asChild>
+		// 					<Button variant='outline' className='text-center block mx-auto'>
+		// 						<ChartPie />
+		// 					</Button>
+		// 				</DialogTrigger>
+		// 				<DialogContent className='sm:max-w-[600px]'>
+		// 					<DialogHeader>
+		// 						<DialogTitle>Biểu đồ phân bổ ngày nghỉ và làm việc</DialogTitle>
+		// 						<DialogDescription>
+		// 							Biểu đồ này thể hiện tỷ lệ các loại ngày nghỉ và ngày làm việc của nhân viên. Bạn có thể xem chi tiết
+		// 							các ngày nghỉ lễ, bệnh, phép, thai sản, không phép và ngày làm việc.
+		// 						</DialogDescription>
+		// 					</DialogHeader>
+		// 					<div style={{ width: '100%', height: 400 }}>
+		// 						<ResponsiveContainer width='100%' height='100%'>
+		// 							<PieChart>
+		// 								<Pie data={data} dataKey='value' nameKey='name' cx='50%' cy='50%' outerRadius='80%' label>
+		// 									{data.map((entry, index) => (
+		// 										<Cell key={`cell-${index}`} fill={entry.fill} />
+		// 									))}
+		// 								</Pie>
+		// 								<Legend />
+		// 								<Tooltip />
+		// 							</PieChart>
+		// 						</ResponsiveContainer>
+		// 					</div>
+		// 					<DialogFooter>
+		// 						<Button type='submit'>Đóng</Button>
+		// 					</DialogFooter>
+		// 				</DialogContent>
+		// 			</Dialog>
+		// 		);
+		// 	}
+		// },
 		{
 			id: 'actions',
 			header: 'Thao tác',
@@ -271,37 +268,90 @@ export default function TimeTrackingMonthTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{row.original.attendanceStatus === 'PRESENT' && (
-							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						)}
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem> */}
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
 		}
 	];
 
-	const handleOpenDialog = (TimeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
-		const leaveTypeMap: Record<number, string> = {
-			0: 'Nghỉ bệnh',
-			1: 'Nghỉ phép',
-			2: 'Nghỉ thai sản',
-			3: 'Nghỉ lễ'
-		};
+	const fetchEvents = async (userId: number, monthOfYear: string) => {
+		try {
+			const response = await getAllAttendanceDetailByUser(userId);
+			if (response?.data) {
+				const data = response.data.filter((item: AttendanceDetail) => item.workingDay.startsWith(monthOfYear));
 
-		const attendanceStatusMap: Record<string, string> = {
-			PRESENT: 'Có mặt',
-			ON_LEAVE: 'Vắng có phép',
-			ABSENT: 'Vắng mặt'
-		};
+				const events = data.map((item: AttendanceDetail) => {
+					let calendarId = '';
+					let title = '';
 
-		const data = {
-			...TimeTrackingMonth,
-			leaveTypeEnumLabel:
-				TimeTrackingMonth?.leaveTypeEnum !== null ? leaveTypeMap[TimeTrackingMonth.leaveTypeEnum as number] : '--',
-			attendanceStatusLabel: attendanceStatusMap[TimeTrackingMonth?.attendanceStatus ?? ''] || 'Chưa cập nhật'
-		};
-		setSelectedTimeTrackingMonth(data);
+					if (item.leaveTypeEnum !== null) {
+						if (item.leaveTypeEnum === 0) {
+							calendarId = 'blue-theme'; // (SICK_LEAVE)
+							title = 'Nghỉ bệnh';
+						} else if (item.leaveTypeEnum === 1) {
+							calendarId = 'orange-theme'; // (PAID_LEAVE)
+							title = 'Nghỉ phép';
+						} else if (item.leaveTypeEnum === 2) {
+							calendarId = 'pink-theme'; //(MATERNITY_LEAVE)
+							title = 'Nghỉ thai sản';
+						} else if (item.leaveTypeEnum === 3) {
+							calendarId = 'purple-theme'; //(HOLIDAY_LEAVE)
+							title = 'Nghỉ lễ';
+						}
+					}
+
+					if (item.attendanceStatus === 'ABSENT') {
+						calendarId = 'red-theme'; // (ABSENT)
+						title = 'Vắng không phép';
+					} else if (item.attendanceStatus === 'PRESENT') {
+						if (!calendarId) {
+							if (item?.lateTypeEnum) {
+								calendarId = 'yellow-theme'; // (PRESENT but LATE)
+								title = 'Đi trễ';
+							} else {
+								calendarId = 'green-theme'; // (PRESENT)
+								title = 'Có mặt';
+							}
+						}
+					}
+
+					const checkOut = item.checkOut ? ' ' + item.checkOut.split(':').slice(0, 2).join(':') : '';
+					const checkIn = item.checkIn ? ' ' + item.checkIn.split(':').slice(0, 2).join(':') : '';
+
+					return {
+						calendarId: calendarId,
+						end: `${item.workingDay}${checkOut}`,
+						id: item.idString,
+						start: `${item.workingDay}${checkIn}`,
+						title: `${checkOut ? '- ' + checkOut + ':' : ''} ${title}`
+					};
+				});
+
+				// console.log(events);
+				setEvents(events);
+			}
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
+	};
+
+	const handleOpenDialog = (timeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
+		setSelectedTimeTrackingMonth(timeTrackingMonth);
+		fetchEvents(timeTrackingMonth.userId, timeTrackingMonth.monthOfYear);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
@@ -312,186 +362,31 @@ export default function TimeTrackingMonthTable() {
 	};
 
 	const hiddenColumns = {
-		date_of_birth: false,
-		gender: false,
-		address: false,
-		base_salary: false,
-		salary_coefficient: false
+		// totalHolidayLeaves: false,
+		// totalMaternityLeaves: false,
+		// totalPaidLeaves: false,
+		// totalSickLeaves: false,
+		// totalUnpaidLeaves: false,
+		// totalWorkingDays: false
 	};
-
-	const employeeFields: FieldConfig[][][] = [
-		[
-			[
-				{
-					label: 'Mã chấm công',
-					key: 'idString',
-					type: 'input',
-					disabled: true
-				},
-				{
-					label: 'Mã NV',
-					key: 'userIdString',
-					type: 'input',
-					disabled: true
-				}
-			],
-			[{ label: 'Ngày chấm công', key: 'workingDay', type: 'date', disabled: true }]
-		],
-		[
-			[
-				{
-					label: 'Họ và tên',
-					key: 'fullName',
-					type: 'input',
-					disabled: true
-				}
-			],
-			[
-				{
-					label: 'Trạng thái',
-					key: 'attendanceStatusLabel',
-					type: 'input',
-					disabled: true
-				},
-				{
-					label: 'Loại nghỉ',
-					key: 'leaveTypeEnumLabel',
-					type: 'input',
-					disabled: true
-				}
-			]
-		],
-		[
-			[],
-			[
-				{
-					label: 'Giờ check-in',
-					key: 'checkIn',
-					type: 'time',
-					validation: {
-						required: 'Vui lòng nhập giờ check-in',
-						pattern: {
-							value: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
-							message: 'Định dạng không hợp lệ (HH:mm:ss)'
-						},
-						validate: value => {
-							if (!selectedTimeTrackingMonth?.checkIn) return true;
-							const [hh, mm, ss] = value.split(':').map(Number);
-							if (hh > 23 || mm > 59 || ss > 59) {
-								return 'Giờ nhập vào không hợp lệ';
-							}
-						}
-					},
-					isShow: selectedTimeTrackingMonth?.attendanceStatus === 'PRESENT' && true
-				},
-				{
-					label: 'Giờ check-out',
-					key: 'checkOut',
-					type: 'time',
-					validation: {
-						required: 'Vui lòng nhập giờ check-out',
-						pattern: {
-							value: /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
-							message: 'Định dạng không hợp lệ (HH:mm:ss)'
-						},
-						validate: value => {
-							if (!selectedTimeTrackingMonth?.checkIn) return true;
-							const [hh, mm, ss] = value.split(':').map(Number);
-							if (hh > 23 || mm > 59 || ss > 59) {
-								return 'Giờ nhập vào không hợp lệ';
-							}
-
-							const checkInTime = selectedTimeTrackingMonth?.checkIn.split(':').map(Number);
-							const checkOutTime = value.split(':').map(Number);
-
-							const checkInSeconds = checkInTime[0] * 3600 + checkInTime[1] * 60 + checkInTime[2];
-							const checkOutSeconds = checkOutTime[0] * 3600 + checkOutTime[1] * 60 + checkOutTime[2];
-
-							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
-						}
-					},
-					isShow: selectedTimeTrackingMonth?.attendanceStatus === 'PRESENT' && true
-				}
-			]
-		]
-	];
-
-	const handleSave = async (data: TimeTrackingMonth) => {
-		console.log(data);
-		// const userId = data.id;
-		// const updatedUserData = {
-		// 	fullName: data.full_name,
-		// 	phoneNumber: data.phone,
-		// 	email: data.email,
-		// 	dateOfBirth: data.date_of_birth,
-		// 	address: data.address,
-		// 	gender: data.gender ? 'MALE' : 'FEMALE',
-		// 	username: data.username,
-		// 	password: ''
-		// };
-		// if (data.password) {
-		// 	updatedUserData.password = data.password;
-		// }
-		// // Call API for update user info
-		// try {
-		// 	await updateUser(userId, updatedUserData);
-		// 	toast.success('Cập nhật thông tin nhân viên thành công!');
-		// 	dispatch(fetchUsers());
-		// 	setIsDialogOpen(false);
-		// } catch (error: unknown) {
-		// 	const err = error as AxiosError;
-		// 	if (err.response?.status === 400) {
-		// 		toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
-		// 	} else if (err.response?.status === 404) {
-		// 		toast.error('Lỗi 404: Không tìm thấy nhân viên.');
-		// 	} else if (err.response?.status === 500) {
-		// 		toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-		// 	} else {
-		// 		toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-		// 	}
-		// }
-	};
-
-	// const handleDelete = async (data: Employee) => {
-	// 	const userId = data.id;
-
-	// 	try {
-	// 		await deleteUser(userId);
-	// 		toast.success('Cập nhật thông tin nhân viên thành công!');
-	// 		dispatch(fetchUsers());
-	// 		setIsDialogOpen(false);
-	// 	} catch (error) {
-	// 		const err = error as AxiosError;
-
-	// 		if (err.response?.status === 400) {
-	// 			toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
-	// 		} else if (err.response?.status === 404) {
-	// 			toast.error('Lỗi 404: Không tìm thấy nhân viên.');
-	// 		} else if (err.response?.status === 500) {
-	// 			toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-	// 		} else {
-	// 			toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-	// 		}
-	// 	}
-	// };
 
 	return (
 		<div>
 			<CustomTable columns={columns} data={timeTrackingMonth} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
-			{selectedTimeTrackingMonth && (
-				<CustomDialog
-					entity={{
-						...selectedTimeTrackingMonth,
-						leaveTypeEnum: selectedTimeTrackingMonth.leaveTypeEnum ? selectedTimeTrackingMonth.leaveTypeEnum : 5 // 5 == null
-					}}
-					isOpen={isDialogOpen}
-					onClose={handleCloseDialog}
-					mode={dialogMode}
-					fields={employeeFields}
-					onSave={handleSave}
-					// onDelete={handleDelete}
-				/>
-			)}
+			<Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+				<DialogContent className='max-w-[70vw] max-h-[100vh]'>
+					<DialogHeader>
+						<DialogTitle>Lịch làm việc và nghỉ của nhân viên</DialogTitle>
+						<DialogDescription></DialogDescription>
+					</DialogHeader>
+					{events.length > 0 && selectedTimeTrackingMonth?.monthOfYear && (
+						<TimeTrackingMonthDialog events={events} monthOfYear={selectedTimeTrackingMonth?.monthOfYear} />
+					)}
+					<DialogFooter>
+						<Button onClick={handleCloseDialog}>Đóng</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

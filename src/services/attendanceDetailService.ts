@@ -33,13 +33,24 @@ export const updateAttendanceDetail = async (attendanceDetail: object) => {
 	}
 };
 
-export const getAllAttendanceDetail = async (date: string) => {
+export const getAllAttendanceDetailByDate = async (date: string) => {
 	try {
 		const response = await axios.get(`/api/v1/attendanceDetails/date?date=${date}`);
 		console.log('Lấy danh sách attendance detail thành công:', response);
 		return response;
 	} catch (error) {
 		console.error('Lỗi khi lấy danh sách attendance detail:', error);
+		throw error;
+	}
+};
+
+export const getAllAttendanceDetailByUser = async (userId: number) => {
+	try {
+		const response = await axios.get(`/api/v1/attendanceDetails/user/${userId}`);
+		console.log('Lấy danh sách chấm công của nhân viên thành công:', response);
+		return response;
+	} catch (error) {
+		console.error('Lỗi khi lấy danh sách chấm công của nhân viên:', error);
 		throw error;
 	}
 };
