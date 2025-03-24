@@ -1,110 +1,73 @@
-'use client';
-
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const formSchema = z.object({
-	email: z.string().email({ message: 'Sai định dạng email' }),
-	password: z
-		.string()
-		.min(8, { message: 'Mật khẩu cần ít nhất 8 ký tự' })
-		.regex(/(?=.*[A-Za-z])(?=.*\d)/, {
-			message: 'Cần ít nhất 1 ký tự chữ và 1 ký tự số'
-		})
+	username: z.string(),
+	password: z.string().min(8, { message: 'Mật khẩu cần ít nhất 8 ký tự' })
+	// .regex(/(?=.*[A-Za-z])(?=.*\d)/, {
+	// 	message: 'Cần ít nhất 1 ký tự chữ và 1 ký tự số'
+	// })
 });
 
 const LoginForm = () => {
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			email: '',
-			password: ''
-		}
+	const navigate = useNavigate();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors }
+	} = useForm({
+		resolver: zodResolver(formSchema)
 	});
 
-	async function onSubmit(values: z.infer<typeof formSchema>) {
+	const onSubmit = async (values: any) => {
 		try {
-			console.log(values);
-			toast(
-				<pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-					<code className='text-white'>{JSON.stringify(values, null, 2)}</code>
-				</pre>
-			);
+			console.log('Logging in with:', values);
+			const payload = { ...values, platform: 'WEB' };
+			// Gọi API đăng nhập
+			const response = await axios.post('http://localhost:8080/api/v1/auth/access', payload);
+
+			// Lưu token vào localStorage
+			localStorage.setItem('accessToken', response.data.data.accessToken);
+			localStorage.setItem('refreshToken', response.data.data.refreshToken);
+			localStorage.setItem('roleUser', response.data.data.roleInfo.name);
+			alert('Đăng nhập thành công!');
+
+			// Chuyển hướng sang trang Dashboard
+			navigate('/dashboard');
 		} catch (error) {
-			console.error('Form submission error', error);
-			toast.error('Failed to submit the form. Please try again.');
+			console.error('Login error:', error);
+			alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
 		}
-	}
+	};
 
 	return (
-		<div className='flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4'>
-			<Card className='mx-2 w-full bg-transparent border-none text-white relative pt-6'>
-				<div className='opacity-40 w-full h-full absolute bg-black rounded-2xl top-0 shadow-md' />
-				<CardContent className='relative z-10 border-none shadow-none'>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-							<div className='grid gap-4'>
-								<FormField
-									control={form.control}
-									name='email'
-									render={({ field }) => (
-										<FormItem className='grid gap-2'>
-											<FormLabel htmlFor='email' className='!text-white'>
-												Email
-											</FormLabel>
-											<FormControl>
-												<Input
-													id='email'
-													placeholder='johndoe@mail.com'
-													type='email'
-													autoComplete='email'
-													className='bg-white text-black'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage className='text-red-400' />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name='password'
-									render={({ field }) => (
-										<FormItem className='grid gap-2'>
-											<div className='flex justify-between items-center'>
-												<FormLabel htmlFor='password' className='!text-white'>
-													Mật khẩu
-												</FormLabel>
-											</div>
-											<FormControl>
-												<Input
-													id='password'
-													placeholder='Nhập mật khẩu'
-													type='password'
-													autoComplete='new-password'
-													className='bg-white text-black'
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage className='text-red-400' />
-										</FormItem>
-									)}
-								/>
-								<Button type='submit' className='w-full'>
-									Đăng nhập
-								</Button>
-							</div>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
+		<div className='flex flex-col items-center justify-center min-h-screen'>
+			<form onSubmit={handleSubmit(onSubmit)} className='p-6 bg-gray-800 rounded-lg shadow-md w-96'>
+				<h2 className='text-white text-2xl mb-4'>Đăng nhập</h2>
+
+				{/* Email Field */}
+				<div className='mb-4'>
+					<label className='block text-white mb-1'>Username</label>
+					<input type='text' {...register('username')} className='w-full p-2 rounded bg-gray-700 text-white' />
+					{errors.username && <p className='text-red-400'>{errors.username.message}</p>}
+				</div>
+
+				{/* Password Field */}
+				<div className='mb-4'>
+					<label className='block text-white mb-1'>Mật khẩu</label>
+					<input type='password' {...register('password')} className='w-full p-2 rounded bg-gray-700 text-white' />
+					{errors.password && <p className='text-red-400'>{errors.password.message}</p>}
+				</div>
+
+				{/* Submit Button */}
+				<button type='submit' className='w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded'>
+					Đăng nhập
+				</button>
+			</form>
 		</div>
 	);
 };
