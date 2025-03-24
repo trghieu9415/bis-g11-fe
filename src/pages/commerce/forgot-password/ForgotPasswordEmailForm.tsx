@@ -2,26 +2,41 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'react-toastify';
+import { forgotPassword } from '@/services/authService';
 
 const emailSchema = z.object({
 	email: z.string().email({ message: 'Sai định dạng email' })
 });
 
-export default function ForgotPasswordEmailForm({ onNext }: { onNext: () => void }) {
+export default function ForgotPasswordEmailForm() {
 	const form = useForm({
 		resolver: zodResolver(emailSchema),
 		defaultValues: { email: '' }
 	});
 
-	function onSubmit(values: any) {
-		console.log(values);
-		toast.success('Email hợp lệ! Chuyển đến bước nhập OTP...');
-		onNext();
+	async function onSubmit(values: { email: string }) {
+		try {
+			const response = await forgotPassword(values.email);
+			toast.success('Link đặt lại mật khẩu đã được gửi đến email của bạn!');
+		} catch (error: any) {
+			console.log(error);
+
+			// Kiểm tra xem có response từ server không
+			if (error.response) {
+				// Lấy thông tin lỗi từ response
+				const errorMessage = error.response.data.message || 'Có lỗi xảy ra, vui lòng thử lại!';
+				toast.error(errorMessage);
+			} else {
+				// Nếu không có response từ server (lỗi network hoặc server không phản hồi)
+				toast.error('Không thể kết nối đến server, vui lòng kiểm tra lại!');
+			}
+			console.error('Error sending password reset email:', error);
+		}
 	}
 
 	return (

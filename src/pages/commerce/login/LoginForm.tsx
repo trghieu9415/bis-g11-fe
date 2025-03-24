@@ -2,8 +2,9 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { loginAccount } from '@/services/authService';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
 	username: z.string(),
@@ -24,24 +25,15 @@ const LoginForm = () => {
 	});
 
 	const onSubmit = async (values: any) => {
-		try {
-			console.log('Logging in with:', values);
-			const payload = { ...values, platform: 'WEB' };
-			// Gọi API đăng nhập
-			const response = await axios.post('http://localhost:8080/api/v1/auth/access', payload);
-
-			// Lưu token vào localStorage
-			localStorage.setItem('accessToken', response.data.data.accessToken);
-			localStorage.setItem('refreshToken', response.data.data.refreshToken);
-			localStorage.setItem('roleUser', response.data.data.roleInfo.name);
-			alert('Đăng nhập thành công!');
-
-			// Chuyển hướng sang trang Dashboard
-			navigate('/dashboard');
-		} catch (error) {
-			console.error('Login error:', error);
-			alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
-		}
+		console.log('Logging in with:', values);
+		const payload = { ...values, platform: 'WEB' };
+		const response = await loginAccount(payload);
+		console.log(response);
+		localStorage.setItem('accessToken', response.data.accessToken);
+		localStorage.setItem('refreshToken', response.data.refreshToken);
+		localStorage.setItem('roleUser', response.data.roleInfo.name);
+		toast.success('Đăng nhập thành công!');
+		navigate('/dashboard');
 	};
 
 	return (

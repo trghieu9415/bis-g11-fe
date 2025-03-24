@@ -1,17 +1,17 @@
-import axios from 'axios';
-
+import axios from '@/services/customize-axios';
 interface LoginBody {
 	username: string;
 	password: string;
 	platform: string;
 }
 
-export const loginAccount = async (body: LoginBody) => {
-	try {
-		const response = await axios.post('/api/v1/auth/access', body);
-		return response.data;
-	} catch (error) {
-		console.error('Error logging in:', error);
-		throw error;
-	}
-};
+interface FormResetPassword {
+	secretKey: string;
+	password: string;
+	confirmPassword: string;
+}
+export const loginAccount = async (body: LoginBody) => axios.post('/api/v1/auth/access', body);
+
+export const forgotPassword = async (body: string) => axios.post('/api/v1/auth/forgot-password', body);
+
+export const resetPassword = async (body: FormResetPassword) => axios.post('/api/v1/auth/reset-password', body);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,6 +8,8 @@ import { motion } from 'framer-motion';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import axios from 'axios';
+import { resetPassword } from '@/services/authService';
 
 const passwordSchema = z
 	.object({
@@ -23,16 +26,31 @@ const passwordSchema = z
 		path: ['confirmPassword']
 	});
 
-export default function ForgotPasswordResetForm() {
+interface Props {
+	token: string;
+}
+
+export default function ForgotPasswordResetForm({ token }: Props) {
 	const form = useForm({
 		resolver: zodResolver(passwordSchema),
 		defaultValues: { password: '', confirmPassword: '' }
 	});
 
-	function onSubmit(values: any) {
-		console.log(values);
-		toast.success('Mật khẩu đã được đặt lại!');
-		window.location.href = '/login';
+	async function onSubmit(values: any) {
+		try {
+			const response = await resetPassword({
+				secretKey: token, // Token từ props
+				password: values.password,
+				confirmPassword: values.confirmPassword
+			});
+
+			toast.success('Mật khẩu đã được đặt lại!');
+			window.location.href = '/login';
+		} catch (error: any) {
+			// Xử lý lỗi
+			const errorMessage = error.response?.message || 'Có lỗi xảy ra!';
+			toast.error(errorMessage);
+		}
 	}
 
 	return (

@@ -20,8 +20,8 @@ const ForgotPassword = () => {
 				<ForgotPasswordForm />
 				<div className='text-white w-full text-center mt-4'>
 					Trở về{' '}
-					<Link to={'/home'} className='hover:underline'>
-						Trang chủ
+					<Link to={'/login'} className='hover:underline'>
+						Đăng nhập
 					</Link>
 				</div>
 			</motion.div>
