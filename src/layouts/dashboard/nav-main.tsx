@@ -105,11 +105,11 @@ export function NavMain() {
 				{
 					title: 'Theo ngày',
 					url: '/time-tracking/today'
-				},
-				{
-					title: 'Theo tháng',
-					url: '/time-tracking/month'
 				}
+				// {
+				// 	title: 'Theo tháng',
+				// 	url: '/time-tracking/month'
+				// }
 			]
 		},
 		{

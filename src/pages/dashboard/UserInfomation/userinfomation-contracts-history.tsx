@@ -109,7 +109,7 @@ export default function UserInfomationContractsHistory() {
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-between flex-1 gap-4 h-full max-h-[100%]'>
+		<div className='bg-white flex flex-col items-center justify-between flex-1 gap-4 h-full max-h-[100%]'>
 			<div className='px-4 py-6 flex-1 w-full  border-gray-200 border-solid border rounded-md h-full overflow-y-auto'>
 				<h1 className='text-base font-bold uppercase text-center'>Lịch sử hợp đồng</h1>
 				<div className='flex justify-center items-center gap-2 mt-2 '>

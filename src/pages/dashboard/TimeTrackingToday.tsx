@@ -5,17 +5,23 @@ import PresentSummary from './TimeTracking/components/present-summary';
 import AbsentSummary from './TimeTracking/components/absent-summary';
 import AwaySummary from './TimeTracking/components/away-summary';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
 import { getAllAttendanceDetailByDate } from '@/services/attendanceDetailService';
-import { set } from 'date-fns';
+import { scanAttendanceDetailRedux } from '@/redux/slices/scanAttendanceDetailSlice';
+import { toast } from 'react-toastify';
 
 export default function TimeTrackingToday() {
 	const dispatch = useAppDispatch();
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
+	const { scanAttendanceDetail } = useSelector((state: RootState) => state.scanAttendanceDetail);
 
 	const [today, setToday] = useState(new Date());
+	const [isScan, setIsScan] = useState(false);
+	const [scanTime, setScanTime] = useState('');
+	const [isFuture, setIsFuture] = useState(false);
 	const [attendanceSummary, setAttendanceSummary] = useState({
 		present: {
 			onTime: 0,
@@ -49,12 +55,9 @@ export default function TimeTrackingToday() {
 	};
 
 	const currentDate = new Date();
-	currentDate.setHours(0, 0, 0, 0);
-
 	const selectedDate = new Date(today);
-	selectedDate.setHours(0, 0, 0, 0);
 
-	const isToday = selectedDate.getTime() === currentDate.getTime();
+	const isToday = selectedDate.setHours(0, 0, 0, 0) === currentDate.setHours(0, 0, 0, 0);
 
 	const weekday = today.toLocaleDateString('vi-VN', { weekday: 'long' });
 	const day = today.toLocaleDateString('vi-VN', { day: '2-digit' });
@@ -65,11 +68,31 @@ export default function TimeTrackingToday() {
 	useEffect(() => {
 		dispatch(fetchAllTimeTrackingToday(`${year}-${month}-${day}`));
 		setAttendanceSummary(prev => ({ ...prev, isSet: false }));
-	}, [today]);
+	}, [today, scanAttendanceDetail]);
 
 	useEffect(() => {
 		fetchPrevDate(today);
 	}, [timeTrackingToday]);
+
+	useEffect(() => {
+		if (selectedDate.setHours(0, 0, 0, 0) > currentDate.setHours(0, 0, 0, 0)) {
+			setIsFuture(true);
+			toast.error('Không thể lọc ngày ở tương lai');
+		} else {
+			setIsFuture(false);
+			const localDateTime = new Date(today).toISOString().slice(0, 19);
+			dispatch(scanAttendanceDetailRedux(localDateTime));
+			if (scanAttendanceDetail?.statusCode === 200) {
+				setIsScan(true);
+				const currentTime = new Date().toLocaleTimeString('vi-VN', {
+					hour: '2-digit',
+					minute: '2-digit',
+					second: '2-digit'
+				});
+				setScanTime(currentTime);
+			}
+		}
+	}, [today]);
 
 	const fetchPrevDate = async (today: Date) => {
 		try {
@@ -87,8 +110,8 @@ export default function TimeTrackingToday() {
 			const year = yesterday.toLocaleDateString('vi-VN', { year: 'numeric' });
 
 			const prevDateData = await getAllAttendanceDetailByDate(`${year}-${month}-${day}`);
-
-			if (prevDateData?.data?.length > 0) {
+			// @ts-expect-error - Response from getAllAttendanceDetailByDate includes success property
+			if (prevDateData?.success) {
 				// console.log(prevDateData.data);
 				// console.log(timeTrackingToday);
 
@@ -133,8 +156,8 @@ export default function TimeTrackingToday() {
 					{ yesterdayOnTime: 0, yesterdayLate: 0, yesterdayEarly: 0 }
 				);
 
-				console.log({ onTime, late, early });
-				console.log({ yesterdayOnTime, yesterdayLate, yesterdayEarly });
+				// console.log({ onTime, late, early });
+				// console.log({ yesterdayOnTime, yesterdayLate, yesterdayEarly });
 
 				const { unpaidLeave, notCheckIn, notCheckOut } = timeTrackingToday.reduce(
 					(acc, item) => {
@@ -243,7 +266,34 @@ export default function TimeTrackingToday() {
 					/>
 				</div>
 			</div>
-			{attendanceSummary.isSet && (
+			{!isFuture && (
+				<div className='flex items-center gap-1 mb-2'>
+					{isScan && (
+						<>
+							<div className='text-sm text-gray-600'>Thời gian quét: {scanTime}</div>
+							<button
+								className='p-1 hover:bg-gray-100 rounded-full text-gray-600'
+								onClick={() => {
+									const localDateTime = new Date(today).toISOString().slice(0, 19);
+									dispatch(scanAttendanceDetailRedux(localDateTime));
+									if (scanAttendanceDetail?.statusCode === 200) {
+										setIsScan(true);
+										const currentTime = new Date().toLocaleTimeString('vi-VN', {
+											hour: '2-digit',
+											minute: '2-digit',
+											second: '2-digit'
+										});
+										setScanTime(currentTime);
+									}
+								}}
+							>
+								<Loader2 className='w-4 h-4 text-gray-600' />
+							</button>
+						</>
+					)}
+				</div>
+			)}
+			{attendanceSummary.isSet && !isFuture && (
 				<div className='flex items-center justify-between gap-4 mb-4'>
 					<PresentSummary {...attendanceSummary.present} />
 					<AbsentSummary {...attendanceSummary.absent} />

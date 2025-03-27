@@ -63,20 +63,10 @@ export default function TimeTrackingMonthTable() {
 	const dispatch = useAppDispatch();
 	const { timeTrackingMonth } = useSelector((state: RootState) => state.timeTrackingMonth);
 
-	const [open, setOpen] = useState(false);
-
-	const handleClickOpen = () => {
-		setOpen(true);
-	};
-
-	const handleClose = () => {
-		setOpen(false);
-	};
-
 	useEffect(() => {
 		const formattedDate = format(new Date(), 'yyyy-MM');
-		// dispatch(fetchAllTimeTrackingMonth(formattedDate));
-		dispatch(fetchAllTimeTrackingMonth('2025-02'));
+		dispatch(fetchAllTimeTrackingMonth(formattedDate));
+		// dispatch(fetchAllTimeTrackingMonth('2025-02'));
 	}, [dispatch]);
 
 	const columns: ColumnDef<TimeTrackingMonth>[] = [
@@ -94,7 +84,7 @@ export default function TimeTrackingMonthTable() {
 			enableHiding: false
 		},
 		{
-			accessorKey: 'userId',
+			accessorKey: 'userIdString',
 			header: ({ column }) => (
 				<Button
 					variant='link'
@@ -104,7 +94,7 @@ export default function TimeTrackingMonthTable() {
 					ID nhân viên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userId')}</span>,
+			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userIdString')}</span>,
 			enableHiding: false
 		},
 		{
@@ -118,7 +108,7 @@ export default function TimeTrackingMonthTable() {
 					Họ và tên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('fullName')}</span>,
+			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
 			enableHiding: false
 		},
 
@@ -349,9 +339,12 @@ export default function TimeTrackingMonthTable() {
 		}
 	};
 
-	const handleOpenDialog = (timeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
+	const handleOpenDialog = async (timeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
+		console.log(timeTrackingMonth);
 		setSelectedTimeTrackingMonth(timeTrackingMonth);
-		fetchEvents(timeTrackingMonth.userId, timeTrackingMonth.monthOfYear);
+		await fetchEvents(timeTrackingMonth.userId, timeTrackingMonth.monthOfYear);
+		console.log(events, timeTrackingMonth?.monthOfYear);
+
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
@@ -373,20 +366,20 @@ export default function TimeTrackingMonthTable() {
 	return (
 		<div>
 			<CustomTable columns={columns} data={timeTrackingMonth} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
-			<Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-				<DialogContent className='max-w-[70vw] max-h-[100vh]'>
-					<DialogHeader>
-						<DialogTitle>Lịch làm việc và nghỉ của nhân viên</DialogTitle>
-						<DialogDescription></DialogDescription>
-					</DialogHeader>
-					{events.length > 0 && selectedTimeTrackingMonth?.monthOfYear && (
+			{events.length > 0 && selectedTimeTrackingMonth?.monthOfYear && (
+				<Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+					<DialogContent className='max-w-[70vw] max-h-[100vh]'>
+						<DialogHeader>
+							<DialogTitle>Lịch làm việc và nghỉ của nhân viên</DialogTitle>
+							<DialogDescription></DialogDescription>
+						</DialogHeader>
 						<TimeTrackingMonthDialog events={events} monthOfYear={selectedTimeTrackingMonth?.monthOfYear} />
-					)}
-					<DialogFooter>
-						<Button onClick={handleCloseDialog}>Đóng</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+						<DialogFooter>
+							<Button onClick={handleCloseDialog}>Đóng</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			)}
 		</div>
 	);
 }

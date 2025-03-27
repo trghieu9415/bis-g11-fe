@@ -54,3 +54,16 @@ export const getAllAttendanceDetailByUser = async (userId: number) => {
 		throw error;
 	}
 };
+
+export const scanAttendanceDetail = async () => {
+	try {
+		// Create current LocalDateTime in Java format (YYYY-MM-DDTHH:mm:ss)
+		const currentDateTime = new Date().toISOString().slice(0, 19);
+		const response = await axios.put(`/api/v1/scan?dateScan=${currentDateTime}`);
+		console.log('Scan ngày chấm công của nhân viên thành công:', response);
+		return response;
+	} catch (error) {
+		console.error('Lỗi khi scan ngày chấm công của nhân viên:', error);
+		throw error;
+	}
+};
