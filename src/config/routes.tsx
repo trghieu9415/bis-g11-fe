@@ -14,7 +14,8 @@ const routes = {
 	orders: 'orders',
 	customers: 'customers',
 	eLogin: '/login',
-	hrLogin: '/hr-login'
+	hrLogin: '/hr-login',
+	salaryMonth: '/salary/month'
 };
 
 export default routes;

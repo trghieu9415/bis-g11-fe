@@ -15,6 +15,7 @@ import CommerceLayout from '@/layouts/commerce-layout';
 import Orders from '@/pages/commerce/Orders';
 import Login from '@/pages/commerce/Login';
 import TimeTrackingMonth from '@/pages/dashboard/TimeTrackingMonth';
+import SalaryMonth from '@/pages/dashboard/SalaryMonth';
 
 const publicRoutes = [
 	// {path: config.routes.home, component: Home}
@@ -31,7 +32,8 @@ const publicRoutes = [
 	{ path: config.routes.customers, component: NewOrder, layout: CommerceLayout },
 	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
 	{ path: config.routes.eLogin, component: Login, layout: NoneLayout },
-	{ path: config.routes.timeTrackingMonth, component: TimeTrackingMonth, layout: DashboardLayout }
+	{ path: config.routes.timeTrackingMonth, component: TimeTrackingMonth, layout: DashboardLayout },
+	{ path: config.routes.salaryMonth, component: SalaryMonth, layout: DashboardLayout }
 ];
 
 const privateRoutes = [];

@@ -249,6 +249,8 @@ export default function TimeTrackingToday() {
 		}
 	};
 
+	console.log(isScan);
+
 	return (
 		<div className='flex flex-col w-full'>
 			<h1 className='text-lg font-bold py-4 uppercase'>
@@ -268,29 +270,25 @@ export default function TimeTrackingToday() {
 			</div>
 			{!isFuture && (
 				<div className='flex items-center gap-1 mb-2'>
-					{isScan && (
-						<>
-							<div className='text-sm text-gray-600'>Thời gian quét: {scanTime}</div>
-							<button
-								className='p-1 hover:bg-gray-100 rounded-full text-gray-600'
-								onClick={() => {
-									const localDateTime = new Date(today).toISOString().slice(0, 19);
-									dispatch(scanAttendanceDetailRedux(localDateTime));
-									if (scanAttendanceDetail?.statusCode === 200) {
-										setIsScan(true);
-										const currentTime = new Date().toLocaleTimeString('vi-VN', {
-											hour: '2-digit',
-											minute: '2-digit',
-											second: '2-digit'
-										});
-										setScanTime(currentTime);
-									}
-								}}
-							>
-								<Loader2 className='w-4 h-4 text-gray-600' />
-							</button>
-						</>
-					)}
+					<div className='text-sm text-gray-600'>Thời gian quét: {scanTime}</div>
+					<button
+						className='p-1 hover:bg-gray-100 rounded-full text-gray-600'
+						onClick={() => {
+							const localDateTime = new Date(today).toISOString().slice(0, 19);
+							dispatch(scanAttendanceDetailRedux(localDateTime));
+							if (scanAttendanceDetail?.statusCode === 200) {
+								setIsScan(true);
+								const currentTime = new Date().toLocaleTimeString('vi-VN', {
+									hour: '2-digit',
+									minute: '2-digit',
+									second: '2-digit'
+								});
+								setScanTime(currentTime);
+							}
+						}}
+					>
+						<Loader2 className='w-4 h-4 text-gray-600' />
+					</button>
 				</div>
 			)}
 			{attendanceSummary.isSet && !isFuture && (
