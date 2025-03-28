@@ -159,7 +159,7 @@ export default function UserInfomationDetail() {
 
 	return (
 		user?.id && (
-			<div className='px-4 py-6 border-gray-200 border-solid border rounded-md h-full max-w-[50vw]'>
+			<div className='bg-white px-4 py-6 border-gray-200 border-solid border rounded-md h-full max-w-[50vw]'>
 				<h1 className='text-lg font-bold uppercase text-center'>Chào mừng đến với thông tin tài khoản</h1>
 				<p className='text-center'>Quản lý thông tin cá nhân, cập nhật hồ sơ và thiết lập tài khoản của bạn tại đây.</p>
 				<div className='mt-6 p-4 overflow-auto'>

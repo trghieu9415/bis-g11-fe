@@ -31,7 +31,6 @@ export const fetchAllTimeTrackingMonth = createAsyncThunk(
 	'time-tracking-month/fetchAllTimeTrackingMonth',
 	async (month: string) => {
 		const response = await axios.get<ApiResponse[]>(`/api/v1/attendances/yearMonth?yearMonth=${month}`);
-		console.log(response.data);
 		return response.data;
 	}
 );

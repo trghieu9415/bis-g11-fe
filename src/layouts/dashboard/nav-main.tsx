@@ -1,5 +1,5 @@
 'use client';
-import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper } from 'lucide-react';
+import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper, BadgeDollarSign } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -105,11 +105,27 @@ export function NavMain() {
 				{
 					title: 'Theo ngày',
 					url: '/time-tracking/today'
-				},
-				{
-					title: 'Theo tháng',
-					url: '/time-tracking/month'
 				}
+				// {
+				// 	title: 'Theo tháng',
+				// 	url: '/time-tracking/month'
+				// }
+			]
+		},
+		{
+			title: 'Bảng lương',
+			url: '#',
+			icon: BadgeDollarSign,
+			isActive: true,
+			items: [
+				{
+					title: 'Lương theo tháng',
+					url: '/salary/month'
+				}
+				// {
+				// 	title: 'Theo tháng',
+				// 	url: '/time-tracking/month'
+				// }
 			]
 		},
 		{
