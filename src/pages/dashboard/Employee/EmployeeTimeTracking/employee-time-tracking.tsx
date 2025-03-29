@@ -14,7 +14,12 @@ import {
 
 import EmployeeCalendar from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-calendar';
 import { fetchAttendanceDetailsByUserID } from '@/redux/slices/attendanceDetailByUserIDSlice';
-import { checkIn, checkOut } from '@/services/attendanceDetailService';
+import {
+	checkIn,
+	checkOut,
+	checkExistAttendanceDetail,
+	updateAttendanceDetail
+} from '@/services/attendanceDetailService';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
 
@@ -42,14 +47,35 @@ export default function EmployeeTimeTracking() {
 				checkIn: now
 			};
 
-			await checkIn(checkInData);
-			const formattedTime = now.toLocaleTimeString('vi-VN', {
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
-			});
-			toast.success(`Check-in thành công lúc  ${formattedTime}`);
-			dispatch(fetchAttendanceDetailsByUserID(user.id));
+			const formattedDate = now.toISOString().split('T')[0];
+			const res = await checkExistAttendanceDetail(user.id, formattedDate);
+
+			// @ts-expect-error - Except res.success
+			if (res?.success) {
+				if (res?.data == 'AttendanceDetail not exists') {
+					await checkIn(checkInData);
+					const formattedTime = now.toLocaleTimeString('vi-VN', {
+						hour: '2-digit',
+						minute: '2-digit',
+						second: '2-digit'
+					});
+					toast.success(`Check-in thành công lúc  ${formattedTime}`);
+					dispatch(fetchAttendanceDetailsByUserID(user.id));
+				} else if (res?.data == 'AttendanceDetail already exist') {
+					await updateAttendanceDetail({ ...checkInData, checkOut: null });
+					const formattedTime = now.toLocaleTimeString('vi-VN', {
+						hour: '2-digit',
+						minute: '2-digit',
+						second: '2-digit'
+					});
+					toast.success(`Check-in thành công lúc  ${formattedTime}`);
+					dispatch(fetchAttendanceDetailsByUserID(user.id));
+				} else {
+					toast.error('Có lỗi trong quá trình chấm công, vui lòng thử lại!');
+				}
+			}
+
+			console.log(res);
 		} catch (error) {
 			const err = error as AxiosError;
 

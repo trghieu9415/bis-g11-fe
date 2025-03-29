@@ -67,3 +67,14 @@ export const scanAttendanceDetail = async () => {
 		throw error;
 	}
 };
+
+export const checkExistAttendanceDetail = async (userId: number, date: string) => {
+	try {
+		const response = await axios.get(`/api/v1/attendanceDetails/checkExist/${userId}?date=${date}`);
+		console.log('Kiểm tra sự tồn tại của attendance detail thành công:', response);
+		return response;
+	} catch (error) {
+		console.error('Lỗi khi kiểm tra sự tồn tại của attendance detail:', error);
+		throw error;
+	}
+};

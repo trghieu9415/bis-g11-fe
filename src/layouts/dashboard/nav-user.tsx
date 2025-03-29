@@ -16,6 +16,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/c
 
 import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTracking/employee-time-tracking';
 import EmployeeLeaveRequest from '@/pages/dashboard/Employee/employee-leave-request';
+import EmployeeSalaryCal from '@/pages/dashboard/Employee/employee-salary-cal';
 import { NavLink } from 'react-router-dom';
 
 export function NavUser({
@@ -81,6 +82,7 @@ export function NavUser({
 						<DropdownMenuGroup>
 							<EmployeeTimeTracking />
 							<EmployeeLeaveRequest />
+							<EmployeeSalaryCal />
 							{/* <DropdownMenuItem>
 								<ShieldQuestion />
 								Quyền lợi nhân viên

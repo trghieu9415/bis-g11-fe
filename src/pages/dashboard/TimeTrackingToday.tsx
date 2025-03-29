@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import TimeTrackingTodayTable from './TimeTracking/time-tracking-today-table';
 import PresentSummary from './TimeTracking/components/present-summary';
@@ -19,7 +19,6 @@ export default function TimeTrackingToday() {
 	const { scanAttendanceDetail } = useSelector((state: RootState) => state.scanAttendanceDetail);
 
 	const [today, setToday] = useState(new Date());
-	const [isScan, setIsScan] = useState(false);
 	const [scanTime, setScanTime] = useState('');
 	const [isFuture, setIsFuture] = useState(false);
 	const [attendanceSummary, setAttendanceSummary] = useState({
@@ -52,6 +51,7 @@ export default function TimeTrackingToday() {
 
 	const updateDate = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setToday(new Date(e.target.value));
+		apiCalledRef.current = false;
 	};
 
 	const currentDate = new Date();
@@ -64,6 +64,8 @@ export default function TimeTrackingToday() {
 	const month = today.toLocaleDateString('vi-VN', { month: '2-digit' });
 	const year = today.toLocaleDateString('vi-VN', { year: 'numeric' });
 	const formattedDate = `${weekday}, ${day} tháng ${month}, ${year}`;
+
+	const apiCalledRef = useRef(false);
 
 	useEffect(() => {
 		dispatch(fetchAllTimeTrackingToday(`${year}-${month}-${day}`));
@@ -81,16 +83,19 @@ export default function TimeTrackingToday() {
 		} else {
 			setIsFuture(false);
 			const localDateTime = new Date(today).toISOString().slice(0, 19);
-			dispatch(scanAttendanceDetailRedux(localDateTime));
-			if (scanAttendanceDetail?.statusCode === 200) {
-				setIsScan(true);
-				const currentTime = new Date().toLocaleTimeString('vi-VN', {
-					hour: '2-digit',
-					minute: '2-digit',
-					second: '2-digit'
-				});
-				setScanTime(currentTime);
+
+			// Use useRef to avoid the problem when scan API call 2 times (react strict mode)
+			if (!apiCalledRef.current) {
+				dispatch(scanAttendanceDetailRedux(localDateTime));
+				apiCalledRef.current = true; 
 			}
+
+			const currentTime = new Date().toLocaleTimeString('vi-VN', {
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			});
+			setScanTime(currentTime);
 		}
 	}, [today]);
 
@@ -249,8 +254,6 @@ export default function TimeTrackingToday() {
 		}
 	};
 
-	console.log(isScan);
-
 	return (
 		<div className='flex flex-col w-full'>
 			<h1 className='text-lg font-bold py-4 uppercase'>
@@ -277,7 +280,6 @@ export default function TimeTrackingToday() {
 							const localDateTime = new Date(today).toISOString().slice(0, 19);
 							dispatch(scanAttendanceDetailRedux(localDateTime));
 							if (scanAttendanceDetail?.statusCode === 200) {
-								setIsScan(true);
 								const currentTime = new Date().toLocaleTimeString('vi-VN', {
 									hour: '2-digit',
 									minute: '2-digit',
