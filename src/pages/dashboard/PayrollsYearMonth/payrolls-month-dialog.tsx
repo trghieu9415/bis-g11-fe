@@ -16,60 +16,60 @@ import { useSelector } from 'react-redux';
 
 import { Input } from '@/components/ui/input';
 
-export default function EmployeeSalaryCal() {
+type Payroll = {
+	id: number;
+	idString: string;
+	standardWorkingDays: number;
+	maternityBenefit: string;
+	sickBenefit: string;
+	netSalary: string;
+	grossSalary: string;
+	tax: string;
+	employeeBHXH: string;
+	employeeBHYT: string;
+	employeeBHTN: string;
+	penalties: string;
+	allowance: string;
+	totalIncome: string;
+	attendanceId: number;
+	monthOfYear: string;
+	userIdStr: string;
+	fullName: string;
+	roleName: string;
+	salaryCoefficient: number;
+	totalWorkingDays: number;
+	totalSickLeaves: number;
+	totalPaidLeaves: number;
+	totalMaternityLeaves: number;
+	totalUnpaidLeaves: number;
+	totalHolidayLeaves: number;
+	baseSalary: string;
+	totalBaseSalary: string;
+	totalBenefit: string;
+	mainSalary: string;
+	deductions: string;
+};
+
+type PayrollsMonthDialogProps = {
+	isOpen: boolean;
+	selectedPayroll: Payroll | null;
+	onClose: () => void;
+};
+
+export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }: PayrollsMonthDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const today = new Date();
-	const date = today.getDate();
-	const month = today.getMonth() + 1;
-	const year = today.getFullYear();
 
-	// const handleSubmitClick = async () => {
-	// 	const fieldsToValidate = ['title', 'description', 'startDate', 'endDate', 'typeSalary'] as const;
-
-	// 	const isValid = await trigger(fieldsToValidate);
-	// 	if (isValid) {
-	// 		try {
-	// 			const salaryReqObject = {
-	// 				title: formData.title,
-	// 				startDate: formData.startDate,
-	// 				endDate: formData.endDate,
-	// 				description: formData.description,
-	// 				salaryReason: formData.typeSalary,
-	// 				userId: user.id
-	// 			};
-	// 			const res = await addSalaryRequest(salaryReqObject);
-	// 			if (res?.data) {
-	// 				dispatch(fetchAllSalaryRequestsByUserId(user.id));
-	// 				toast.success('Thêm yêu cầu tính lương thành công!');
-	// 				setIsDialogOpen(false);
-	// 			}
-	// 		} catch (error) {
-	// 			const err = error as AxiosError;
-
-	// 			if (err.response?.status === 400) {
-	// 				toast.error(
-	// 					(err.response.data as { message?: string }).message ||
-	// 						'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
-	// 				);
-	// 			} else if (err.response?.status === 404) {
-	// 				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
-	// 			} else if (err.response?.status === 500) {
-	// 				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-	// 			} else {
-	// 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-	// 			}
-	// 		}
-	// 	}
-	// };
+	useEffect(() => {
+		if (isOpen) {
+			setIsDialogOpen(true);
+			// reset();
+		} else {
+			setIsDialogOpen(false);
+		}
+	}, [isOpen]);
 
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-			<DialogTrigger asChild>
-				<Button variant='outline' className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'>
-					<BadgeDollarSign />
-					Tính lương
-				</Button>
-			</DialogTrigger>
+		<Dialog open={isDialogOpen} onOpenChange={onClose}>
 			<DialogContent
 				className='!w-[50vw] !max-w-none !h-[98vh] flex flex-col'
 				onOpenAutoFocus={e => e.preventDefault()}
@@ -89,69 +89,61 @@ export default function EmployeeSalaryCal() {
 							<h2 className='text-md font-semibold text-center mb-2'>PHIẾU LƯƠNG</h2>
 							<div className=' flex justify-center items-center mb-4'>
 								<label htmlFor='monthYear' className=' mr-2 text-md font-medium'>
-									Kỳ lương
+									Kỳ lương {selectedPayroll?.monthOfYear?.replace(/(\d{4})-(\d{2})/, 'tháng $2 năm $1')}
 								</label>
-								<Input
-									type='month'
-									id='monthYear'
-									className='border rounded-md p-2 block w-[160px] h-[30px]'
-									onChange={e => {
-										// Xử lý việc chọn tháng và năm
-									}}
-								/>
 							</div>
 						</div>
 						<div className='overflow-y-auto px-4 max-h-[430px] pb-2'>
 							<div className='grid grid-col grid-cols-2'>
 								<p className='mb-2 text-xs'>
-									<strong>Mã Nhân Viên:</strong> NV-3
+									<strong>Mã Nhân Viên:</strong> {selectedPayroll?.userIdStr}
 								</p>
 								<p className='mb-2 text-xs'>
-									<strong>Ngày công đi làm:</strong> 17
+									<strong>Ngày công đi làm:</strong> {selectedPayroll?.totalWorkingDays}
 								</p>
 							</div>
 							<div className='grid grid-col grid-cols-2'>
 								<p className='mb-2 text-xs'>
-									<strong>Họ và tên:</strong> Lữ Quang Minh
+									<strong>Họ và tên:</strong> {selectedPayroll?.fullName}
 								</p>
 								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ lễ:</strong> 5
-								</p>
-							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Chức danh:</strong> EMPLOYEE
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ phép:</strong> 1
+									<strong>Ngày nghỉ lễ:</strong> {selectedPayroll?.totalHolidayLeaves}
 								</p>
 							</div>
 
 							<div className='grid grid-col grid-cols-2'>
 								<p className='mb-2 text-xs'>
-									<strong>Lương cơ bản:</strong> 8,000,000 VNĐ
+									<strong>Chức danh:</strong> {selectedPayroll?.roleName}
 								</p>
 								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ ốm:</strong> 1
-								</p>
-							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Hệ số lương:</strong> 1.0
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Nghỉ thai sản:</strong> 0
+									<strong>Ngày nghỉ phép:</strong> {selectedPayroll?.totalPaidLeaves}
 								</p>
 							</div>
 
 							<div className='grid grid-col grid-cols-2'>
 								<p className='mb-2 text-xs'>
-									<strong>Ngày công chuẩn:</strong> 18
+									<strong>Lương cơ bản:</strong> {selectedPayroll?.baseSalary}
 								</p>
 								<p className='mb-2 text-xs'>
-									<strong>Nghỉ không phép:</strong> 0
+									<strong>Ngày nghỉ bệnh:</strong> {selectedPayroll?.totalSickLeaves}
+								</p>
+							</div>
+
+							<div className='grid grid-col grid-cols-2'>
+								<p className='mb-2 text-xs'>
+									<strong>Hệ số lương:</strong> {selectedPayroll?.salaryCoefficient}
+								</p>
+								<p className='mb-2 text-xs'>
+									<strong>Nghỉ thai sản:</strong> {selectedPayroll?.totalMaternityLeaves}
+								</p>
+							</div>
+
+							<div className='grid grid-col grid-cols-2'>
+								<p className='mb-2 text-xs'>
+									<strong>Ngày công chuẩn:</strong> {selectedPayroll?.standardWorkingDays}
+								</p>
+								<p className='mb-2 text-xs'>
+									<strong>Nghỉ không phép:</strong> {selectedPayroll?.totalUnpaidLeaves}
 								</p>
 							</div>
 
@@ -167,18 +159,20 @@ export default function EmployeeSalaryCal() {
 									<tr>
 										<td className='border border-gray-300 p-2'>1</td>
 										<td className='border border-gray-300 p-2'>Lương chính thức</td>
-										<td className='border border-gray-300 p-2 text-right'>3,000,000.00</td>
+										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.mainSalary} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'>2</td>
 										<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
-										<td className='border border-gray-300 p-2 text-right'>830,000.00</td>
+										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.allowance}</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
 											Tổng cộng:
 										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>3,830,000.00</td>
+										<td className='border border-gray-300 p-2 font-bold text-right'>
+											{selectedPayroll?.grossSalary} VNĐ
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -201,38 +195,38 @@ export default function EmployeeSalaryCal() {
 									<tr>
 										<td className='border border-gray-300 p-2'></td>
 										<td className='border border-gray-300 p-2'>1.1. Bảo hiểm xã hội (8%)</td>
-										<td className='border border-gray-300 p-2 text-right'>644,000.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHXH} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'></td>
 										<td className='border border-gray-300 p-2'>1.2. Bảo hiểm y tế (1.5%)</td>
-										<td className='border border-gray-300 p-2 text-right'>1,245,000.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHYT} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'></td>
 										<td className='border border-gray-300 p-2'>1.3. Bảo hiểm thất nghiệp (1%)</td>
-										<td className='border border-gray-300 p-2 text-right'>83,000.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHTN} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'>2</td>
 										<td className='border border-gray-300 p-2'>Thuế TNCN</td>
-										<td className='border border-gray-300 p-2 text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.tax} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'>3</td>
 										<td className='border border-gray-300 p-2'>Phạt</td>
-										<td className='border border-gray-300 p-2 text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.penalties} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'>4</td>
 										<td className='border border-gray-300 p-2'>Khác</td>
-										<td className='border border-gray-300 p-2 text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 text-right'>- 0 VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
 											Tổng cộng:
 										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>871,500.00</td>
+										<td className='border border-gray-300 p-2 font-bold text-right'>- {selectedPayroll?.deductions}</td>
 									</tr>
 								</tbody>
 							</table>
@@ -248,18 +242,20 @@ export default function EmployeeSalaryCal() {
 									<tr>
 										<td className='border border-gray-300 p-2'>1</td>
 										<td className='border border-gray-300 p-2'>Phụ cấp thai sản</td>
-										<td className='border border-gray-300 p-2 text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.maternityBenefit} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2'>2</td>
 										<td className='border border-gray-300 p-2'>Phụ cấp nghỉ bệnh</td>
-										<td className='border border-gray-300 p-2 text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.sickBenefit} VNĐ</td>
 									</tr>
 									<tr>
 										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
 											Tổng cộng:
 										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>0.00</td>
+										<td className='border border-gray-300 p-2 font-bold text-right'>
+											{selectedPayroll?.totalBenefit} VNĐ
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -270,13 +266,13 @@ export default function EmployeeSalaryCal() {
 								<tbody>
 									<tr>
 										<td className='border border-gray-300 p-2 w-8/12 text-right font-bold' colSpan={2}>
-											Tổng Số Tiền Lương Thực Nhận:
+											Tổng số tiền lương thực nhận:
 										</td>
 										<td
 											className='border border-gray-300 p-2 w-4/12 font-bold text-right text-green-600'
 											style={{ fontWeight: 'bold' }}
 										>
-											7,425,000.00
+											{Math.floor(parseFloat(selectedPayroll?.netSalary || '0')).toLocaleString('en-US')} VNĐ
 										</td>
 									</tr>
 								</tbody>
@@ -285,7 +281,13 @@ export default function EmployeeSalaryCal() {
 					</div>
 				</div>
 				<div className='flex items-center w-full justify-end gap-2'>
-					<Button className='w-full' onClick={() => setIsDialogOpen(false)}>
+					<Button
+						className='w-full'
+						onClick={() => {
+							setIsDialogOpen(false);
+							onClose();
+						}}
+					>
 						Đóng
 					</Button>
 					<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>

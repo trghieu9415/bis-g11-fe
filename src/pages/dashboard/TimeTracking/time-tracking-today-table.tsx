@@ -70,10 +70,6 @@ export default function TimeTrackingTodayTable() {
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
 	const formattedDate = format(new Date(), 'yyyy-MM-dd');
 
-	// useEffect(() => {
-	// 	dispatch(fetchAllTimeTrackingToday(formattedDate));
-	// }, [dispatch]);
-
 	const columns: ColumnDef<TimeTrackingToday>[] = [
 		{
 			accessorKey: 'idString',
@@ -469,8 +465,6 @@ export default function TimeTrackingTodayTable() {
 			checkIn: formatToFake7Z(data.workingDay, data.checkIn),
 			checkOut: formatToFake7Z(data.workingDay, data.checkOut)
 		};
-
-		console.log(attendanceDetail);
 
 		try {
 			await updateAttendanceDetail(attendanceDetail);
