@@ -39,12 +39,21 @@ export default function EmployeeTimeTracking() {
 		setEvents(attendanceDetailsByUserID);
 	}, [attendanceDetailsByUserID]);
 
+	function toISOStringWithTimezone(date: Date, offset: number): string {
+		const tzDate = new Date(date.getTime() + offset * 60 * 60 * 1000);
+		const isoString = tzDate.toISOString().split('Z')[0];
+		return `${isoString}`;
+	}
+
 	const handleCheckIn = async () => {
 		try {
-			const now = new Date();
+			const now = new Date(); // Get the current date and time
+			console.log(now);
+			const nowUTC = toISOStringWithTimezone(now, 7);
+			console.log(nowUTC);
 			const checkInData = {
 				userId: user.id,
-				checkIn: now
+				checkIn: nowUTC
 			};
 
 			const formattedDate = now.toISOString().split('T')[0];
@@ -52,7 +61,7 @@ export default function EmployeeTimeTracking() {
 
 			// @ts-expect-error - Except res.success
 			if (res?.success) {
-				if (res?.data == 'AttendanceDetail not exists') {
+				if (res?.data == 'AttendanceDetail not exist') {
 					await checkIn(checkInData);
 					const formattedTime = now.toLocaleTimeString('vi-VN', {
 						hour: '2-digit',
@@ -62,7 +71,11 @@ export default function EmployeeTimeTracking() {
 					toast.success(`Check-in thành công lúc  ${formattedTime}`);
 					dispatch(fetchAttendanceDetailsByUserID(user.id));
 				} else if (res?.data == 'AttendanceDetail already exist') {
-					await updateAttendanceDetail({ ...checkInData, checkOut: null });
+					console.log(checkInData);
+					await updateAttendanceDetail({
+						...checkInData,
+						checkOut: null
+					});
 					const formattedTime = now.toLocaleTimeString('vi-VN', {
 						hour: '2-digit',
 						minute: '2-digit',
@@ -74,8 +87,6 @@ export default function EmployeeTimeTracking() {
 					toast.error('Có lỗi trong quá trình chấm công, vui lòng thử lại!');
 				}
 			}
-
-			console.log(res);
 		} catch (error) {
 			const err = error as AxiosError;
 
@@ -113,7 +124,9 @@ export default function EmployeeTimeTracking() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
 			} else if (err.response?.status === 500) {

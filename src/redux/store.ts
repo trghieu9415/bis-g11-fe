@@ -13,6 +13,7 @@ import holidaysReducer from './slices/holidaysSlice';
 import timeTrackingMonthReducer from './slices/timeTrackingMonthSlice';
 import scanAttendanceDetailReducer from './slices/scanAttendanceDetailSlice';
 import payrollsByYearMonthReducer from './slices/payrollsByYearMonthSlice';
+import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -28,7 +29,8 @@ export const store = configureStore({
 		holidays: holidaysReducer,
 		timeTrackingMonth: timeTrackingMonthReducer,
 		scanAttendanceDetail: scanAttendanceDetailReducer,
-		payrollsByYearMonth: payrollsByYearMonthReducer
+		payrollsByYearMonth: payrollsByYearMonthReducer,
+		payrollsYearByUserID: payrollsYearByUserIDReducer
 	}
 });
 

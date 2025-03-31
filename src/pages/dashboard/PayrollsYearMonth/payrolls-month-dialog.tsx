@@ -1,20 +1,23 @@
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger
-} from '@/components/ui/dialog';
-import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
-import { RootState, useAppDispatch } from '@/redux/store';
-import { BadgeDollarSign, FileText } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 
-import { Input } from '@/components/ui/input';
+import { FileText } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { exportPayroll } from '@/services/payrollService';
+
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
 
 type Payroll = {
 	id: number;
@@ -58,7 +61,7 @@ type PayrollsMonthDialogProps = {
 
 export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }: PayrollsMonthDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+	const [exportLink, setExportLink] = useState<string | null>('');
 	useEffect(() => {
 		if (isOpen) {
 			setIsDialogOpen(true);
@@ -68,234 +71,283 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 		}
 	}, [isOpen]);
 
+	const handleExportPayroll = async () => {
+		if (selectedPayroll) {
+			try {
+				const response = await exportPayroll(selectedPayroll.id);
+				// @ts-expect-error - except
+				if (response?.success) {
+					if (response?.data?.link) {
+						setExportLink(`${response.data?.link}`);
+					}
+				}
+			} catch (error: unknown) {
+				const err = error as AxiosError;
+				if (err.response?.status === 400) {
+					toast.error(
+						(err.response.data as { message?: string }).message ||
+							'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+					);
+				} else if (err.response?.status === 404) {
+					toast.error('Lỗi 404: Không tìm thấy chấm công.');
+				} else if (err.response?.status === 500) {
+					toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				} else {
+					toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+				}
+			}
+		}
+	};
+
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={onClose}>
-			<DialogContent
-				className='!w-[50vw] !max-w-none !h-[98vh] flex flex-col'
-				onOpenAutoFocus={e => e.preventDefault()}
-			>
-				<DialogHeader>
-					<DialogTitle></DialogTitle>
-					<DialogDescription></DialogDescription>
-				</DialogHeader>
-				<div className='flex-1 mb-4'>
-					<div>
-						<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
-							<h1 className='text-lg font-bold text-center mb-1'>Công ty Inverse</h1>
+		<>
+			<Dialog open={isDialogOpen} onOpenChange={onClose}>
+				<DialogContent
+					className='!w-[50vw] !max-w-none !h-[98vh] flex flex-col'
+					onOpenAutoFocus={e => e.preventDefault()}
+				>
+					<DialogHeader>
+						<DialogTitle></DialogTitle>
+						<DialogDescription></DialogDescription>
+					</DialogHeader>
+					<div className='flex-1 mb-4'>
+						<div>
+							<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
+								<h1 className='text-lg font-bold text-center mb-1'>Công ty Inverse</h1>
 
-							<p className='text-center text-sm mb-4'>
-								Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
-							</p>
-							<h2 className='text-md font-semibold text-center mb-2'>PHIẾU LƯƠNG</h2>
-							<div className=' flex justify-center items-center mb-4'>
-								<label htmlFor='monthYear' className=' mr-2 text-md font-medium'>
-									Kỳ lương {selectedPayroll?.monthOfYear?.replace(/(\d{4})-(\d{2})/, 'tháng $2 năm $1')}
-								</label>
+								<p className='text-center text-sm mb-4'>
+									Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
+								</p>
+								<h2 className='text-md font-semibold text-center mb-2'>PHIẾU LƯƠNG</h2>
+								<div className=' flex justify-center items-center mb-4'>
+									<label htmlFor='monthYear' className=' mr-2 text-md font-medium'>
+										Kỳ lương {selectedPayroll?.monthOfYear?.replace(/(\d{4})-(\d{2})/, 'tháng $2 năm $1')}
+									</label>
+								</div>
 							</div>
-						</div>
-						<div className='overflow-y-auto px-4 max-h-[430px] pb-2'>
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Mã Nhân Viên:</strong> {selectedPayroll?.userIdStr}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày công đi làm:</strong> {selectedPayroll?.totalWorkingDays}
-								</p>
+							<div className='overflow-y-auto px-4 max-h-[430px] pb-2'>
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Mã Nhân Viên:</strong> {selectedPayroll?.userIdStr}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Ngày công đi làm:</strong> {selectedPayroll?.totalWorkingDays}
+									</p>
+								</div>
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Họ và tên:</strong> {selectedPayroll?.fullName}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Ngày nghỉ lễ:</strong> {selectedPayroll?.totalHolidayLeaves}
+									</p>
+								</div>
+
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Chức danh:</strong> {selectedPayroll?.roleName}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Ngày nghỉ phép:</strong> {selectedPayroll?.totalPaidLeaves}
+									</p>
+								</div>
+
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Lương cơ bản:</strong> {selectedPayroll?.baseSalary}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Ngày nghỉ bệnh:</strong> {selectedPayroll?.totalSickLeaves}
+									</p>
+								</div>
+
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Hệ số lương:</strong> {selectedPayroll?.salaryCoefficient}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Nghỉ thai sản:</strong> {selectedPayroll?.totalMaternityLeaves}
+									</p>
+								</div>
+
+								<div className='grid grid-col grid-cols-2'>
+									<p className='mb-2 text-xs'>
+										<strong>Ngày công chuẩn:</strong> {selectedPayroll?.standardWorkingDays}
+									</p>
+									<p className='mb-2 text-xs'>
+										<strong>Nghỉ không phép:</strong> {selectedPayroll?.totalUnpaidLeaves}
+									</p>
+								</div>
+
+								<table className='min-w-full border border-gray-300 mt-4 text-xs'>
+									<thead className='bg-gray-200'>
+										<tr>
+											<th className='border border-gray-300 p-2 w-1/12'>STT</th>
+											<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Thu Nhập</th>
+											<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td className='border border-gray-300 p-2'>1</td>
+											<td className='border border-gray-300 p-2'>Lương chính thức</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.mainSalary} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>2</td>
+											<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.allowance}</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
+												Tổng cộng:
+											</td>
+											<td className='border border-gray-300 p-2 font-bold text-right'>
+												{selectedPayroll?.grossSalary} VNĐ
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<table className='min-w-full border border-gray-300 mt-4 text-xs'>
+									<thead className='bg-gray-200'>
+										<tr>
+											<th className='border border-gray-300 p-2 w-1/12'>STT</th>
+											<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Trừ Vào Lương</th>
+											<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td className='border border-gray-300 p-2'>1</td>
+											<td className='border border-gray-300 p-2 text-left font-bold' colSpan={2}>
+												Bảo hiểm bắt buộc
+											</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'></td>
+											<td className='border border-gray-300 p-2'>1.1. Bảo hiểm xã hội (8%)</td>
+											<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHXH} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'></td>
+											<td className='border border-gray-300 p-2'>1.2. Bảo hiểm y tế (1.5%)</td>
+											<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHYT} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'></td>
+											<td className='border border-gray-300 p-2'>1.3. Bảo hiểm thất nghiệp (1%)</td>
+											<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHTN} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>2</td>
+											<td className='border border-gray-300 p-2'>Thuế TNCN</td>
+											<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.tax} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>3</td>
+											<td className='border border-gray-300 p-2'>Phạt</td>
+											<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.penalties} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>4</td>
+											<td className='border border-gray-300 p-2'>Khác</td>
+											<td className='border border-gray-300 p-2 text-right'>- 0 VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
+												Tổng cộng:
+											</td>
+											<td className='border border-gray-300 p-2 font-bold text-right'>
+												- {selectedPayroll?.deductions} VNĐ
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<table className='min-w-full border border-gray-300 mt-4 text-xs'>
+									<thead className='bg-gray-200'>
+										<tr>
+											<th className='border border-gray-300 p-2 w-1/12'>STT</th>
+											<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Phụ Cấp BHXH</th>
+											<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td className='border border-gray-300 p-2'>1</td>
+											<td className='border border-gray-300 p-2'>Phụ cấp thai sản</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.maternityBenefit} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>2</td>
+											<td className='border border-gray-300 p-2'>Phụ cấp nghỉ bệnh</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.sickBenefit} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
+												Tổng cộng:
+											</td>
+											<td className='border border-gray-300 p-2 font-bold text-right'>
+												{selectedPayroll?.totalBenefit} VNĐ
+											</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Họ và tên:</strong> {selectedPayroll?.fullName}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ lễ:</strong> {selectedPayroll?.totalHolidayLeaves}
-								</p>
+
+							<div className='px-6'>
+								<table className='min-w-full mt-4 text-xs'>
+									<tbody>
+										<tr>
+											<td className='border border-gray-300 p-2 w-8/12 text-right font-bold' colSpan={2}>
+												Tổng số tiền lương thực nhận:
+											</td>
+											<td
+												className='border border-gray-300 p-2 w-4/12 font-bold text-right text-green-600'
+												style={{ fontWeight: 'bold' }}
+											>
+												{Math.floor(parseFloat(selectedPayroll?.netSalary || '0')).toLocaleString('en-US')} VNĐ
+											</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Chức danh:</strong> {selectedPayroll?.roleName}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ phép:</strong> {selectedPayroll?.totalPaidLeaves}
-								</p>
-							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Lương cơ bản:</strong> {selectedPayroll?.baseSalary}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày nghỉ bệnh:</strong> {selectedPayroll?.totalSickLeaves}
-								</p>
-							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Hệ số lương:</strong> {selectedPayroll?.salaryCoefficient}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Nghỉ thai sản:</strong> {selectedPayroll?.totalMaternityLeaves}
-								</p>
-							</div>
-
-							<div className='grid grid-col grid-cols-2'>
-								<p className='mb-2 text-xs'>
-									<strong>Ngày công chuẩn:</strong> {selectedPayroll?.standardWorkingDays}
-								</p>
-								<p className='mb-2 text-xs'>
-									<strong>Nghỉ không phép:</strong> {selectedPayroll?.totalUnpaidLeaves}
-								</p>
-							</div>
-
-							<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-								<thead className='bg-gray-200'>
-									<tr>
-										<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-										<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Thu Nhập</th>
-										<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td className='border border-gray-300 p-2'>1</td>
-										<td className='border border-gray-300 p-2'>Lương chính thức</td>
-										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.mainSalary} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'>2</td>
-										<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
-										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.allowance}</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-											Tổng cộng:
-										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>
-											{selectedPayroll?.grossSalary} VNĐ
-										</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-								<thead className='bg-gray-200'>
-									<tr>
-										<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-										<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Trừ Vào Lương</th>
-										<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td className='border border-gray-300 p-2'>1</td>
-										<td className='border border-gray-300 p-2 text-left font-bold' colSpan={2}>
-											Bảo hiểm bắt buộc
-										</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'></td>
-										<td className='border border-gray-300 p-2'>1.1. Bảo hiểm xã hội (8%)</td>
-										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHXH} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'></td>
-										<td className='border border-gray-300 p-2'>1.2. Bảo hiểm y tế (1.5%)</td>
-										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHYT} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'></td>
-										<td className='border border-gray-300 p-2'>1.3. Bảo hiểm thất nghiệp (1%)</td>
-										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.employeeBHTN} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'>2</td>
-										<td className='border border-gray-300 p-2'>Thuế TNCN</td>
-										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.tax} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'>3</td>
-										<td className='border border-gray-300 p-2'>Phạt</td>
-										<td className='border border-gray-300 p-2 text-right'>- {selectedPayroll?.penalties} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'>4</td>
-										<td className='border border-gray-300 p-2'>Khác</td>
-										<td className='border border-gray-300 p-2 text-right'>- 0 VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-											Tổng cộng:
-										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>- {selectedPayroll?.deductions}</td>
-									</tr>
-								</tbody>
-							</table>
-							<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-								<thead className='bg-gray-200'>
-									<tr>
-										<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-										<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Phụ Cấp BHXH</th>
-										<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td className='border border-gray-300 p-2'>1</td>
-										<td className='border border-gray-300 p-2'>Phụ cấp thai sản</td>
-										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.maternityBenefit} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2'>2</td>
-										<td className='border border-gray-300 p-2'>Phụ cấp nghỉ bệnh</td>
-										<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.sickBenefit} VNĐ</td>
-									</tr>
-									<tr>
-										<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-											Tổng cộng:
-										</td>
-										<td className='border border-gray-300 p-2 font-bold text-right'>
-											{selectedPayroll?.totalBenefit} VNĐ
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-
-						<div className='px-6'>
-							<table className='min-w-full mt-4 text-xs'>
-								<tbody>
-									<tr>
-										<td className='border border-gray-300 p-2 w-8/12 text-right font-bold' colSpan={2}>
-											Tổng số tiền lương thực nhận:
-										</td>
-										<td
-											className='border border-gray-300 p-2 w-4/12 font-bold text-right text-green-600'
-											style={{ fontWeight: 'bold' }}
-										>
-											{Math.floor(parseFloat(selectedPayroll?.netSalary || '0')).toLocaleString('en-US')} VNĐ
-										</td>
-									</tr>
-								</tbody>
-							</table>
 						</div>
 					</div>
-				</div>
-				<div className='flex items-center w-full justify-end gap-2'>
-					<Button
-						className='w-full'
-						onClick={() => {
-							setIsDialogOpen(false);
-							onClose();
-						}}
-					>
-						Đóng
-					</Button>
-					<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>
-						<FileText />
-						Xuất PDF
-					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
+					<div className='flex items-center w-full justify-end gap-2'>
+						<Button
+							className='w-full'
+							onClick={() => {
+								setIsDialogOpen(false);
+								onClose();
+							}}
+						>
+							Đóng
+						</Button>
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>
+									<FileText />
+									Xuất PDF
+								</Button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Thông báo xem PDF</AlertDialogTitle>
+									<AlertDialogDescription>
+										Bạn có chắc chắn muốn xem bảng lương dưới dạng PDF không? Hành động này sẽ tạo ra một tệp PDF cho
+										bảng lương của bạn.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Thoát</AlertDialogCancel>
+									<AlertDialogAction onClick={handleExportPayroll}>Tiếp</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+					</div>
+				</DialogContent>
+			</Dialog>
+		</>
 	);
 }

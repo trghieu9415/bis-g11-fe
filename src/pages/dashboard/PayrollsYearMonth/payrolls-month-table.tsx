@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,17 +7,13 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen } from 'lucide-react';
-import { useState } from 'react';
-import CustomDialog from '@/components/custom-dialog';
+import { ArrowUpDown, Ellipsis } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import PayrollsMonthDialog from './payrolls-month-dialog';
-import { RegisterOptions } from 'react-hook-form';
 
+import { fetchPayrollsByYearMonth } from '@/redux/slices/payrollsByYearMonthSlice'; 
 import { RootState, useAppDispatch } from '@/redux/store';
-import { fetchPayrollsByYearMonth } from '@/redux/slices/payrollsByYearMonthSlice'; // Updated import for payrolls
-// import { updatePayroll, deletePayroll } from '@/services/payrollService'; // Updated service for payrolls
-import { toast } from 'react-toastify';
-import { AxiosError } from 'axios';
 
 type Payroll = {
 	id: number;
@@ -239,8 +233,8 @@ export default function PayrollsYearMonthTable({ month, year }: PayrollsYearMont
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
