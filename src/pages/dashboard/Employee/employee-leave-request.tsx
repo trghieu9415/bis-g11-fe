@@ -40,7 +40,6 @@ export default function EmployeeLeaveRequest() {
 
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
-
 	const {
 		register,
 		watch,
@@ -82,6 +81,9 @@ export default function EmployeeLeaveRequest() {
 			case 'PAID_LEAVE':
 				return 1;
 			case 'MATERNITY_LEAVE':
+				if (user.gender === 'MALE') {
+					return 7;
+				}
 				return 180;
 			case 'SICK_LEAVE':
 				return 7;
@@ -114,7 +116,10 @@ export default function EmployeeLeaveRequest() {
 				const err = error as AxiosError;
 
 				if (err.response?.status === 400) {
-					toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+					toast.error(
+						(err.response.data as { message?: string }).message ||
+							'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+					);
 				} else if (err.response?.status === 404) {
 					toast.error('Lỗi 404: Không tìm thấy nhân viên.');
 				} else if (err.response?.status === 500) {
@@ -226,7 +231,7 @@ export default function EmployeeLeaveRequest() {
 
 														const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
 														// Day offs = Start date - End Date + 1
-														if (diffDays + 1 > maxDays) return `(Bạn chỉ được nghỉ tối đa ${maxDays} ngày)`;
+														if (diffDays + 1 > maxDays) return `Bạn chỉ được nghỉ tối đa ${maxDays} ngày`;
 													}
 												}
 											}

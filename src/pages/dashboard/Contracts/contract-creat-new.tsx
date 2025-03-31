@@ -165,8 +165,6 @@ export default function ContractCreateNew() {
 		}
 	};
 
-	console.log(users);
-
 	// Person information
 	const personalInfo = [
 		{ label: 'Họ và tên', value: selectedUser?.full_name },
@@ -224,8 +222,6 @@ export default function ContractCreateNew() {
 			userId: selectedUser.id
 		};
 
-		console.log(contractData);
-
 		try {
 			await addContract(contractData);
 			toast.success('Thêm hợp đồng cho nhân viên thành công!');
@@ -235,7 +231,9 @@ export default function ContractCreateNew() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy hợp đồng.');
 			} else if (err.response?.status === 500) {
@@ -352,7 +350,11 @@ export default function ContractCreateNew() {
 											</CommandGroup>
 											<CommandSeparator />
 										</CommandList>
-										{isShowErrorChooseUser && <p className='text-red-500 text-sm mt-2'>Vui lòng chọn nhân viên, nếu không có hãy tạo nhân viên mới nhé.</p>}
+										{isShowErrorChooseUser && (
+											<p className='text-red-500 text-sm mt-2'>
+												Vui lòng chọn nhân viên, nếu không có hãy tạo nhân viên mới nhé.
+											</p>
+										)}
 									</Command>
 								</div>
 

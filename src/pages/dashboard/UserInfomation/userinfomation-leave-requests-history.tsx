@@ -139,7 +139,7 @@ export default function UserInfomationLeaveRequestsHistory() {
 	};
 
 	return (
-		<div className='px-4 py-6 flex-1 w-full border-gray-200 border-solid border rounded-md h-full max-h-[100%] overflow-hidden relative'>
+		<div className='bg-white px-4 py-6 flex-1 w-full border-gray-200 border-solid border rounded-md h-full max-h-[100%] overflow-hidden relative'>
 			<h1 className='text-lg font-bold uppercase text-center '>Lịch sử đơn xin nghỉ phép</h1>
 			<div className='flex justify-center items-center gap-2 mt-2 '>
 				<div className='flex gap-2 mb-4'>

@@ -57,7 +57,6 @@ export default function ContractTable() {
 
 	const dispatch = useAppDispatch();
 	const { contracts } = useSelector((state: RootState) => state.contracts);
-	console.log(contracts);
 
 	useEffect(() => {
 		dispatch(fetchContracts());

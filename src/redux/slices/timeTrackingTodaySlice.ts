@@ -29,7 +29,7 @@ const initialState: TimeTrackingTodayStates = {
 };
 
 export const fetchAllTimeTrackingToday = createAsyncThunk(
-	'leave-request/fetchAllTimeTrackingToday',
+	'time-tracking-today/fetchAllTimeTrackingToday',
 	async (date: string) => {
 		const response = await axios.get<ApiResponse[]>(`/api/v1/attendanceDetails/date?date=${date}`);
 		return response.data;
@@ -37,7 +37,7 @@ export const fetchAllTimeTrackingToday = createAsyncThunk(
 );
 
 const timeTrackingTodaySlice = createSlice({
-	name: 'leaveRequests',
+	name: 'timeTrackingToday',
 	initialState,
 	reducers: {},
 	extraReducers: builder => {
