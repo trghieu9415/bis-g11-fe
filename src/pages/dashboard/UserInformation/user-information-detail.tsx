@@ -35,7 +35,7 @@ type Employee = {
 	password: string | null;
 };
 
-export default function UserInfomationDetail() {
+export default function UserInformationDetail() {
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
 	const { users } = useSelector((state: RootState) => state.users);

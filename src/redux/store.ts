@@ -14,6 +14,7 @@ import timeTrackingMonthReducer from './slices/timeTrackingMonthSlice';
 import scanAttendanceDetailReducer from './slices/scanAttendanceDetailSlice';
 import payrollsByYearMonthReducer from './slices/payrollsByYearMonthSlice';
 import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
+import allowancesReducer from './slices/allowancesSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -30,7 +31,8 @@ export const store = configureStore({
 		timeTrackingMonth: timeTrackingMonthReducer,
 		scanAttendanceDetail: scanAttendanceDetailReducer,
 		payrollsByYearMonth: payrollsByYearMonthReducer,
-		payrollsYearByUserID: payrollsYearByUserIDReducer
+		payrollsYearByUserID: payrollsYearByUserIDReducer,
+		allowances: allowancesReducer
 	}
 });
 

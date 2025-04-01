@@ -1,6 +1,8 @@
 import { Dialog, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface SalaryStructureDialogProps {
 	isOpen: boolean;
@@ -8,6 +10,8 @@ interface SalaryStructureDialogProps {
 }
 
 const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, onClose }) => {
+	const { allowances } = useSelector((state: RootState) => state.allowances);
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogOverlay />
@@ -123,26 +127,14 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 									</tr>
 								</thead>
 								<tbody className='bg-white divide-y divide-gray-200 text-sm'>
-									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Quản lý nhân sự</td>
-										<td className='px-6 py-4 whitespace-nowrap'>500,000 VNĐ/tháng</td>
-									</tr>
-									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Quản lý kho</td>
-										<td className='px-6 py-4 whitespace-nowrap'>500,000 VNĐ/tháng</td>
-									</tr>
-									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Quản lý kinh doanh</td>
-										<td className='px-6 py-4 whitespace-nowrap'>500,000 VNĐ/tháng</td>
-									</tr>
-									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Nhân viên</td>
-										<td className='px-6 py-4 whitespace-nowrap'>500,000 VNĐ/tháng</td>
-									</tr>
-									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Nhân viên</td>
-										<td className='px-6 py-4 whitespace-nowrap'>500,000 VNĐ/tháng</td>
-									</tr>
+									{allowances.map(allowance =>
+										allowance.roleName.map((role, index) => (
+											<tr key={`${allowance.id}-${index}`}>
+												<td className='px-6 py-4 whitespace-nowrap'>{role}</td>
+												<td className='px-6 py-4 whitespace-nowrap'>{allowance.allowance} VNĐ/tháng</td>
+											</tr>
+										))
+									)}
 								</tbody>
 							</table>
 						</div>
