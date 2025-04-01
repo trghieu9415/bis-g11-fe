@@ -14,10 +14,8 @@ import {
 
 import { FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { exportPayroll } from '@/services/payrollService';
-
-import { toast } from 'react-toastify';
-import { AxiosError } from 'axios';
+import ReactDOMServer from 'react-dom/server';
+import html2pdf from 'html2pdf.js';
 
 type Payroll = {
 	id: number;
@@ -61,7 +59,6 @@ type PayrollsMonthDialogProps = {
 
 export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }: PayrollsMonthDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const [exportLink, setExportLink] = useState<string | null>('');
 	useEffect(() => {
 		if (isOpen) {
 			setIsDialogOpen(true);
@@ -71,31 +68,92 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 		}
 	}, [isOpen]);
 
-	const handleExportPayroll = async () => {
-		if (selectedPayroll) {
-			try {
-				const response = await exportPayroll(selectedPayroll.id);
-				// @ts-expect-error - except
-				if (response?.success) {
-					if (response?.data?.link) {
-						setExportLink(`${response.data?.link}`);
-					}
-				}
-			} catch (error: unknown) {
-				const err = error as AxiosError;
-				if (err.response?.status === 400) {
-					toast.error(
-						(err.response.data as { message?: string }).message ||
-							'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
-					);
-				} else if (err.response?.status === 404) {
-					toast.error('Lỗi 404: Không tìm thấy chấm công.');
-				} else if (err.response?.status === 500) {
-					toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-				} else {
-					toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-				}
+	console.log(selectedPayroll);
+
+	const handleExportPayrollByMonth = () => {
+		const companyNameElement = `<div class='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
+																	<h1 class='text-lg font-bold text-center mb-1'>CÔNG TY INVERSE</h1>
+
+																	<p class='text-center text-sm mb-4'>
+																		Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
+																	</p>
+																</div>
+																<div class='flex flex-col justify-center items-center mb-4 w-full' id='monthly-pay-period'>
+																	<h2 class='text-base font-semibold text-center'>PHIẾU LƯƠNG</h2>
+																	<label htmlFor='monthYear' class='text-md font-medium'>
+																		Kỳ lương tháng
+																	</label>
+																</div>`;
+
+		const newNetSalaryElement = `<div class='px-6' id='net-salary'>
+																		<table class='min-w-full mt-2 text-xs'>
+																			<tbody>
+																				<tr>
+																					<td class='border border-gray-300 p-2 w-8/12 text-right font-bold' colSpan={2}>
+																						Tổng Số Tiền Lương Thực Nhận:
+																					</td>
+																					<td
+																						class='border border-gray-300 p-2 w-4/12 font-bold text-right text-green-600'
+																						style={{ fontWeight: 'bold' }}
+																					>
+																						${selectedPayroll?.netSalary ? Math.floor(Number(selectedPayroll?.netSalary)).toLocaleString('en-US') : '0'} VNĐ
+																					</td>
+																				</tr>
+																			</tbody>
+																		</table>
+																	</div>`;
+
+		const signElement = `<div class='max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg'>
+													<table class='w-full border border-gray-300 mt-10'>
+														<tbody>
+															<tr>
+																<td class='border border-gray-300 px-4 pt-2 pb-20 text-center'>
+																	<p class='font-semibold'>Người lập phiếu</p>
+																	<p>(Ký và ghi rõ họ tên)</p>
+																</td>
+																<td class='border border-gray-300 px-4 pt-2 pb-20 text-center'>
+																	<p class='font-semibold'>Người nhận tiền</p>
+																	<p>(Ký và ghi rõ họ tên)</p>
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>`;
+
+		const element = document.getElementById('payroll-month');
+
+		if (element) {
+			const elementClone = element.cloneNode(true) as HTMLElement;
+
+			const monthlyPayPeriodElement = elementClone.querySelector('#monthly-pay-period');
+			if (monthlyPayPeriodElement) {
+				monthlyPayPeriodElement.remove();
 			}
+
+			const selectedPayrollContentElement = elementClone.querySelector('#payroll-month-content');
+			if (selectedPayrollContentElement) {
+				selectedPayrollContentElement.classList.remove('overflow-y-auto');
+				selectedPayrollContentElement.classList.remove('max-h-[430px]');
+			}
+
+			const netSalaryElement = elementClone.querySelector('#net-salary');
+			if (netSalaryElement) {
+				netSalaryElement.remove();
+			}
+
+			elementClone.insertAdjacentHTML('afterbegin', companyNameElement);
+			elementClone.innerHTML +=
+				newNetSalaryElement + `<div class="page-break" style="page-break-after: always;"></div>` + signElement;
+
+			const options = {
+				margin: 1,
+				filename: 'payroll_report.pdf',
+				image: { type: 'jpeg', quality: 0.98 },
+				html2canvas: { scale: 4 },
+				jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+			};
+
+			html2pdf(elementClone, options);
 		}
 	};
 
@@ -111,8 +169,8 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 						<DialogDescription></DialogDescription>
 					</DialogHeader>
 					<div className='flex-1 mb-4'>
-						<div>
-							<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
+						<div id='payroll-month'>
+							<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg' id='monthly-pay-period'>
 								<h1 className='text-lg font-bold text-center mb-1'>Công ty Inverse</h1>
 
 								<p className='text-center text-sm mb-4'>
@@ -125,7 +183,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 									</label>
 								</div>
 							</div>
-							<div className='overflow-y-auto px-4 max-h-[430px] pb-2'>
+							<div className='overflow-y-auto px-4 max-h-[430px] pb-2' id='payroll-month-content'>
 								<div className='grid grid-col grid-cols-2'>
 									<p className='mb-2 text-xs'>
 										<strong>Mã Nhân Viên:</strong> {selectedPayroll?.userIdStr}
@@ -295,7 +353,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 								</table>
 							</div>
 
-							<div className='px-6'>
+							<div className='px-6' id='net-salary'>
 								<table className='min-w-full mt-4 text-xs'>
 									<tbody>
 										<tr>
@@ -341,7 +399,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 								</AlertDialogHeader>
 								<AlertDialogFooter>
 									<AlertDialogCancel>Thoát</AlertDialogCancel>
-									<AlertDialogAction onClick={handleExportPayroll}>Tiếp</AlertDialogAction>
+									<AlertDialogAction onClick={handleExportPayrollByMonth}>Xác nhận</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>

@@ -15,7 +15,7 @@ import CommerceLayout from '@/layouts/commerce-layout';
 import Orders from '@/pages/commerce/Orders';
 import Login from '@/pages/commerce/Login';
 import TimeTrackingMonth from '@/pages/dashboard/TimeTrackingMonth';
-import SalaryMonth from '@/pages/dashboard/PayrollsYearMonth';
+import SalaryMonth from '@/pages/dashboard/PayrollsMonth';
 
 const publicRoutes = [
 	// {path: config.routes.home, component: Home}
