@@ -13,7 +13,7 @@ import classNames from 'classnames';
 import CustomDialog from '@/components/custom-dialog';
 import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
 import { RootState, useAppDispatch } from '@/redux/store';
-import { updateAttendanceDetail } from '@/services/attendanceDetailService';
+import { checkIn, updateAttendanceDetail } from '@/services/attendanceDetailService';
 import { ColumnDef } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { format } from 'date-fns';
@@ -69,10 +69,6 @@ export default function TimeTrackingTodayTable() {
 	const dispatch = useAppDispatch();
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
 	const formattedDate = format(new Date(), 'yyyy-MM-dd');
-
-	// useEffect(() => {
-	// 	dispatch(fetchAllTimeTrackingToday(formattedDate));
-	// }, [dispatch]);
 
 	const columns: ColumnDef<TimeTrackingToday>[] = [
 		{
@@ -149,7 +145,7 @@ export default function TimeTrackingTodayTable() {
 				const checkIn = row.original.checkIn;
 				const checkOut = row.original.checkOut;
 
-				if (!checkIn) return filterValue === 'late'; //If not checkin => Late
+				if (!checkIn) return filterValue === 'late'; // If not checkin => Late
 
 				const [inHour, inMinute] = checkIn.split(':').map(Number);
 				const totalCheckInMinutes = inHour * 60 + inMinute;
@@ -162,7 +158,7 @@ export default function TimeTrackingTodayTable() {
 
 				const [outHour, outMinute] = checkOut.split(':').map(Number);
 				const totalCheckOutMinutes = outHour * 60 + outMinute;
-				if (filterValue === 'leaveEarly') return totalCheckInMinutes <= 1050; // Before 5:30PM
+				if (filterValue === 'leaveEarly') return totalCheckOutMinutes < 1050; // Before 5:30PM
 				if (filterValue === 'leaveLate') return totalCheckOutMinutes >= 1080; // After 6PM
 
 				return true;
@@ -235,26 +231,29 @@ export default function TimeTrackingTodayTable() {
 					</SelectContent>
 				</Select>
 			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('attendanceStatus') === 'PRESENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
-							Có mặt
-						</p>
-					) : row.getValue('attendanceStatus') === 'ON_LEAVE' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
-						</p>
-					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
-							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
-						</p>
-					) : (
-						<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
-					)}
-				</span>
-			)
+			cell: ({ row }) => {
+				const checkIn = row.original.checkIn;
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('attendanceStatus') === 'PRESENT' ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-green-500 rounded-sm p-1'>
+								<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+								Có mặt
+							</p>
+						) : row.getValue('attendanceStatus') === 'ON_LEAVE' ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
+								<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
+							</p>
+						) : row.getValue('attendanceStatus') === 'ABSENT' && !checkIn ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
+								<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
+							</p>
+						) : (
+							<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
+						)}
+					</span>
+				);
+			}
 		},
 		{
 			accessorKey: 'leaveTypeEnum',
@@ -277,34 +276,38 @@ export default function TimeTrackingTodayTable() {
 					</SelectContent>
 				</Select>
 			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('leaveTypeEnum') === 0 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-blue-500 rounded-sm p-1'>
-							<Hospital className='w-4 h-4 mr-1' stroke='white' />
-							Nghỉ bệnh
-						</p>
-					) : row.getValue('leaveTypeEnum') === 1 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-orange-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Nghỉ phép
-						</p>
-					) : row.getValue('leaveTypeEnum') === 2 ? (
-						<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
-							<Baby className='w-6 h-4' stroke='white' /> Nghỉ thai sản
-						</p>
-					) : row.getValue('leaveTypeEnum') === 3 ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
-							<PartyPopper className='w-4 h-4 mr-1' stroke='white' /> Nghỉ lễ
-						</p>
-					) : row.getValue('attendanceStatus') === 'ABSENT' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-red-500 rounded-sm p-1'>
-							<AlertTriangle className='w-4 h-4 mr-1' stroke='white' /> Không phép
-						</p>
-					) : (
-						'--'
-					)}
-				</span>
-			),
+			cell: ({ row }) => {
+				const checkIn = row.original.checkIn;
+
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('leaveTypeEnum') === 0 ? (
+							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-blue-500 rounded-sm p-1'>
+								<Hospital className='w-4 h-4 mr-1' stroke='white' />
+								Nghỉ bệnh
+							</p>
+						) : row.getValue('leaveTypeEnum') === 1 ? (
+							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-orange-500 rounded-sm p-1'>
+								<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Nghỉ phép
+							</p>
+						) : row.getValue('leaveTypeEnum') === 2 ? (
+							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
+								<Baby className='w-6 h-4' stroke='white' /> Nghỉ thai sản
+							</p>
+						) : row.getValue('leaveTypeEnum') === 3 ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
+								<PartyPopper className='w-4 h-4 mr-1' stroke='white' /> Nghỉ lễ
+							</p>
+						) : row.getValue('attendanceStatus') === 'ABSENT' && !checkIn ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-red-500 rounded-sm p-1'>
+								<AlertTriangle className='w-4 h-4 mr-1' stroke='white' /> Không phép
+							</p>
+						) : (
+							<span className='flex justify-center text-gray-400'>--</span>
+						)}
+					</span>
+				);
+			},
 			filterFn: (row, columnId, filterValue) => {
 				if (filterValue === undefined) return true;
 				return row.getValue(columnId) == filterValue;
@@ -322,7 +325,7 @@ export default function TimeTrackingTodayTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{row.original.attendanceStatus === 'PRESENT' && (
+						{row.original.attendanceStatus === 'ABSENT' && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
@@ -418,14 +421,15 @@ export default function TimeTrackingTodayTable() {
 							message: 'Định dạng không hợp lệ (HH:mm:ss)'
 						},
 						validate: value => {
+							if (value === '00:00:00') return 'Vui lòng nhập giờ check-in';
 							if (!selectedTimeTrackingToday?.checkIn) return true;
 							const [hh, mm, ss] = value.split(':').map(Number);
 							if (hh > 23 || mm > 59 || ss > 59) {
 								return 'Giờ nhập vào không hợp lệ';
 							}
 						}
-					},
-					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+					}
+					// isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
 				},
 				{
 					label: 'Giờ check-out',
@@ -438,6 +442,7 @@ export default function TimeTrackingTodayTable() {
 							message: 'Định dạng không hợp lệ (HH:mm:ss)'
 						},
 						validate: value => {
+							if (value === '00:00:00') return 'Vui lòng nhập giờ check-in';
 							if (!selectedTimeTrackingToday?.checkIn) return true;
 							const [hh, mm, ss] = value.split(':').map(Number);
 							if (hh > 23 || mm > 59 || ss > 59) {
@@ -452,15 +457,15 @@ export default function TimeTrackingTodayTable() {
 
 							return checkOutSeconds > checkInSeconds || 'Giờ check-out phải lớn hơn giờ check-in';
 						}
-					},
-					isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
+					}
+					// isShow: selectedTimeTrackingToday?.attendanceStatus === 'PRESENT' && true
 				}
 			]
 		]
 	];
 
-	const formatToFake7Z = (date: string, time: string): string => {
-		return `${date}T${time}.000Z`;
+	const formatToFake7Z = (date: string, time: string): string | null => {
+		return time === '00:00:00' ? null : `${date}T${time}.000Z`;
 	};
 
 	const handleSave = async (data: TimeTrackingToday) => {
@@ -469,8 +474,6 @@ export default function TimeTrackingTodayTable() {
 			checkIn: formatToFake7Z(data.workingDay, data.checkIn),
 			checkOut: formatToFake7Z(data.workingDay, data.checkOut)
 		};
-
-		console.log(attendanceDetail);
 
 		try {
 			await updateAttendanceDetail(attendanceDetail);
@@ -523,6 +526,8 @@ export default function TimeTrackingTodayTable() {
 				<CustomDialog
 					entity={{
 						...selectedTimeTrackingToday,
+						checkIn: selectedTimeTrackingToday.checkIn ? selectedTimeTrackingToday.checkIn : '00:00:00',
+						checkOut: selectedTimeTrackingToday.checkOut ? selectedTimeTrackingToday.checkOut : '00:00:00',
 						leaveTypeEnum: selectedTimeTrackingToday.leaveTypeEnum ? selectedTimeTrackingToday.leaveTypeEnum : 5 // 5 == null
 					}}
 					isOpen={isDialogOpen}

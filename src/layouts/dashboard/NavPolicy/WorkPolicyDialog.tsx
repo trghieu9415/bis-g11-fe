@@ -37,16 +37,16 @@ const WorkPolicyDialog: React.FC<WorkPolicyDialogProps> = ({ isOpen, onClose }) 
 							</p>
 							<ul className='list-disc pl-6 space-y-2'>
 								<li>
-									<strong>Đi trễ từ 9h00 đến 10h00</strong>: Trừ ngày công bậc 1
+									<strong>Đi trễ từ 9h00 đến 10h00</strong>: Trừ 12.5% ngày công
 								</li>
 								<li>
-									<strong>Đi trễ từ 10h00 đến 13h30</strong>: Trừ ngày công bậc 2
+									<strong>Đi trễ từ 10h00 đến 12h00</strong>: Trừ 25% ngày công
 								</li>
 								<li>
-									<strong>Đi trễ từ 13h30 đến 14h00</strong>: Trừ ngày công bậc 3
+									<strong>Đi trễ từ 13h30 đến 14h00</strong>: Trừ 60% ngày công
 								</li>
 								<li>
-									<strong>Đi trễ sau 14h00</strong>: Trừ ngày công bậc 4
+									<strong>Đi trễ sau 14h00</strong>: Xem như vắng
 								</li>
 							</ul>
 							<p className='mt-1'>Nhân viên phải có mặt đúng giờ, vi phạm sẽ bị xử lý theo quy định công ty.</p>

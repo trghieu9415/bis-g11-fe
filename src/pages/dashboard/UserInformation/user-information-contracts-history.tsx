@@ -37,7 +37,7 @@ interface ApiResponse {
 	salaryCoefficient: number;
 }
 
-export default function UserInfomationContractsHistory() {
+export default function UserInformationContractsHistory() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [filteredContracts, setFilteredContracts] = useState<ApiResponse[]>([]);
 	const [openItem, setOpenItem] = useState('');

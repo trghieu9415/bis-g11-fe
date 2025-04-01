@@ -1,20 +1,20 @@
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import UserInfomationDetail from '@/pages/dashboard/UserInfomation/userinfomation-detail';
-import UserInfomationContractsHistory from './UserInfomation/userinfomation-contracts-history';
-import UserInfomationLeaveRequestsHistory from './UserInfomation/userinfomation-leave-requests-history';
+import UserInformationDetail from '@/pages/dashboard/UserInformation/user-information-detail';
+import UserInformationContractsHistory from './UserInformation/user-information-contracts-history';
+import UserInformationLeaveRequestsHistory from './UserInformation/user-information-leave-requests-history';
 
-export default function UserInfomation() {
+export default function UserInformation() {
 	return (
 		<div className='flex items-start justify-between w-full max-h-[calc(100vh-60px)] mb-2 gap-4'>
 			{/* Thông tin User */}
-			<UserInfomationDetail />
+			<UserInformationDetail />
 
 			{/* Khung chứa lịch sử */}
 			<div className='flex flex-col flex-1 gap-4 h-full'>
 				<PanelGroup direction='vertical' className='w-full h-full rounded-sm'>
 					{/* Panel Contract */}
 					<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-						<UserInfomationContractsHistory />
+						<UserInformationContractsHistory />
 					</Panel>
 
 					{/* Scroll */}
@@ -22,7 +22,7 @@ export default function UserInfomation() {
 
 					{/* Panel Leave Request */}
 					<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-						<UserInfomationLeaveRequestsHistory />
+						<UserInformationLeaveRequestsHistory />
 					</Panel>
 				</PanelGroup>
 			</div>
