@@ -4,7 +4,7 @@ import NoneLayout from '@/layouts/none-layout';
 import HREmployees from '@/pages/dashboard/HREmployees';
 import Products from '@/pages/dashboard/Products';
 import Supplier from '@/pages/dashboard/Supplier';
-import UserInfomation from '@/pages/dashboard/UserInfomation';
+import UserInfomation from '@/pages/dashboard/UserInformation';
 import Contracts from '@/pages/dashboard/Contracts';
 import AllLeaveRequests from '@/pages/dashboard/AllLeaveRequests';
 import TimeTrackingToday from '@/pages/dashboard/TimeTrackingToday';

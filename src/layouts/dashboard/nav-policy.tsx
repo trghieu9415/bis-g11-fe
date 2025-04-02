@@ -11,10 +11,19 @@ import LeavePolicyDialog from './NavPolicy/LeavePolicyDialog';
 import WorkPolicyDialog from './NavPolicy/WorkPolicyDialog';
 import SalaryStructureDialog from './NavPolicy/SalaryStructureDialog';
 
+import { fetchAllAllowances } from '@/redux/slices/allowancesSlice';
+import { useEffect } from 'react';
+import { useAppDispatch } from '@/redux/store';
+
 export function NavPolicies() {
 	const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 	const [isWorkDialogOpen, setIsWorkDialogOpen] = useState(false);
 	const [isSalaryDialogOpen, setIsSalaryDialogOpen] = useState(false);
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(fetchAllAllowances());
+	}, [dispatch]);
 
 	const policies = [
 		{

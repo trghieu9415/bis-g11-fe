@@ -46,7 +46,7 @@ interface ApiResponse {
 	userId: number;
 }
 
-export default function UserInfomationLeaveRequestsHistory() {
+export default function UserInformationLeaveRequestsHistory() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [filteredLeaveRequests, setFilteredLeaveRequests] = useState<ApiResponse[]>([]);
 	const [openItem, setOpenItem] = useState('');

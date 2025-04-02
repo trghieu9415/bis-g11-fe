@@ -80,10 +80,9 @@ function EmployeeCalendar({ events, onCheckIn, onCheckOut }: EmployeeCalendarPro
 	const handleShowCheckInCheckOut = () => {
 		const today = new Date();
 		const hours = today.getHours();
-		console.log(hours);
 		const minutes = today.getMinutes();
 		const isCheckOutTime = (hours === 17 && minutes >= 30) || (hours === 18 && minutes <= 30);
-		const isCheckInTime = hours >= 8 && hours <= 15;
+		const isCheckInTime = hours >= 8 && hours < 2;
 
 		const newestCheckInEvent = events
 			.filter(event => event.title === 'Check-in')
