@@ -10,9 +10,9 @@ const routes = {
 	products: '/products',
 	supplier: '/supplier',
 	holiday: '/holiday',
-	newOrder: 'new-order',
-	orders: 'orders',
-	customers: 'customers',
+	newOrder: '/new-order',
+	orders: '/orders',
+	customers: '/customers',
 	eLogin: '/login',
 	hrLogin: '/hr-login',
 	salaryMonth: '/salary/month'
