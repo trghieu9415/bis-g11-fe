@@ -14,6 +14,8 @@ import NewOrder from '@/pages/commerce/NewOrder';
 import CommerceLayout from '@/layouts/commerce-layout';
 import Orders from '@/pages/commerce/Orders';
 import Login from '@/pages/commerce/Login';
+import NoneLayout from '@/layouts/none-layout';
+import ForgotPassword from '@/pages/commerce/ForgotPassword';
 import TimeTrackingMonth from '@/pages/dashboard/TimeTrackingMonth';
 import SalaryMonth from '@/pages/dashboard/SalaryMonth';
 import { Customers } from '@/pages/commerce/customers';
@@ -30,9 +32,10 @@ const publicRoutes = [
 	{ path: config.routes.holiday, component: Holiday, layout: DashboardLayout },
 	{ path: config.routes.userInfomation, component: UserInfomation, layout: DashboardLayout },
 	{ path: config.routes.newOrder, component: NewOrder, layout: CommerceLayout },
-	{ path: config.routes.customers, component: Customers, layout: CommerceLayout },
-	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
+	{ path: config.routes.customers, component: NewOrder, layout: CommerceLayout },
 	{ path: config.routes.eLogin, component: Login, layout: NoneLayout },
+	{ path: config.routes.eForgot, component: ForgotPassword, layout: NoneLayout }
+	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
 	{ path: config.routes.timeTrackingMonth, component: TimeTrackingMonth, layout: DashboardLayout },
 	{ path: config.routes.salaryMonth, component: SalaryMonth, layout: DashboardLayout }
 ];
