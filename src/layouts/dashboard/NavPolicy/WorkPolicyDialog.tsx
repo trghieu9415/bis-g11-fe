@@ -37,7 +37,7 @@ const WorkPolicyDialog: React.FC<WorkPolicyDialogProps> = ({ isOpen, onClose }) 
 							</p>
 							<ul className='list-disc pl-6 space-y-2'>
 								<li>
-									<strong>Đi trễ từ 9h00 đến 10h00</strong>: Trừ 12.5% ngày công
+									<strong>Đi trễ từ 8h30 đến 10h00</strong>: Trừ 12.5% ngày công
 								</li>
 								<li>
 									<strong>Đi trễ từ 10h00 đến 12h00</strong>: Trừ 25% ngày công

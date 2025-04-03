@@ -1,6 +1,6 @@
 const routes = {
 	home: '/',
-	userInfomation: '/user/:id',
+	userInformation: '/user/:id',
 	hremployee: '/hremployee',
 	contracts: '/contracts',
 	leaveRequests: '/leave-requests',
@@ -15,7 +15,9 @@ const routes = {
 	customers: 'customers',
 	eLogin: '/login',
 	hrLogin: '/hr-login',
-	salaryMonth: '/salary/month'
+	salaryMonth: '/salary/month',
+	salaryYear: '/salary/year',
+	roles: '/roles'
 };
 
 export default routes;

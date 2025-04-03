@@ -119,13 +119,13 @@ export function NavMain() {
 			isActive: true,
 			items: [
 				{
-					title: 'Lương theo tháng',
+					title: 'Theo tháng',
 					url: '/salary/month'
+				},
+				{
+					title: 'Theo năm',
+					url: '/salary/year'
 				}
-				// {
-				// 	title: 'Theo tháng',
-				// 	url: '/time-tracking/month'
-				// }
 			]
 		},
 		{
