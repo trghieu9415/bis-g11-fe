@@ -1,7 +1,6 @@
 import config from '@/config';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import NoneLayout from '@/layouts/none-layout';
-
 import HREmployees from '@/pages/dashboard/HREmployees';
 import Products from '@/pages/dashboard/Products';
 import Supplier from '@/pages/dashboard/Supplier';
@@ -19,9 +18,9 @@ import TimeTrackingMonth from '@/pages/dashboard/TimeTrackingMonth';
 import SalaryMonth from '@/pages/dashboard/PayrollsMonth';
 import SalaryYear from '@/pages/dashboard/PayrollsYear';
 import Roles from '@/pages/dashboard/Roles';
+import { Customers } from '@/pages/commerce/customers';
 
 const publicRoutes = [
-	// {path: config.routes.home, component: Home}
 	{ path: config.routes.hremployee, component: HREmployees, layout: DashboardLayout },
 	{ path: config.routes.contracts, component: Contracts, layout: DashboardLayout },
 	{ path: config.routes.leaveRequests, component: AllLeaveRequests, layout: DashboardLayout },
@@ -32,7 +31,8 @@ const publicRoutes = [
 	{ path: config.routes.holiday, component: Holiday, layout: DashboardLayout },
 	{ path: config.routes.userInformation, component: UserInformation, layout: DashboardLayout },
 	{ path: config.routes.newOrder, component: NewOrder, layout: CommerceLayout },
-	{ path: config.routes.customers, component: NewOrder, layout: CommerceLayout },
+	{ path: config.routes.customers, component: Customers, layout: CommerceLayout },
+	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
 	{ path: config.routes.eLogin, component: Login, layout: NoneLayout },
 	{ path: config.routes.eForgot, component: ForgotPassword, layout: NoneLayout },
 	{ path: config.routes.orders, component: Orders, layout: CommerceLayout },
