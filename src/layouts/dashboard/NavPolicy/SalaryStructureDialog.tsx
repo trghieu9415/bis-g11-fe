@@ -199,7 +199,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 								</thead>
 								<tbody className='bg-white divide-y divide-gray-200 text-sm'>
 									<tr>
-										<td className='px-6 py-4 whitespace-nowrap'>Đi trễ từ 9h00 đến 10h00</td>
+										<td className='px-6 py-4 whitespace-nowrap'>Đi trễ từ 8h30 đến 10h00</td>
 										<td className='px-6 py-4 whitespace-nowrap'>Trừ 12.5% ngày công</td>
 									</tr>
 									<tr>

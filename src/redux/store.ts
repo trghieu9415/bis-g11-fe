@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import usersReducer from './slices/usersSlice';
-import rolesReducer from './slices/rolesSlice';
 import userDetailReducer from './slices/userDetailSlice';
 import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
 import contractsByUserIDReducer from './slices/contractsByUserIDSlice';
@@ -15,6 +14,8 @@ import scanAttendanceDetailReducer from './slices/scanAttendanceDetailSlice';
 import payrollsByYearMonthReducer from './slices/payrollsByYearMonthSlice';
 import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
 import allowancesReducer from './slices/allowancesSlice';
+import payrollsByYearReducer from './slices/payrollsByYearSlice';
+import rolesReducer from './slices/rolesSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -32,7 +33,9 @@ export const store = configureStore({
 		scanAttendanceDetail: scanAttendanceDetailReducer,
 		payrollsByYearMonth: payrollsByYearMonthReducer,
 		payrollsYearByUserID: payrollsYearByUserIDReducer,
-		allowances: allowancesReducer
+		allowances: allowancesReducer,
+		payrollsByYear: payrollsByYearReducer
+		// roles: rolesReducer
 	}
 });
 
