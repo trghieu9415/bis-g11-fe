@@ -56,6 +56,8 @@ export default function RolesTable() {
 	const dispatch = useAppDispatch();
 	const { roles } = useSelector((state: RootState) => state.roles);
 
+	console.log(roles)
+
 	useEffect(() => {
 		dispatch(fetchRoles());
 	}, [dispatch]);
@@ -133,33 +135,6 @@ export default function RolesTable() {
 		setSelectedRole(null);
 	};
 
-	const roleFields: FieldConfig[][][] = [
-		[
-			[
-				{
-					label: 'ID',
-					key: 'id',
-					type: 'input',
-					disabled: true
-				},
-				{
-					label: 'Tên vai trò',
-					key: 'name',
-					type: 'input',
-					disabled: false
-				}
-			],
-			[
-				{
-					label: 'Mô tả',
-					key: 'description',
-					type: 'input',
-					disabled: false
-				}
-			]
-		]
-	];
-
 	console.log(selectedRole);
 
 	return (
@@ -176,7 +151,7 @@ export default function RolesTable() {
 					// onDelete={handleDelete}
 				/>
 			)} */}
-			<RolesDialog isOpen={isDialogOpen} selectedRole={selectedRole} onClose={handleCloseDialog} />
+			<RolesDialog isOpen={isDialogOpen} selectedRole={selectedRole} onClose={handleCloseDialog} mode={dialogMode} />
 		</div>
 	);
 }
