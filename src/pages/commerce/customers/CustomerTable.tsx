@@ -11,12 +11,11 @@ import type { Customer } from '@/types/customer';
 
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, CheckCircle, Ellipsis } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RegisterOptions } from 'react-hook-form';
-import { deleteCustomer, getListCustomers, updateCustomer } from '@/services/customerService';
+import { deleteCustomer, updateCustomer } from '@/services/customerService';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
-import { stat } from 'fs';
 
 type FieldConfig = {
 	label: string;
@@ -28,32 +27,16 @@ type FieldConfig = {
 	showOnly?: 'view' | 'edit' | 'delete';
 };
 
-const CustomerTable = () => {
+type CustomerTableProps = {
+	customers: Customer[];
+	fetchCustomers: () => Promise<void>;
+};
+
+const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
-	const [customers, setCustomers] = useState<Customer[]>([]);
-	// Hàm gọi API
-	const fetchCustomers = async () => {
-		try {
-			// Gọi API lấy danh sách khách hàng
-			const customerData = await getListCustomers();
-			console.log('API response:', customerData); // Kiểm tra toàn bộ dữ liệu trả về
 
-			if (customerData && customerData.data && Array.isArray(customerData.data)) {
-				console.log('Customer data:', customerData.data);
-				// Cập nhật trạng thái với dữ liệu khách hàng nhận được
-				setCustomers(customerData.data);
-			} else {
-				console.error('Dữ liệu không hợp lệ:', customerData);
-			}
-		} catch (error) {
-			console.error('Lỗi khi lấy danh sách khách hàng:', error);
-		}
-	};
-	useEffect(() => {
-		fetchCustomers();
-	}, []);
 	const handleOpenDialog = (customer: Customer, mode: 'view' | 'edit' | 'delete') => {
 		setSelectedCustomer(customer);
 		setDialogMode(mode);
@@ -64,10 +47,6 @@ const CustomerTable = () => {
 		setIsDialogOpen(false);
 		setSelectedCustomer(null);
 	};
-
-	if (selectedCustomer) {
-		console.log('Selected customer:', selectedCustomer);
-	}
 
 	const hiddenColumns = {
 		createdAt: false
