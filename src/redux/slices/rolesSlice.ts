@@ -4,6 +4,7 @@ import axios from '@/services/customize-axios';
 
 interface ResSeniority {
 	id: number;
+	idString: string;
 	levelName: string;
 	description: string;
 	salaryCoefficient: number;
@@ -13,7 +14,9 @@ interface ResSeniority {
 
 interface ApiResponse {
 	id: number;
+	idString: string;
 	name: string;
+	allowanceId: string;
 	description: string;
 	status: boolean;
 	resSeniority: ResSeniority[];

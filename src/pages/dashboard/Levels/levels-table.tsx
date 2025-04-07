@@ -1,44 +1,37 @@
 import { useState } from 'react';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, ChevronDown, ChevronUp, Ellipsis, CheckCheck, CircleOff, CheckCircle, XCircle } from 'lucide-react';
 import {
 	AlertDialog,
-	AlertDialogTrigger,
+	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
 	AlertDialogDescription,
 	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction
+	AlertDialogHeader,
+	AlertDialogTitle
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
+import { CheckCheck, CheckCircle, ChevronDown, ChevronUp, CircleOff, Ellipsis, Plus, XCircle } from 'lucide-react';
 
-import { useForm } from 'react-hook-form';
+import { fetchRoles } from '@/redux/slices/rolesSlice';
+import { useAppDispatch } from '@/redux/store';
+import { addLevel, deleteLevel, updateLevel } from '@/services/levelService';
 import { AxiosError } from 'axios';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { updateLevel, deleteLevel, addLevel } from '@/services/levelService';
 
 interface ResSeniority {
 	id: number;
+	idString: string;
 	levelName: string;
 	description: string;
 	salaryCoefficient: number;
@@ -55,9 +48,9 @@ type Role = {
 
 type Level = {
 	id: number;
+	idString: string;
 	levelName: string;
 	description: string;
-	roleId: number;
 	salaryCoefficient: string | number;
 	status: number;
 };
@@ -66,7 +59,6 @@ interface NewLevel {
 	levelName: string;
 	description: string;
 	salaryCoefficient: number;
-	roleId: number;
 }
 
 type RolesDialogProps = {
@@ -78,7 +70,16 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 	const [isShowAdd, setIsShowAdd] = useState(false);
 	const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [changeValueLevel, setChangeValueLevel] = useState({
+		description: '',
+		name: '',
+		status: -1,
+		salaryCoefficient: 0.0
+	});
 
+	console.log(changeValueLevel);
+
+	const dispatch = useAppDispatch();
 	const {
 		register,
 		formState: { errors },
@@ -89,8 +90,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 		defaultValues: {
 			levelName: '',
 			description: '',
-			salaryCoefficient: 0.0,
-			roleId: -1
+			salaryCoefficient: 0.0
 		}
 	});
 
@@ -98,7 +98,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 
 	const handleAddLevel = async (level: NewLevel) => {
 		try {
-			const fieldsToValidate = ['levelName', 'description', 'salaryCoefficient', 'roleId'] as const;
+			const fieldsToValidate = ['levelName', 'description', 'salaryCoefficient'] as const;
 			const isValid = await trigger(fieldsToValidate);
 			if (isValid) {
 				const levelData = {
@@ -108,14 +108,21 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 						typeof level?.salaryCoefficient === 'string'
 							? parseFloat(level.salaryCoefficient)
 							: (level?.salaryCoefficient ?? 0),
-					roleId: level?.roleId
+					roleId: selectedRole?.id
 				};
-				console.log(levelData);
 				const res = await addLevel(levelData);
-				console.log(res);
 				// @ts-expect-error - exception success attr
 				if (res.success) {
 					toast.success('Thêm thông tin cấp bậc thành công!');
+					dispatch(fetchRoles());
+					setSelectedLevel({
+						id: -1,
+						idString: '',
+						levelName: '',
+						description: '',
+						salaryCoefficient: '-1',
+						status: -1
+					});
 					reset();
 				}
 			}
@@ -145,14 +152,22 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 					typeof level?.salaryCoefficient === 'string'
 						? parseFloat(level.salaryCoefficient)
 						: (level?.salaryCoefficient ?? 0),
-				roleId: level?.roleId
+				roleId: selectedRole?.id
 			};
-			console.log(levelID, levelData);
 			const res = await updateLevel(levelID, levelData);
-			console.log(res);
 			// @ts-expect-error - exception success attr
 			if (res.success) {
 				toast.success('Cập nhật thông tin cấp bậc thành công!');
+				console.log('FK');
+				dispatch(fetchRoles());
+				setSelectedLevel({
+					id: -1,
+					idString: '',
+					levelName: '',
+					description: '',
+					salaryCoefficient: '-1',
+					status: -1
+				});
 			}
 		} catch (error) {
 			const err = error as AxiosError;
@@ -174,10 +189,18 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 	const handleDeleteLevel = async (levelID: number) => {
 		try {
 			const res = await deleteLevel(levelID);
-			console.log(res);
 			// @ts-expect-error - exception success attr
 			if (res.success) {
 				toast.success('Xóa cấp bậc thành công!');
+				dispatch(fetchRoles());
+				setSelectedLevel({
+					id: -1,
+					idString: '',
+					levelName: '',
+					description: '',
+					salaryCoefficient: '-1',
+					status: -1
+				});
 				setIsDialogOpen(false);
 			}
 		} catch (error) {
@@ -304,191 +327,223 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 					</TableHeader>
 					<TableBody>
 						{selectedRole?.resSeniority && selectedRole.resSeniority.length > 0 ? (
-							selectedRole.resSeniority.map(seniority => (
-								<TableRow key={seniority.id} className='hover:bg-gray-50'>
-									<TableCell className='border border-gray-300 py-1 px-2 text-center'>{seniority.id}</TableCell>
-									<TableCell
-										className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-0' : 'py-1  px-2 '}`}
-									>
-										{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-											<Input
-												value={selectedLevel?.description || ''}
-												className='w-full h-[40px] px-2'
-												onChange={e => {
-													setSelectedLevel(prev => ({
-														...prev,
-														description: e.target.value,
-														id: prev ? prev.id : -1,
-														levelName: prev ? prev.levelName : '',
-														roleId: prev ? prev.roleId : -1,
-														salaryCoefficient: prev ? prev.salaryCoefficient : '-1',
-														status: prev ? prev.status : -1
-													}));
-												}}
-											/>
-										) : (
-											seniority.description
-										)}
-									</TableCell>
-									<TableCell
-										className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
-									>
-										{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-											<Input
-												value={selectedLevel?.levelName || ''}
-												className='w-full h-[40px] px-2'
-												onChange={e => {
-													setSelectedLevel(prev => ({
-														...prev,
-														levelName: e.target.value,
-														id: prev ? prev.id : -1,
-														description: prev ? prev.description : '',
-														roleId: prev ? prev.roleId : -1,
-														salaryCoefficient: prev ? prev.salaryCoefficient : '-1',
-														status: prev ? prev.status : -1
-													}));
-												}}
-											/>
-										) : (
-											seniority.levelName
-										)}
-									</TableCell>
-									<TableCell
-										className={`border border-gray-300 text-center ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
-									>
-										{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-											<Select
-												value={selectedLevel.status.toString()}
-												onValueChange={value =>
-													setSelectedLevel(prev => ({
-														...prev,
-														status: parseInt(value),
-														id: prev ? prev.id : -1,
-														levelName: prev ? prev.levelName : '',
-														roleId: prev ? prev.roleId : -1,
-														salaryCoefficient: prev ? prev.salaryCoefficient : '-1',
-														description: prev ? prev.description : ''
-													}))
-												}
+							selectedRole.resSeniority.map(seniority => {
+								if (seniority.status !== 0) {
+									return (
+										<TableRow key={seniority.idString} className='hover:bg-gray-50'>
+											<TableCell className='border border-gray-300 py-1 px-2 text-center'>
+												{seniority.idString}
+											</TableCell>
+											<TableCell
+												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-0' : 'py-1  px-2 '}`}
 											>
-												<SelectTrigger className='w-[180px]'>
-													<SelectValue placeholder='Chọn trạng thái' />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectGroup>
-														<SelectItem value='1'>Kích hoạt</SelectItem>
-														<SelectItem value='2'>Chưa kích hoạt</SelectItem>
-													</SelectGroup>
-												</SelectContent>
-											</Select>
-										) : seniority.status === 1 ? (
-											<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-												<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
-												Kích hoạt
-											</p>
-										) : (
-											<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-red-500 rounded-sm p-1'>
-												<XCircle className='w-4 h-4 mr-1' stroke='white' />
-												Chưa kích hoạt
-											</p>
-										)}
-									</TableCell>
-									<TableCell
-										className={`border border-gray-300 w-20 text-end ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
-									>
-										{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-											<Input
-												value={selectedLevel?.salaryCoefficient || ''}
-												placeholder='Điền hệ số lương...'
-												className='w-full h-[40px] px-2'
-												onChange={e => {
-													const value = e.target.value;
-													if (/^\d*\.?\d*$/.test(value) || value === '') {
-														setSelectedLevel(prev => ({
-															...prev,
-															salaryCoefficient: value,
-															id: prev?.id ?? -1,
-															description: prev?.description ?? '',
-															roleId: prev?.roleId ?? -1,
-															levelName: prev?.levelName ?? '',
-															status: prev?.status ?? -1
-														}));
-													}
-												}}
-											/>
-										) : (
-											seniority.salaryCoefficient
-										)}
-									</TableCell>
-									{mode === 'edit' && seniority.status === 2 && (
-										<TableCell className='border border-gray-300 py-1 px-2'>
-											{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-												<div className='flex justify-center items-center gap-1'>
-													<Button
-														className='bg-green-500 hover:bg-green-600 h-[30px] w-[30px]'
-														onClick={() => handleUpdateLevel(selectedLevel?.id, selectedLevel)}
-													>
-														<CheckCheck />
-													</Button>
-													<Button
-														className='bg-red-500 hover:bg-red-600  h-[30px] w-[30px]'
-														onClick={() =>
-															setSelectedLevel({
-																id: -1,
-																levelName: '',
-																description: '',
-																roleId: -1,
-																salaryCoefficient: '-1',
-																status: -1
-															})
+												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
+													<>
+														<Input
+															value={selectedLevel?.description || ''}
+															className={`w-full h-[40px] px-2 ${selectedLevel.description.length < 3 ? 'mt-2' : ''}`}
+															onChange={e => {
+																setSelectedLevel(prev => ({
+																	...prev,
+																	description: e.target.value,
+																	id: prev ? prev.id : -1,
+																	idString: prev ? prev.idString : '',
+																	levelName: prev ? prev.levelName : '',
+																	salaryCoefficient: prev ? prev.salaryCoefficient : '-1',
+																	status: prev ? prev.status : -1
+																}));
+															}}
+														/>
+														{selectedLevel?.description?.length < 3 && (
+															<p className='text-red-500 text-sm my-1'>Mô tả cấp bậc không được nhỏ hơn 3 ký tự</p>
+														)}
+													</>
+												) : (
+													seniority.description
+												)}
+											</TableCell>
+											<TableCell
+												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+											>
+												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
+													<>
+														<Input
+															value={selectedLevel?.levelName || ''}
+															className={`w-full h-[40px] px-2 ${selectedLevel.levelName.length < 3 ? 'mt-2' : ''}`}
+															onChange={e => {
+																setSelectedLevel(prev => ({
+																	...prev,
+																	levelName: e.target.value,
+																	id: prev ? prev.id : -1,
+																	idString: prev ? prev.idString : '',
+																	description: prev ? prev.description : '',
+																	salaryCoefficient: prev ? prev.salaryCoefficient : '-1',
+																	status: prev ? prev.status : -1
+																}));
+															}}
+														/>
+														{selectedLevel?.levelName?.length < 3 && (
+															<p className='text-red-500 text-sm my-1'>Tên cấp bậc không được nhỏ hơn 3 ký tự</p>
+														)}
+													</>
+												) : (
+													seniority.levelName
+												)}
+											</TableCell>
+											<TableCell
+												className={`border border-gray-300 text-center ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+											>
+												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
+													<Select
+														value={selectedLevel.status.toString()}
+														onValueChange={value =>
+															setSelectedLevel(prev => ({
+																...prev,
+																status: parseInt(value),
+																levelName: prev ? prev.levelName : '',
+																id: prev ? prev.id : -1,
+																idString: prev ? prev.idString : '',
+																description: prev ? prev.description : '',
+																salaryCoefficient: prev ? prev.salaryCoefficient : '-1'
+															}))
 														}
 													>
-														<CircleOff />
-													</Button>
-												</div>
-											) : (
-												<>
-													<DropdownMenu>
-														<DropdownMenuTrigger asChild>
-															<Button variant='ghost' size='icon'>
-																<Ellipsis className='w-4 h-4' />
+														<SelectTrigger className='w-[180px]'>
+															<SelectValue placeholder='Chọn trạng thái' />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectGroup>
+																<SelectItem value='1'>Kích hoạt</SelectItem>
+																<SelectItem value='2'>Chưa kích hoạt</SelectItem>
+															</SelectGroup>
+														</SelectContent>
+													</Select>
+												) : seniority.status === 1 ? (
+													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
+														<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+														Kích hoạt
+													</p>
+												) : (
+													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-red-500 rounded-sm p-1'>
+														<XCircle className='w-4 h-4 mr-1' stroke='white' />
+														Chưa kích hoạt
+													</p>
+												)}
+											</TableCell>
+											<TableCell
+												className={`border border-gray-300 ${!selectedLevel?.salaryCoefficient ? 'w-40' : 'w20'} text-end ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+											>
+												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
+													<>
+														<Input
+															value={selectedLevel?.salaryCoefficient || ''}
+															className={`w-full h-[40px] px-2 ${!selectedLevel.salaryCoefficient ? 'mt-2' : ''}`}
+															onChange={e => {
+																const value = e.target.value;
+																if (/^\d*\.?\d*$/.test(value) || value === '') {
+																	setSelectedLevel(prev => ({
+																		...prev,
+																		salaryCoefficient: value,
+																		levelName: prev ? prev.levelName : '',
+																		id: prev ? prev.id : -1,
+																		idString: prev ? prev.idString : '',
+																		description: prev ? prev.description : '',
+																		status: prev ? prev.status : -1
+																	}));
+																}
+															}}
+														/>
+														{!selectedLevel?.salaryCoefficient && (
+															<p className='text-red-500 text-sm text-start my-1'>Hệ số lương không được rỗng</p>
+														)}
+													</>
+												) : (
+													seniority.salaryCoefficient
+												)}
+											</TableCell>
+											{mode === 'edit' && seniority.status === 2 && (
+												<TableCell className='border border-gray-300 py-1 px-2'>
+													{mode === 'edit' && selectedLevel?.id === seniority.id ? (
+														<div className='flex justify-center items-center gap-1'>
+															<Button
+																className='bg-green-500 hover:bg-green-600 h-[30px] w-[30px]'
+																onClick={() => handleUpdateLevel(selectedLevel?.id, selectedLevel)}
+															>
+																<CheckCheck />
 															</Button>
-														</DropdownMenuTrigger>
-														<DropdownMenuContent align='end'>
-															<DropdownMenuItem onClick={() => setSelectedLevel(seniority)}>Sửa</DropdownMenuItem>
-															<DropdownMenuItem onClick={() => setIsDialogOpen(true)}>Xóa</DropdownMenuItem>
-														</DropdownMenuContent>
-													</DropdownMenu>
-													<AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-														<AlertDialogContent>
-															<AlertDialogHeader>
-																<AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-																<AlertDialogDescription>
-																	Bạn có chắc chắn muốn xóa cấp bậc{' '}
-																	<strong>
-																		{seniority.levelName} (ID: {seniority.id})
-																	</strong>{' '}
-																	này không?
-																</AlertDialogDescription>
-															</AlertDialogHeader>
-															<AlertDialogFooter>
-																<AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Hủy</AlertDialogCancel>
-																<AlertDialogAction
-																	onClick={() => {
-																		handleDeleteLevel(seniority.id);
-																	}}
-																>
-																	Xác nhận
-																</AlertDialogAction>
-															</AlertDialogFooter>
-														</AlertDialogContent>
-													</AlertDialog>
-												</>
+															<Button
+																className='bg-red-500 hover:bg-red-600  h-[30px] w-[30px]'
+																onClick={() =>
+																	setSelectedLevel({
+																		id: -1,
+																		idString: '',
+																		levelName: '',
+																		description: '',
+																		salaryCoefficient: '-1',
+																		status: -1
+																	})
+																}
+															>
+																<CircleOff />
+															</Button>
+														</div>
+													) : (
+														<>
+															<DropdownMenu>
+																<DropdownMenuTrigger asChild>
+																	<Button variant='ghost' size='icon'>
+																		<Ellipsis className='w-4 h-4' />
+																	</Button>
+																</DropdownMenuTrigger>
+																<DropdownMenuContent align='end'>
+																	<DropdownMenuItem
+																		onClick={() => {
+																			setSelectedLevel(seniority);
+																			setChangeValueLevel({
+																				description: seniority.description,
+																				name: seniority.levelName,
+																				status: seniority.status,
+																				salaryCoefficient: seniority.salaryCoefficient
+																			});
+																		}}
+																	>
+																		Sửa
+																	</DropdownMenuItem>
+																	<DropdownMenuItem onClick={() => setIsDialogOpen(true)}>Xóa</DropdownMenuItem>
+																</DropdownMenuContent>
+															</DropdownMenu>
+															<AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+																<AlertDialogContent>
+																	<AlertDialogHeader>
+																		<AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+																		<AlertDialogDescription>
+																			Bạn có chắc chắn muốn xóa cấp bậc{' '}
+																			<strong>
+																				{seniority.levelName} (ID: {seniority.id})
+																			</strong>{' '}
+																			này không?
+																		</AlertDialogDescription>
+																	</AlertDialogHeader>
+																	<AlertDialogFooter>
+																		<AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Hủy</AlertDialogCancel>
+																		<AlertDialogAction
+																			onClick={() => {
+																				handleDeleteLevel(seniority.id);
+																			}}
+																		>
+																			Xác nhận
+																		</AlertDialogAction>
+																	</AlertDialogFooter>
+																</AlertDialogContent>
+															</AlertDialog>
+														</>
+													)}
+												</TableCell>
 											)}
-										</TableCell>
-									)}
-								</TableRow>
-							))
+										</TableRow>
+									);
+								}
+							})
 						) : (
 							<TableRow>
 								<TableCell colSpan={6} className='border border-gray-300 text-start'>

@@ -6,23 +6,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSelector } from 'react-redux';
-import classNames from 'classnames';
 
-import CustomDialog from '@/components/custom-dialog';
 import { fetchRoles } from '@/redux/slices/rolesSlice';
+import { fetchAllAllowances } from '@/redux/slices/allowancesSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { ColumnDef } from '@tanstack/react-table';
-import { useEffect, useState } from 'react';
-import { RegisterOptions } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import { ArrowUpDown, Ellipsis } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import RolesDialog from './roles-dialog';
 
 interface ResSeniority {
 	id: number;
+	idString: string;
 	levelName: string;
 	description: string;
 	salaryCoefficient: number;
@@ -32,20 +29,11 @@ interface ResSeniority {
 
 type Role = {
 	id: number;
+	idString: string;
 	name: string;
 	description: string;
+	allowanceId: string;
 	resSeniority: ResSeniority[];
-};
-
-type FieldConfig = {
-	label: string;
-	key: keyof Role;
-	type: 'input' | 'select' | 'number' | 'date' | 'time';
-	options?: { value: string; label: string; isBoolean?: boolean }[];
-	disabled?: boolean;
-	validation?: RegisterOptions;
-	showOnly?: 'view' | 'edit' | 'delete';
-	isShow?: boolean;
 };
 
 export default function RolesTable() {
@@ -55,16 +43,26 @@ export default function RolesTable() {
 
 	const dispatch = useAppDispatch();
 	const { roles } = useSelector((state: RootState) => state.roles);
+	const { allowances } = useSelector((state: RootState) => state.allowances);
 
-	console.log(roles)
+	console.log(allowances);
+	console.log(roles);
 
 	useEffect(() => {
 		dispatch(fetchRoles());
+		dispatch(fetchAllAllowances());
 	}, [dispatch]);
+
+	useEffect(() => {
+		if (selectedRole?.id) {
+			const newRole = roles.filter(item => item.id === selectedRole.id);
+			setSelectedRole(newRole?.[0] || null);
+		}
+	}, [roles]);
 
 	const columns: ColumnDef<Role>[] = [
 		{
-			accessorKey: 'id',
+			accessorKey: 'idString',
 			header: ({ column }) => (
 				<Button
 					variant='link'
@@ -105,6 +103,24 @@ export default function RolesTable() {
 			enableHiding: false
 		},
 		{
+			accessorKey: 'allowanceId',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-22'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Phụ cấp <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const allowance = allowances.find(a => a.allowanceId === row.getValue('allowanceId'));
+				console.log(allowance);
+				return <span className='flex items-center justify-end'>{allowance}</span>;
+			},
+			enableHiding: false
+		},
+		{
 			id: 'actions',
 			header: 'Thao tác',
 			cell: ({ row }) => (
@@ -135,23 +151,12 @@ export default function RolesTable() {
 		setSelectedRole(null);
 	};
 
-	console.log(selectedRole);
-
 	return (
 		<div>
 			<CustomTable columns={columns} data={roles} stickyClassIndex={0} />
-			{/* {selectedRole && (
-				<CustomDialog
-					entity={selectedRole}
-					isOpen={isDialogOpen}
-					onClose={handleCloseDialog}
-					mode={dialogMode}
-					fields={roleFields}
-					// onSave={handleSave}
-					// onDelete={handleDelete}
-				/>
-			)} */}
-			<RolesDialog isOpen={isDialogOpen} selectedRole={selectedRole} onClose={handleCloseDialog} mode={dialogMode} />
+			{selectedRole && (
+				<RolesDialog isOpen={isDialogOpen} selectedRole={selectedRole} onClose={handleCloseDialog} mode={dialogMode} />
+			)}
 		</div>
 	);
 }
