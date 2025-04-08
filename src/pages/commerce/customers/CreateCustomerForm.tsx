@@ -9,6 +9,7 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addCustomer } from '@/services/customerService';
 import { toast } from 'react-toastify';
+import { DialogDescription } from '@radix-ui/react-dialog';
 
 const formSchema = z.object({
 	name: z.string().min(1, { message: 'Tên khách hàng không được để trống' }),
@@ -25,7 +26,7 @@ const formSchema = z.object({
 type CustomerFormValues = z.infer<typeof formSchema>;
 
 type CreateCustomerFormProps = {
-	fetchCustomers: () => Promise<void>;
+	fetchCustomers?: () => Promise<void>;
 };
 
 const CreateCustomerForm = ({ fetchCustomers }: CreateCustomerFormProps) => {
@@ -52,7 +53,9 @@ const CreateCustomerForm = ({ fetchCustomers }: CreateCustomerFormProps) => {
 			setIsLoading(true);
 			await addCustomer({ ...data, status: 1 });
 			toast.success('Thêm khách hàng thành công!');
-			await fetchCustomers(); // Gọi lại hàm fetchCustomers
+			if (fetchCustomers) {
+				await fetchCustomers(); // Gọi lại hàm fetchCustomers
+			}
 			setIsOpen(false);
 			form.reset();
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,17 +69,26 @@ const CreateCustomerForm = ({ fetchCustomers }: CreateCustomerFormProps) => {
 
 	return (
 		<>
-			<div className='text-end mb-4'>
-				<Button className='bg-green-800 hover:bg-green-900' onClick={openDialog}>
+			<div className='text-end mb-4 '>
+				<Button className='bg-green-800 hover:bg-green-800/80' onClick={openDialog}>
 					<Plus />
 					Thêm
 				</Button>
 			</div>
 
-			<Dialog open={isOpen} onOpenChange={setIsOpen}>
+			<Dialog
+				open={isOpen}
+				onOpenChange={open => {
+					setIsOpen(open);
+					if (!open) form.reset();
+				}}
+			>
 				<DialogContent className='sm:max-w-[500px]'>
 					<DialogHeader>
-						<DialogTitle className='text-xl font-bold'>Thêm Khách Hàng Mới</DialogTitle>
+						<DialogHeader>
+							<DialogTitle className='text-xl font-bold'>Thêm Khách Hàng Mới</DialogTitle>
+							<DialogDescription>Điền thông tin khách hàng để lưu vào hệ thống.</DialogDescription>
+						</DialogHeader>{' '}
 					</DialogHeader>
 
 					<Form {...form}>

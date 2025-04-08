@@ -1,40 +1,30 @@
-'use client';
-
-import * as React from 'react';
 import { Check, ChevronsUpDown, User } from 'lucide-react';
-
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Customer } from '@/types/customer';
+import { useEffect, useState } from 'react';
+import { getListCustomers } from '@/services/customerService';
 
-const frameworks = [
-	{
-		value: 'next.js',
-		label: 'Next.js'
-	},
-	{
-		value: 'sveltekit',
-		label: 'SvelteKit'
-	},
-	{
-		value: 'nuxt.js',
-		label: 'Nuxt.js'
-	},
-	{
-		value: 'remix',
-		label: 'Remix'
-	},
-	{
-		value: 'astro',
-		label: 'Astro'
-	}
-];
+type SelectCustomerProps = {
+	onChange: (customer: Customer) => void;
+};
+export function SelectCustomer({ onChange }: SelectCustomerProps) {
+	const [open, setOpen] = useState(false);
 
-export function SelectCustomer() {
-	const [open, setOpen] = React.useState(false);
-	const [value, setValue] = React.useState('');
+	const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
+	const [customers, setCustomers] = useState<Customer[]>([]);
 
+	useEffect(() => {
+		const fetchCustomer = async () => {
+			const res = await getListCustomers();
+			if (res) {
+				setCustomers(res.data);
+			}
+		};
+		fetchCustomer();
+	}, []);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild className='flex-grow w-[300px]'>
@@ -48,7 +38,7 @@ export function SelectCustomer() {
 						aria-expanded={open}
 						className='justify-between rounded-none flex-grow'
 					>
-						{value ? frameworks.find(framework => framework.value === value)?.label : 'Chọn khách hàng...'}
+						{selectedCustomer ? selectedCustomer.name : 'Chọn khách hàng...'}
 						<ChevronsUpDown className='opacity-50' />
 					</Button>
 				</div>
@@ -57,19 +47,22 @@ export function SelectCustomer() {
 				<Command>
 					<CommandInput placeholder='Tìm kiếm khách hàng...' />
 					<CommandList>
-						<CommandEmpty>No framework found.</CommandEmpty>
+						<CommandEmpty>Không tìm thấy khách hàng</CommandEmpty>
 						<CommandGroup>
-							{frameworks.map(framework => (
+							{customers.map(customer => (
 								<CommandItem
-									key={framework.value}
-									value={framework.value}
-									onSelect={currentValue => {
-										setValue(currentValue === value ? '' : currentValue);
+									key={customer.id}
+									value={customer.name}
+									onSelect={() => {
+										setSelectedCustomer(customer);
+										onChange(customer);
 										setOpen(false);
 									}}
 								>
-									{framework.label}
-									<Check className={cn('ml-auto', value === framework.value ? 'opacity-100' : 'opacity-0')} />
+									{customer.name}
+									<Check
+										className={cn('ml-auto', selectedCustomer?.id === customer.id ? 'opacity-100' : 'opacity-0')}
+									/>
 								</CommandItem>
 							))}
 						</CommandGroup>

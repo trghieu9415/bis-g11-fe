@@ -29,9 +29,10 @@ const LoginForm = () => {
 		const payload = { ...values, platform: 'WEB' };
 		const response = await loginAccount(payload);
 		console.log(response);
+		localStorage.setItem('roleUser', response.data.roleName);
+		localStorage.setItem('userId', response.data.userId);
 		localStorage.setItem('accessToken', response.data.accessToken);
 		localStorage.setItem('refreshToken', response.data.refreshToken);
-		localStorage.setItem('roleUser', response.data.roleInfo.name);
 		toast.success('Đăng nhập thành công!');
 		navigate('/dashboard');
 	};
