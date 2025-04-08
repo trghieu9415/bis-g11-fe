@@ -1,4 +1,4 @@
-import data from '@/pages/dashboard/Warehouse Management/data.json';
+// import data from '@/pages/dashboard/Warehouse Management/data.json';
 import CustomTable from '@/components/custom-table';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,30 +8,71 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ban, CircleCheckBig, Ellipsis, BookText } from 'lucide-react';
-import { useState } from 'react';
-import CustomDialog from '@/components/custom-dialog';
+import { ArrowUpDown, Ellipsis, CalendarCheck, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { fetchProducts, Product } from '@/redux/slices/productSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { useSelector } from 'react-redux';
+import ProductsStatus from './ProductStatus';
+import { toast } from 'react-toastify';
+import { deleteProduct, updateProduct } from '@/services/productService';
+import CustomProductDialog from '@/components/custom-product-dialog';
+import { AxiosError } from 'axios';
 
-type FieldConfig = {
-	label: string;
-	key: keyof Product;
-	type: 'input' | 'select' | 'number' | 'date';
-	options?: { value: string; label: string; isBoolean?: boolean }[];
-	disabled?: boolean;
-};
-type Product = {
+export type FieldProduct = {
+	image: string;
 	id: number;
 	name: string;
 	status: boolean;
 	quantity: number;
-	price: string;
+	price: number;
+	supplierName: string;
+	categoryName: string;
+	authorName: string;
+};
+
+type FieldConfig = {
+	label: string;
+	key: keyof FieldProduct;
+	type: 'input' | 'select' | 'number' | 'image';
+	options?: { value: string; label: string; isBoolean?: boolean }[];
+	disabled?: boolean;
 };
 
 const ProductsTable = () => {
-	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+	const [selectedProduct, setSelectedProduct] = useState<FieldProduct | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
+	const [productImage, setProductImage] = useState<File | null>(null);
+	const { products, isLoading, error } = useSelector((state: RootState) => state.products);
+
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		dispatch(fetchProducts());
+	}, []);
+
 	const columns: ColumnDef<Product>[] = [
+		{
+			accessorKey: 'image',
+			header: ({}) => (
+				<Button
+					variant='link'
+					className='text-white w-16'
+					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Hình ảnh
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex items-center justify-center'>
+					<img src={row.getValue('image')} className='min-w-[90px] h-[120px] object-fill overflow-auto rounded' />
+				</span>
+			),
+			enableHiding: false
+		},
+
 		{
 			accessorKey: 'id',
 			header: ({ column }) => (
@@ -43,6 +84,7 @@ const ProductsTable = () => {
 					ID <ArrowUpDown />
 				</Button>
 			),
+			cell: ({ row }) => <span className='flex justify-center'>{row.getValue('id')}</span>,
 			enableHiding: false
 		},
 		{
@@ -56,14 +98,7 @@ const ProductsTable = () => {
 					Tên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => (
-				<span className='flex items-center'>
-					<Button variant='ghost' className='text-black p-1 h-5 mr-2'>
-						<BookText />
-					</Button>
-					{row.getValue('name')}
-				</span>
-			),
+			cell: ({ row }) => <span className='flex items-center flex-wrap'>{row.getValue('name')}</span>,
 			enableHiding: false
 		},
 		{
@@ -71,7 +106,7 @@ const ProductsTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='text-white w-30'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
@@ -80,9 +115,14 @@ const ProductsTable = () => {
 			cell: ({ row }) => (
 				<span className='flex justify-center'>
 					{row.getValue('status') ? (
-						<CircleCheckBig color='#31843f' strokeWidth={3} />
+						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
+							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							Đang kinh doanh
+						</p>
 					) : (
-						<Ban color='#ef5350' strokeWidth={3} />
+						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
+							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Ngừng kinh doanh
+						</p>
 					)}
 				</span>
 			),
@@ -116,7 +156,67 @@ const ProductsTable = () => {
 				>
 					Giá <ArrowUpDown />
 				</Button>
-			)
+			),
+			cell: ({ row }) => {
+				const price = Number(row.getValue('price'));
+				const formattedPrice = new Intl.NumberFormat('vi-VN', {
+					style: 'currency',
+					currency: 'VND'
+				}).format(price);
+
+				return <span className='flex items-center justify-end text-right text-base'>{formattedPrice}</span>;
+			}
+		},
+		{
+			accessorKey: 'supplier',
+			header: ({}) => (
+				<Button
+					variant='link'
+					className='text-white w-16'
+					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Nhà xuất bản
+				</Button>
+			),
+			cell: ({ row }) => {
+				const supplier = row.getValue('supplier') as { id: number; name: string };
+				return <span className='flex items-center'>{supplier.name}</span>;
+			},
+			enableHiding: true
+		},
+		{
+			accessorKey: 'author',
+			header: ({}) => (
+				<Button
+					variant='link'
+					className='text-white w-16'
+					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Tác giả
+				</Button>
+			),
+			cell: ({ row }) => {
+				const author = row.getValue('author') as { id: number; name: string };
+				return <span className='flex items-center'>{author.name}</span>;
+			},
+			enableHiding: true
+		},
+		{
+			accessorKey: 'category',
+			header: ({}) => (
+				<Button
+					variant='link'
+					className='text-white w-16'
+					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Thể loại
+				</Button>
+			),
+			cell: ({ row }) => {
+				const category = row.getValue('category') as { id: number; name: string };
+				return <span className='flex items-center'>{category.name}</span>;
+			},
+			enableHiding: true
 		},
 		{
 			id: 'actions',
@@ -129,16 +229,67 @@ const ProductsTable = () => {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								const entity: FieldProduct = {
+									id: row.original.id,
+									name: row.original.name,
+									image: row.original.image,
+									status: row.original.status,
+									quantity: row.original.quantity,
+									price: row.original.price,
+									supplierName: row.original.supplier.name,
+									categoryName: row.original.category.name,
+									authorName: row.original.author.name
+								};
+								handleOpenDialog(entity, 'view');
+							}}
+						>
+							Xem
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								const entity: FieldProduct = {
+									id: row.original.id,
+									name: row.original.name,
+									image: row.original.image,
+									status: row.original.status,
+									quantity: row.original.quantity,
+									price: row.original.price,
+									supplierName: row.original.supplier.name,
+									categoryName: row.original.category.name,
+									authorName: row.original.author.name
+								};
+								handleOpenDialog(entity, 'edit');
+							}}
+						>
+							Sửa
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								const entity: FieldProduct = {
+									id: row.original.id,
+									name: row.original.name,
+									image: row.original.image,
+									status: row.original.status,
+									quantity: row.original.quantity,
+									price: row.original.price,
+									supplierName: row.original.supplier.name,
+									categoryName: row.original.category.name,
+									authorName: row.original.author.name
+								};
+								handleOpenDialog(entity, 'delete');
+							}}
+						>
+							Xóa
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
 		}
 	];
 
-	const handleOpenDialog = (product: Product, mode: 'view' | 'edit' | 'delete') => {
+	const handleOpenDialog = (product: FieldProduct, mode: 'view' | 'edit' | 'delete') => {
 		setSelectedProduct(product);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
@@ -150,45 +301,133 @@ const ProductsTable = () => {
 	};
 	const productFields: FieldConfig[][][] = [
 		[
+			[{ label: 'Hình ảnh', key: 'image', type: 'image' }],
 			[
 				{ label: 'ID', key: 'id', type: 'input', disabled: true },
-				{ label: 'Tên sản phẩm', key: 'name', type: 'input' }
+				{ label: 'Số lượng', key: 'quantity', type: 'number', disabled: true }
+			]
+		],
+		[[{ label: 'Tên sản phẩm', key: 'name', type: 'input' }]],
+		[
+			[
+				{ label: 'Nhà cung cấp', key: 'supplierName', type: 'input', disabled: true },
+				{ label: 'Giá', key: 'price', type: 'input', disabled: true }
 			]
 		],
 		[
 			[
-				{
-					label: 'Trạng thái',
-					key: 'status',
-					type: 'select',
-					options: [
-						{ value: 'true', label: 'Hoạt động', isBoolean: true },
-						{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
-					]
-				}
+				{ label: 'Tác giả', key: 'authorName', type: 'input', disabled: true },
+				{ label: 'Thể loại', key: 'categoryName', type: 'input', disabled: true }
 			]
-		],
-		[
-			[{ label: 'Số lượng', key: 'quantity', type: 'number', disabled: true }],
-			[{ label: 'Giá', key: 'price', type: 'input' }]
 		]
 	];
 
-	const handleSave = (data: Product) => {
-		console.log('Saving data:', data);
-		setIsDialogOpen(false);
+	// const handleSave = async (data: FieldProduct) => {
+	// 	const product = products.find(p => p.id === data.id);
+	// 	console.log(data);
+	// 	const formData = new FormData();
+	// 	formData.append(
+	// 		'product',
+	// 		JSON.stringify({
+	// 			name: data.name,
+	// 			price: data.price,
+	// 			quantity: data.quantity,
+	// 			supplierId: product?.supplier.id,
+	// 			authorId: product?.author.id,
+	// 			categoryId: product?.category.id
+	// 		})
+	// 	);
+	// 	if (data.image) {
+	// 		formData.append('file', data.image);
+	// 	}
+	// 	try {
+	// 		await updateProduct(data.id, formData);
+	// 		toast.success('Cập nhật thông tin sản phẩm thành công!');
+	// 		dispatch(fetchProducts());
+	// 		setIsDialogOpen(false);
+	// 	} catch (error: unknown) {
+	// 		const err = error as AxiosError;
+
+	// 		if (err.response?.status === 400) {
+	// 			toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+	// 		} else if (err.response?.status === 404) {
+	// 			toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+	// 		} else if (err.response?.status === 500) {
+	// 			toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+	// 		} else {
+	// 			toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+	// 		}
+	// 	}
+	// 	console.log('Saving data:', data);
+	// 	setIsDialogOpen(false);
+	// };
+
+	const handleSave = async (data: FieldProduct) => {
+		const product = products.find(p => p.id === data.id);
+		const status = data.status === true ? 1 : 0;
+		const formData = new FormData();
+		formData.append(
+			'product',
+			JSON.stringify({
+				name: data.name,
+				price: data.price,
+				quantity: data.quantity,
+				status: status,
+				supplierId: product?.supplier.id,
+				authorId: product?.author.id,
+				categoryId: product?.category.id
+			})
+		);
+		// Use the stored image file if available
+		if (productImage) {
+			formData.append('file', productImage);
+		}
+
+		try {
+			await updateProduct(data.id, formData);
+			setIsDialogOpen(false);
+			toast.success('Cập nhật thông tin sản phẩm thành công!');
+			dispatch(fetchProducts());
+			// Reset the product image after successful update
+			setProductImage(null);
+		} catch (error: unknown) {
+			// Error handling remains the same
+		}
 	};
 
-	const handleDelete = (data: Product) => {
+	const handleDelete = async (data: FieldProduct) => {
 		console.log('Deleting data:', data);
-		setIsDialogOpen(false);
+		const productId = data.id;
+
+		try {
+			await deleteProduct(productId);
+			toast.success('Xóa sản phẩm thành công!');
+			dispatch(fetchProducts());
+			setIsDialogOpen(false);
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+			} else if (err.response?.status === 404) {
+				toast.error('Lỗi 404: Không tìm thấy sản phẩm.');
+			} else if (err.response?.status === 500) {
+				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
+		}
 	};
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={data} />
+			{isLoading || error ? (
+				<ProductsStatus isLoading={isLoading} error={error} />
+			) : (
+				<CustomTable columns={columns} data={products} stickyClassIndex={0} />
+			)}
 			{selectedProduct && (
-				<CustomDialog
+				<CustomProductDialog
 					entity={selectedProduct}
 					isOpen={isDialogOpen}
 					onClose={handleCloseDialog}
@@ -196,6 +435,7 @@ const ProductsTable = () => {
 					fields={productFields}
 					onSave={handleSave}
 					onDelete={handleDelete}
+					setProductImage={setProductImage}
 				/>
 			)}
 		</div>

@@ -18,7 +18,8 @@ const routes = {
 	hrLogin: '/hr-login',
 	salaryMonth: '/salary/month',
 	salaryYear: '/salary/year',
-	roles: '/roles'
+	roles: '/roles',
+	inventory: '/inventory'
 };
 
 export default routes;
