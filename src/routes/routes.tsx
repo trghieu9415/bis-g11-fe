@@ -19,6 +19,7 @@ import SalaryMonth from '@/pages/dashboard/PayrollsMonth';
 import SalaryYear from '@/pages/dashboard/PayrollsYear';
 import Roles from '@/pages/dashboard/Roles';
 import Customer from '@/pages/commerce/Customer';
+import Inventory from '@/pages/dashboard/Inventory';
 // import { Customers } from '@/pages/commerce/customers';
 
 const publicRoutes = [
@@ -40,7 +41,9 @@ const publicRoutes = [
 	{ path: config.routes.timeTrackingMonth, component: TimeTrackingMonth, layout: DashboardLayout },
 	{ path: config.routes.salaryYear, component: SalaryYear, layout: DashboardLayout },
 	{ path: config.routes.salaryMonth, component: SalaryMonth, layout: DashboardLayout },
-	{ path: config.routes.roles, component: Roles, layout: DashboardLayout }
+	{ path: config.routes.roles, component: Roles, layout: DashboardLayout },
+	{ path: config.routes.eLogin, component: Login, layout: NoneLayout },
+	{ path: config.routes.inventory, component: Inventory, layout: DashboardLayout }
 ];
 
 const privateRoutes = [];

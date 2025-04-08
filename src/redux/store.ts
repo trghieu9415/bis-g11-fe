@@ -16,7 +16,10 @@ import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
 import allowancesReducer from './slices/allowancesSlice';
 import payrollsByYearReducer from './slices/payrollsByYearSlice';
 import rolesReducer from './slices/rolesSlice';
-
+import productsReducer from './slices/productSlice';
+import supplierReducer from './slices/supplierSlice';
+import authorReducer from './slices/authorSlice';
+import categoryReducer from './slices/categorySlice';
 export const store = configureStore({
 	reducer: {
 		users: usersReducer,
@@ -34,7 +37,11 @@ export const store = configureStore({
 		payrollsByYearMonth: payrollsByYearMonthReducer,
 		payrollsYearByUserID: payrollsYearByUserIDReducer,
 		allowances: allowancesReducer,
-		payrollsByYear: payrollsByYearReducer
+		payrollsByYear: payrollsByYearReducer,
+		products: productsReducer,
+		supplier: supplierReducer,
+		author: authorReducer,
+		category: categoryReducer
 		// roles: rolesReducer
 	}
 });
