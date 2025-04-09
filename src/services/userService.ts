@@ -32,3 +32,12 @@ export const addUser = async (userData: object) => {
 		throw error;
 	}
 };
+export const getUser = async (userId: number) => {
+	try {
+		const response = await axios.get(`/api/v1/users/${userId}`);
+		return response.data;
+	} catch (error) {
+		console.error('Lỗi lấy user:', error);
+		throw error;
+	}
+};
