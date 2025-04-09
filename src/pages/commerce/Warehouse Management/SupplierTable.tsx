@@ -8,7 +8,7 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ban, CircleCheckBig, Ellipsis, BookText, CheckCircle, CalendarCheck } from 'lucide-react';
+import { ArrowUpDown, Ellipsis, BookText, CheckCircle, CalendarCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { useSelector } from 'react-redux';

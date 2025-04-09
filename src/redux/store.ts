@@ -20,6 +20,7 @@ import productsReducer from './slices/productSlice';
 import supplierReducer from './slices/supplierSlice';
 import authorReducer from './slices/authorSlice';
 import categoryReducer from './slices/categorySlice';
+import goodsReceiptReducer from './slices/goodReceiptsSlice';
 export const store = configureStore({
 	reducer: {
 		users: usersReducer,
@@ -41,7 +42,8 @@ export const store = configureStore({
 		products: productsReducer,
 		supplier: supplierReducer,
 		author: authorReducer,
-		category: categoryReducer
+		category: categoryReducer,
+		goodsReceipt: goodsReceiptReducer
 		// roles: rolesReducer
 	}
 });

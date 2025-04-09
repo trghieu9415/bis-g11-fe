@@ -43,3 +43,12 @@ export const addProduct = async (data: object) => {
 		throw error;
 	}
 };
+export const getProduct = async (productId: number) => {
+	try {
+		const response = await axios.get(`/api/v1/product/${productId}`);
+		return response.data;
+	} catch (error) {
+		console.error('Lỗi lấy product:', error);
+		throw error;
+	}
+};

@@ -2,8 +2,8 @@ import config from '@/config';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import NoneLayout from '@/layouts/none-layout';
 import HREmployees from '@/pages/dashboard/HREmployees';
-import Products from '@/pages/dashboard/Products';
-import Supplier from '@/pages/dashboard/Supplier';
+import Products from '@/pages/commerce/Products';
+import Supplier from '@/pages/commerce/Supplier';
 import UserInformation from '@/pages/dashboard/UserInformation';
 import Contracts from '@/pages/dashboard/Contracts';
 import AllLeaveRequests from '@/pages/dashboard/AllLeaveRequests';
@@ -18,6 +18,8 @@ import SalaryMonth from '@/pages/dashboard/PayrollsMonth';
 import SalaryYear from '@/pages/dashboard/PayrollsYear';
 import Roles from '@/pages/dashboard/Roles';
 import Customer from '@/pages/commerce/Customer';
+import Inventory from '@/pages/commerce/Inventory';
+// import { Customers } from '@/pages/commerce/customers';
 import NewBill from '@/pages/commerce/NewBill';
 
 const publicRoutes = [
