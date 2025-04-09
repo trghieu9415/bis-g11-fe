@@ -1,4 +1,7 @@
 import axios from '@/services/customize-axios';
+import { Product } from '@/types/product';
+
+export const getListProducts = async () => await axios.get<Product[]>('/api/v1/product/list');
 
 export const updateProduct = async (userId: number, data: object) => {
 	try {

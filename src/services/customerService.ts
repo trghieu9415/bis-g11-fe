@@ -5,7 +5,8 @@ export const getListCustomers = async () => axios.get<Customer[]>('/api/v1/custo
 
 export const getCustomerById = async (id: number) => axios.get<Customer>(`/api/v1/customer/${id}`);
 
-export const addCustomer = async (customer: Customer) => axios.post('/api/v1/customer', customer);
+export const addCustomer = async (customer: RequestCustomer) =>
+	axios.post('/api/v1/customer/add', { ...customer, status: 1 });
 
 export const updateCustomer = async (customerId: number, customer: RequestCustomer) =>
 	axios.put(`/api/v1/customer/${customerId}`, customer);
