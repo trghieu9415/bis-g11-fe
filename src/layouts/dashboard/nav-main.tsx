@@ -1,5 +1,5 @@
 'use client';
-import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper, BadgeDollarSign } from 'lucide-react';
+import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper, BadgeDollarSign, UserCog } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,7 @@ export function NavMain() {
 		url: string;
 		icon?: ElementType;
 		isActive: boolean;
+		total?: number;
 		items: { title: string; url: string; total?: number }[];
 	}[] = [
 		{
@@ -57,22 +58,23 @@ export function NavMain() {
 				{
 					title: 'Hợp đồng lao động',
 					url: '/contracts'
-				},
+				}
 				// {
 				// 	title: 'Vi phạm',
 				// 	url: '#'
 				// },
-				{
-					title: 'Báo cáo nhân sự',
-					url: '#'
-				}
+				// {
+				// 	title: 'Báo cáo nhân sự',
+				// 	url: '#'
+				// }
 			]
 		},
 		{
 			title: 'Đơn nghỉ phép',
-			url: '#',
+			url: '/leave-requests',
 			icon: Hourglass,
 			isActive: true,
+			total: leaveStats.all,
 			items: [
 				// {
 				// 	title: 'Nghỉ phép',
@@ -89,23 +91,23 @@ export function NavMain() {
 				// 	url: '/leave-requests/sick',
 				// 	total: leaveStats.sick
 				// },
-				{
-					title: 'Tất cả đơn',
-					url: '/leave-requests',
-					total: leaveStats.all
-				}
+				// {
+				// 	title: 'Tất cả đơn',
+				// 	url: '/leave-requests',
+				// 	total: leaveStats.all
+				// }
 			]
 		},
 		{
 			title: 'Chấm công',
-			url: '#',
+			url: '/time-tracking/today',
 			icon: CalendarDays,
 			isActive: true,
 			items: [
-				{
-					title: 'Theo ngày',
-					url: '/time-tracking/today'
-				}
+				// {
+				// 	title: 'Theo ngày',
+				// 	url: '/time-tracking/today'
+				// }
 				// {
 				// 	title: 'Theo tháng',
 				// 	url: '/time-tracking/month'
@@ -129,16 +131,18 @@ export function NavMain() {
 			]
 		},
 		{
+			title: 'Chức vụ & Cấp bậc',
+			url: '/roles',
+			icon: UserCog,
+			isActive: true,
+			items: []
+		},
+		{
 			title: 'Lịch nghỉ lễ',
-			url: '#',
+			url: '/holiday',
 			icon: PartyPopper,
 			isActive: true,
-			items: [
-				{
-					title: 'Tất cả lịch',
-					url: '/holiday'
-				}
-			]
+			items: []
 		}
 	];
 
@@ -146,35 +150,52 @@ export function NavMain() {
 		<SidebarGroup>
 			<SidebarGroupLabel>Quản lý nhân sự</SidebarGroupLabel>
 			<SidebarMenu>
-				{data.map(item => (
-					<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
-						<SidebarMenuItem>
-							<CollapsibleTrigger asChild>
-								<SidebarMenuButton tooltip={item.title}>
-									{item.icon && <item.icon />}
-									<span>{item.title}</span>
-									<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-								</SidebarMenuButton>
-							</CollapsibleTrigger>
-							<CollapsibleContent>
-								<SidebarMenuSub>
-									{item.items?.map(subItem => (
-										<SidebarMenuSubItem key={subItem.title}>
-											<SidebarMenuSubButton asChild>
-												<NavLink to={subItem.url} className='flex justify-between'>
-													<span>{subItem.title}</span>
-													{subItem?.total ? (
-														<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
-													) : null}
-												</NavLink>
-											</SidebarMenuSubButton>
-										</SidebarMenuSubItem>
-									))}
-								</SidebarMenuSub>
-							</CollapsibleContent>
+				{data.map(item =>
+					item.items?.length > 0 ? (
+						<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
+							<SidebarMenuItem>
+								<CollapsibleTrigger asChild>
+									<SidebarMenuButton tooltip={item.title}>
+										{item.icon && <item.icon />}
+										<span>{item.title}</span>
+										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+									</SidebarMenuButton>
+								</CollapsibleTrigger>
+
+								<CollapsibleContent>
+									<SidebarMenuSub>
+										{item.items.map(subItem => (
+											<SidebarMenuSubItem key={subItem.title}>
+												<SidebarMenuSubButton asChild>
+													<NavLink to={subItem.url} className='flex justify-between'>
+														<span>{subItem.title}</span>
+														{/* {subItem?.total && (
+															<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
+														)} */}
+													</NavLink>
+												</SidebarMenuSubButton>
+											</SidebarMenuSubItem>
+										))}
+									</SidebarMenuSub>
+								</CollapsibleContent>
+							</SidebarMenuItem>
+						</Collapsible>
+					) : (
+						<SidebarMenuItem key={item.title}>
+							<SidebarMenuButton tooltip={item.title} asChild>
+								<div className='flex items-center justify-between'>
+									<NavLink to={item.url} className='flex  items-center gap-2 w-full'>
+										{item.icon && <item.icon size={16} />}
+										<span>{item.title}</span>
+									</NavLink>
+									{typeof item.total === 'number' && item.total > 0 && (
+										<Badge className='w-1 flex justify-center bg-red-800'>{item.total}</Badge>
+									)}
+								</div>
+							</SidebarMenuButton>
 						</SidebarMenuItem>
-					</Collapsible>
-				))}
+					)
+				)}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

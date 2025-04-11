@@ -216,7 +216,7 @@ export default function EmployeeCreateNew() {
 		{ label: 'Chức vụ', value: formData.role_name },
 		{ label: 'Cấp bậc', value: formData.level_name },
 		{ label: 'Hệ số lương', value: formData.salary_coefficient },
-		{ label: 'Ngày công chuẩn', value: formData.standard_working_days },
+		// { label: 'Ngày công chuẩn', value: formData.standard_working_days },
 		{ label: 'Ngày bắt đầu', value: formData.start_date },
 		{ label: 'Ngày kết thúc', value: formData.end_date }
 	];
@@ -608,15 +608,19 @@ export default function EmployeeCreateNew() {
 													<SelectValue placeholder='Chọn vai trò' />
 												</SelectTrigger>
 												<SelectContent>
-													{roles?.map((item, index) => {
-														if (item.name.toLowerCase() === 'admin'.toLowerCase()) return;
+													{roles
+														?.filter(
+															item => item.status === 1 && item.resSeniority?.filter(s => s.status === 1).length > 0
+														)
+														?.map((item, index) => {
+															if (item.name.toLowerCase() === 'admin'.toLowerCase()) return;
 
-														return (
-															<SelectItem value={String(item.id)} key={index}>
-																{item.name}
-															</SelectItem>
-														);
-													})}
+															return (
+																<SelectItem value={String(item.id)} key={index}>
+																	{item.name}
+																</SelectItem>
+															);
+														})}
 												</SelectContent>
 											</Select>
 											{errors.role_id && <p className='text-red-500 text-sm'>{errors.role_id.message}</p>}
@@ -663,19 +667,19 @@ export default function EmployeeCreateNew() {
 											/>
 											{errors.base_salary && <p className='text-red-500 text-sm'>{errors.base_salary.message}</p>}{' '}
 										</div>
-										<div className='grid grid-cols-2 gap-4'>
+										<div className='grid grid-cols-1 '>
 											<div>
 												<label className='text-sm' htmlFor=''>
 													<strong>Hệ số lương</strong>
 												</label>
 												<Input type='number' className='mt-1' value={formData.salary_coefficient} readOnly disabled />
 											</div>
-											<div>
+											{/* <div>
 												<label className='text-sm' htmlFor=''>
 													<strong>Ngày công chuẩn</strong>
 												</label>
 												<Input type='number' className='mt-1' value={20} readOnly disabled />
-											</div>
+											</div> */}
 										</div>
 									</div>
 								</div>
@@ -805,7 +809,7 @@ export default function EmployeeCreateNew() {
 										className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
 										onClick={() => setIsNumberStep(prev => Math.max(1, prev - 1))}
 									>
-										Prev
+										Trở về
 									</Button>
 								</div>
 							)}
@@ -815,7 +819,7 @@ export default function EmployeeCreateNew() {
 									onClick={closeDialog}
 									className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
 								>
-									Cancel
+									Thoát
 								</Button>
 								{isNumberStep < 3 ? (
 									<Button
@@ -824,13 +828,13 @@ export default function EmployeeCreateNew() {
 										// onClick={() => setIsNumberStep(prev => Math.min(3, prev + 1))}
 										onClick={handleNextClick}
 									>
-										Next
+										Tiếp
 									</Button>
 								) : (
 									<AlertDialog>
 										<AlertDialogTrigger asChild>
 											<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
-												Submit
+												Xác nhận
 											</button>
 										</AlertDialogTrigger>
 										<AlertDialogContent>
@@ -842,8 +846,8 @@ export default function EmployeeCreateNew() {
 												</AlertDialogDescription>
 											</AlertDialogHeader>
 											<AlertDialogFooter>
-												<AlertDialogCancel>Cancel</AlertDialogCancel>
-												<AlertDialogAction onClick={() => handleSubmitClick(formData)}>Confirm</AlertDialogAction>
+												<AlertDialogCancel>Thoát</AlertDialogCancel>
+												<AlertDialogAction onClick={() => handleSubmitClick(formData)}>Xác nhận</AlertDialogAction>
 											</AlertDialogFooter>
 										</AlertDialogContent>
 									</AlertDialog>
