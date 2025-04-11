@@ -61,6 +61,8 @@ export default function EmployeeTable() {
 		dispatch(fetchUsers());
 	}, [dispatch]);
 
+	console.log(users);
+
 	const columns: ColumnDef<Employee>[] = [
 		{
 			accessorKey: 'idString',
@@ -106,6 +108,9 @@ export default function EmployeeTable() {
 				>
 					Vai trò <ArrowUpDown />
 				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-center'>{row.getValue('role') ? row.getValue('role') : '--'}</span>
 			)
 		},
 		{
@@ -119,20 +124,25 @@ export default function EmployeeTable() {
 					Trạng thái <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('status') ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
-							Đang làm việc
-						</p>
-					) : (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Tạm nghỉ
-						</p>
-					)}
-				</span>
-			),
+			cell: ({ row }) => {
+				// console.log(row.getValue('role') === '', 'Status: ', row.getValue('status'));
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('status') && row.getValue('role') !== '' ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
+								<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+								Đang làm việc
+							</p>
+						) : (
+							row.getValue('role') === '' && (
+								<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-yellow-500 rounded-sm p-1'>
+									<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Hết hợp đồng
+								</p>
+							)
+						)}
+					</span>
+				);
+			},
 			sortingFn: (rowA, rowB) => {
 				const statusA = rowA.original.status ? 1 : 0;
 				const statusB = rowB.original.status ? 1 : 0;
@@ -162,6 +172,9 @@ export default function EmployeeTable() {
 				>
 					Kinh nghiệm <ArrowUpDown />
 				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-center'>{row.getValue('level') ? row.getValue('level') : '--'}</span>
 			)
 		},
 		{
@@ -249,7 +262,7 @@ export default function EmployeeTable() {
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
@@ -314,7 +327,7 @@ export default function EmployeeTable() {
 
 		[
 			[
-				{ label: 'ID', key: 'id', type: 'input', disabled: true },
+				{ label: 'ID', key: 'idString', type: 'input', disabled: true },
 				{
 					label: 'Ngày sinh',
 					key: 'date_of_birth',

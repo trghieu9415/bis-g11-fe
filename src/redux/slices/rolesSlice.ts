@@ -16,9 +16,9 @@ interface ApiResponse {
 	id: number;
 	idString: string;
 	name: string;
-	allowanceId: string;
+	allowanceId: number;
 	description: string;
-	status: boolean;
+	status: number;
 	resSeniority: ResSeniority[];
 }
 

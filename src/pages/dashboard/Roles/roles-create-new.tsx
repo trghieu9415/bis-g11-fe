@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -21,15 +21,16 @@ import {
 } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import LevelsTable from '@/pages/dashboard/Levels/levels-table';
-import { updateRole, deleteRole } from '@/services/roleService';
+import { addRole } from '@/services/roleService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { fetchRoles } from '@/redux/slices/rolesSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { useSelector } from 'react-redux';
-import { Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface ResSeniority {
 	id: number;
@@ -51,13 +52,6 @@ type Role = {
 	status: number;
 };
 
-type RolesDialogProps = {
-	isOpen: boolean;
-	selectedRole: Role | null;
-	mode: string;
-	onClose: () => void;
-};
-
 type FormValues = {
 	roleName: string;
 	description: string;
@@ -65,12 +59,11 @@ type FormValues = {
 	status: number;
 };
 
-export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: RolesDialogProps) {
+export default function RolesCreateNew() {
+	const [isOpen, setIsOpen] = useState(false);
+
 	const dispatch = useAppDispatch();
 	const { allowances } = useSelector((state: RootState) => state.allowances);
-
-	console.log('current role: ', selectedRole);
-	console.log('dspc: ', allowances);
 
 	const {
 		register,
@@ -83,75 +76,35 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 		defaultValues: {
 			roleName: '',
 			description: '',
-			allowanceId: undefined,
-			status: undefined
+			allowanceId: undefined
 		}
 	});
 
 	const formData = watch();
 
-	useEffect(() => {
-		if (selectedRole) {
-			reset({
-				roleName: selectedRole.name,
-				description: selectedRole.description,
-				allowanceId: selectedRole.allowanceId ?? undefined,
-				status: selectedRole.status ?? undefined
-			});
-		}
-	}, [selectedRole, reset]);
+	const openDialog = () => {
+		reset();
+		setIsOpen(true);
+	};
 
-	const handleUpdateRole = async () => {
+	const closeDialog = () => setIsOpen(false);
+
+	const handleAddRole = async () => {
 		try {
-			const fieldsToValidate = ['roleName', 'description', 'allowanceId', 'status'] as const;
+			const fieldsToValidate = ['roleName', 'description', 'allowanceId'] as const;
 			const isValid = await trigger(fieldsToValidate);
-			if (isValid && selectedRole) {
-				const roleId = selectedRole.id;
+			if (isValid) {
 				const roleData = {
 					name: formData.roleName,
 					description: formData.description,
-					allowanceId: formData.allowanceId,
-					status: formData.status
+					allowanceId: formData.allowanceId
 				};
-
-				console.log(roleId, roleData);
-				const res = await updateRole(roleId, roleData);
-				console.log(res);
-				// @ts-expect-error - exception success attr
+				const res = await addRole(roleData);
+				// @ts-expect-error - except success attr
 				if (res.success) {
-					toast.success('Cập nhật thông tin cấp bậc thành công!');
+					toast.success('Thêm thông tin cấp bậc thành công!');
 					dispatch(fetchRoles());
-					onClose();
-				}
-			}
-		} catch (error) {
-			const err = error as AxiosError;
-
-			if (err.response?.status === 400) {
-				toast.error(
-					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
-				);
-			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy cấp bậc.');
-			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
-			} else {
-				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
-			}
-		}
-	};
-
-	const handleDeleteRole = async () => {
-		try {
-			if (selectedRole) {
-				const roleId = selectedRole.id;
-				const res = await deleteRole(roleId);
-				console.log(res);
-				// @ts-expect-error - exception success attr
-				if (res.success) {
-					toast.success('Xóa cấp bậc thành công!');
-					dispatch(fetchRoles());
-					onClose();
+					closeDialog();
 				}
 			}
 		} catch (error) {
@@ -172,26 +125,18 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 	};
 
 	return (
-		<>
-			<Dialog open={isOpen} onOpenChange={() => onClose()}>
+		<div className='text-end mb-4'>
+			<Button className='bg-green-800 hover:bg-green-900' onClick={openDialog}>
+				<Plus />
+				Thêm
+			</Button>
+			<Dialog open={isOpen} onOpenChange={() => closeDialog()}>
 				<DialogContent className='min-w-[1000px] max-h-[98vh] ' onOpenAutoFocus={e => e.preventDefault()}>
 					<DialogHeader>
-						<DialogTitle>{selectedRole ? selectedRole.name : 'Role Details'}</DialogTitle>
-						<DialogDescription>{selectedRole ? selectedRole.description : 'No role selected'}</DialogDescription>
+						<DialogTitle>Thêm chức vụ</DialogTitle>
+						<DialogDescription>Vui lòng nhập đầy đủ thông tin để thêm chức vụ mới vào hệ thống.</DialogDescription>
 					</DialogHeader>
-					<div className='grid grid-cols-4 gap-4'>
-						<div>
-							<label htmlFor='role-id' className='w-full text-sm mb-1 text-start font-semibold'>
-								ID
-							</label>
-							<Input
-								id='role-id'
-								type='text'
-								value={selectedRole ? selectedRole.idString : 'N/A'}
-								className='w-full'
-								disabled
-							/>
-						</div>
+					<div className='grid grid-cols-3 gap-4'>
 						<div>
 							<label htmlFor='role-name' className='w-full text-sm mb-1 text-start font-semibold'>
 								Tên chức vụ
@@ -200,7 +145,6 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 								id='role-name'
 								type='text'
 								className='w-full'
-								disabled={mode !== 'edit' || selectedRole?.status === 1}
 								{...register('roleName', {
 									required: 'Vui lòng tên chức vụ',
 									minLength: {
@@ -222,11 +166,7 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 								}}
 								{...register('allowanceId', { required: 'Vui lòng chọn phụ cấp' })}
 							>
-								<SelectTrigger
-									className='w-full'
-									id='allowance'
-									disabled={mode !== 'edit' || selectedRole?.status === 1}
-								>
+								<SelectTrigger className='w-full' id='allowance'>
 									<SelectValue placeholder='Chọn phụ cấp' />
 								</SelectTrigger>
 								<SelectContent>
@@ -248,13 +188,13 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 								Trạng thái
 							</label>
 							<Select
-								value={formData?.status !== undefined ? formData.status.toString() : undefined}
-								onValueChange={value => {
-									setValue('status', parseInt(value));
-								}}
-								{...register('status', { required: 'Vui lòng chọn trạng thái' })}
+								value={`2`}
+								// onValueChange={value => {
+								// 	setValue('status', parseInt(value));
+								// }}
+								// {...register('status', { required: 'Vui lòng chọn trạng thái' })}
 							>
-								<SelectTrigger className='w-full' id='status' disabled={mode !== 'edit' || selectedRole?.status === 1}>
+								<SelectTrigger className='w-full' disabled id='status'>
 									<SelectValue placeholder='Chọn trạng thái' />
 								</SelectTrigger>
 								<SelectContent>
@@ -276,7 +216,6 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 								id='role-description'
 								type='text'
 								className='w-full'
-								disabled={mode !== 'edit' || selectedRole?.status === 1}
 								{...register('description', {
 									required: 'Vui lòng nhập mô tả',
 									minLength: {
@@ -288,10 +227,18 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 							{errors.description && <p className='text-red-500 text-sm'>{errors.description.message}</p>}
 						</div>
 					</div>
-					{mode === 'edit' && selectedRole?.status === 2 && (
+					<div className='flex items-center justify-end gap-2'>
+						<div className='flex justify-end gap-2'>
+							<button
+								className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+								onClick={() => closeDialog()}
+							>
+								Thoát
+							</button>
+						</div>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<button className='px-4 py-2 border w-[80px] ml-auto float-end bg-black text-white rounded-md hover:bg-gray-600 transition '>
+								<button className='px-4 py-2 border w-[80px] float-end bg-black text-white rounded-md hover:bg-gray-600 transition '>
 									Lưu
 								</button>
 							</AlertDialogTrigger>
@@ -302,46 +249,13 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 								</AlertDialogHeader>
 								<AlertDialogFooter>
 									<AlertDialogCancel>Thoát</AlertDialogCancel>
-									<AlertDialogAction onClick={handleUpdateRole}>Xác nhận</AlertDialogAction>
+									<AlertDialogAction onClick={handleAddRole}>Xác nhận</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
-					)}
-
-					<LevelsTable selectedRole={selectedRole} mode={mode} />
-
-					{mode === 'delete' && (
-						<div className='flex items-center justify-between'>
-							<AlertDialog>
-								<AlertDialogTrigger asChild>
-									<button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'>
-										<Trash2 />
-										Xóa
-									</button>
-								</AlertDialogTrigger>
-								<AlertDialogContent>
-									<AlertDialogHeader>
-										<AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
-										<AlertDialogDescription>Bạn có chắc chắn muốn xóa chức vụ này không?</AlertDialogDescription>
-									</AlertDialogHeader>
-									<AlertDialogFooter>
-										<AlertDialogCancel>Thoát</AlertDialogCancel>
-										<AlertDialogAction onClick={handleDeleteRole}>Xác nhận</AlertDialogAction>
-									</AlertDialogFooter>
-								</AlertDialogContent>
-							</AlertDialog>
-							<div className='flex justify-end gap-2'>
-								<button
-									className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
-									onClick={() => onClose()}
-								>
-									Thoát
-								</button>
-							</div>
-						</div>
-					)}
+					</div>
 				</DialogContent>
 			</Dialog>
-		</>
+		</div>
 	);
 }

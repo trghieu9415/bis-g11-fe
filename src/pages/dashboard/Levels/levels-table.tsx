@@ -43,6 +43,7 @@ type Role = {
 	id: number;
 	name: string;
 	description: string;
+	status: number;
 	resSeniority: ResSeniority[];
 };
 
@@ -108,7 +109,8 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 						typeof level?.salaryCoefficient === 'string'
 							? parseFloat(level.salaryCoefficient)
 							: (level?.salaryCoefficient ?? 0),
-					roleId: selectedRole?.id
+					roleId: selectedRole?.id,
+					status: 2
 				};
 				const res = await addLevel(levelData);
 				// @ts-expect-error - exception success attr
@@ -133,6 +135,10 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 				toast.error(
 					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
 				);
+			} else if (err.response?.status === 409) {
+				toast.error(
+					(err.response.data as { error?: string }).error || 'Lỗi 409: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy cấp bậc.');
 			} else if (err.response?.status === 500) {
@@ -143,6 +149,8 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 		}
 	};
 
+	console.log(selectedLevel);
+
 	const handleUpdateLevel = async (levelID: number, level: Level) => {
 		try {
 			const levelData = {
@@ -152,7 +160,8 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 					typeof level?.salaryCoefficient === 'string'
 						? parseFloat(level.salaryCoefficient)
 						: (level?.salaryCoefficient ?? 0),
-				roleId: selectedRole?.id
+				roleId: selectedRole?.id,
+				status: level?.status
 			};
 			const res = await updateLevel(levelID, levelData);
 			// @ts-expect-error - exception success attr
@@ -231,7 +240,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 						mode === 'edit' && <ChevronUp className='hover:cursor-pointer' onClick={() => setIsShowAdd(!isShowAdd)} />
 					)}
 				</div>
-				{mode === 'edit' && isShowAdd && (
+				{mode === 'edit' && isShowAdd && selectedRole?.status === 1 ? (
 					<>
 						<div className='grid grid-cols-2 gap-4 mt-1'>
 							<div className='grid grid-cols-2 gap-4'>
@@ -309,24 +318,35 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 							</Button>
 						</div>
 					</>
+				) : (
+					mode === 'edit' &&
+					isShowAdd && (
+						<>
+							<span className='text-center '>
+								<p className='my-2'>
+									Vui lòng cập nhật sang trạng thái <strong>"Hoạt động"</strong> để có thể thêm cấp bậc
+								</p>
+							</span>
+						</>
+					)
 				)}
 			</div>
 			<div className={`overflow-y-auto ${isShowAdd ? 'max-h-[300px]' : 'max-h-[400px]'}  pr-1`}>
-				<Table className='min-w-full border border-gray-300 mt-2'>
+				<Table className='min-w-full table-fixed border border-gray-300 mt-2'>
 					<TableHeader className='bg-gray-100'>
 						<TableRow>
-							<TableCell className='border border-gray-300 py-1 px-2'>ID</TableCell>
-							<TableCell className='border border-gray-300 py-1 px-2 '>Mô tả</TableCell>
-							<TableCell className='border border-gray-300 py-1 px-2'>Tên cấp bậc</TableCell>
-							<TableCell className='border border-gray-300 py-1 px-2 w-22 text-center'>Trạng thái</TableCell>
-							<TableCell className='border border-gray-300 py-1 px-2 w-16 text-center'>Hệ số lương</TableCell>
+							<TableCell className='border border-gray-300 py-2 px-2  w-20 text-center'>ID</TableCell>
+							<TableCell className='border border-gray-300 py-2 px-2 w-80 text-center'>Mô tả</TableCell>
+							<TableCell className='border border-gray-300 py-2 px-2 text-center'>Tên cấp bậc</TableCell>
+							<TableCell className='border border-gray-300 py-2 px-2 min-w-[160px] text-center'>Trạng thái</TableCell>
+							<TableCell className='border border-gray-300 py-2 px-2 w-28 text-center'>Hệ số lương</TableCell>
 							{mode === 'edit' && (
-								<TableCell className='border border-gray-300 py-1 px-2 w-22 text-center'>Thao tác</TableCell>
+								<TableCell className='border border-gray-300 py-2 px-2 w-20 text-center'>Thao tác</TableCell>
 							)}
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{selectedRole?.resSeniority && selectedRole.resSeniority.length > 0 ? (
+						{selectedRole?.resSeniority && selectedRole.resSeniority.length > 0 && selectedRole.status === 1 ? (
 							selectedRole.resSeniority.map(seniority => {
 								if (seniority.status !== 0) {
 									return (
@@ -408,7 +428,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 															}))
 														}
 													>
-														<SelectTrigger className='w-[180px]'>
+														<SelectTrigger className='w-[148px]'>
 															<SelectValue placeholder='Chọn trạng thái' />
 														</SelectTrigger>
 														<SelectContent>
@@ -424,7 +444,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 														Kích hoạt
 													</p>
 												) : (
-													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-red-500 rounded-sm p-1'>
+													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-yellow-500 rounded-sm p-1'>
 														<XCircle className='w-4 h-4 mr-1' stroke='white' />
 														Chưa kích hoạt
 													</p>

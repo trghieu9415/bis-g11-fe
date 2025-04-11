@@ -9,10 +9,9 @@ import {
 import { useSelector } from 'react-redux';
 
 import { fetchRoles } from '@/redux/slices/rolesSlice';
-import { fetchAllAllowances } from '@/redux/slices/allowancesSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ellipsis } from 'lucide-react';
+import { ArrowUpDown, Ellipsis, CheckCircle, CalendarCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import RolesDialog from './roles-dialog';
@@ -32,7 +31,8 @@ type Role = {
 	idString: string;
 	name: string;
 	description: string;
-	allowanceId: string;
+	allowanceId: number;
+	status: number;
 	resSeniority: ResSeniority[];
 };
 
@@ -50,7 +50,6 @@ export default function RolesTable() {
 
 	useEffect(() => {
 		dispatch(fetchRoles());
-		dispatch(fetchAllAllowances());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -89,6 +88,32 @@ export default function RolesTable() {
 			enableHiding: false
 		},
 		{
+			accessorKey: 'status',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white w-30'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Trạng thái <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				const status = row.getValue('status');
+				return status === 1 ? (
+					<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
+						<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+						Hoạt động
+					</p>
+				) : (
+					<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-yellow-500 rounded-sm p-1'>
+						<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Chưa kích hoạt
+					</p>
+				);
+			},
+			enableHiding: false
+		},
+		{
 			accessorKey: 'description',
 			header: ({ column }) => (
 				<Button
@@ -100,7 +125,7 @@ export default function RolesTable() {
 				</Button>
 			),
 			cell: ({ row }) => <span className='flex items-center'>{row.getValue('description')}</span>,
-			enableHiding: false
+			enableHiding: true
 		},
 		{
 			accessorKey: 'allowanceId',
@@ -114,9 +139,13 @@ export default function RolesTable() {
 				</Button>
 			),
 			cell: ({ row }) => {
-				const allowance = allowances.find(a => a.allowanceId === row.getValue('allowanceId'));
+				const allowance = allowances.find(a => a.id === row.getValue('allowanceId'));
 				console.log(allowance);
-				return <span className='flex items-center justify-end'>{allowance}</span>;
+				if (allowance?.allowance != null) {
+					return <span className='flex items-center justify-end'>{allowance.allowance.toLocaleString()} VNĐ</span>;
+				} else {
+					return <span className='flex items-center justify-center'>--</span>;
+				}
 			},
 			enableHiding: false
 		},
@@ -133,7 +162,9 @@ export default function RolesTable() {
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{row.getValue('status') !== 1 && (
+							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)

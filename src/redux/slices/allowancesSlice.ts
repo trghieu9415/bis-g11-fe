@@ -4,6 +4,8 @@ import axios from '@/services/customize-axios';
 
 interface ApiResponse {
 	id: number;
+	name: string;
+	allowance: string;
 	idString: string;
 	roleName: string[];
 }
