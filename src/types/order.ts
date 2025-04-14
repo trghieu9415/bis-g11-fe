@@ -9,33 +9,42 @@ export interface BillDetailRequest {
 	quantity: number;
 }
 
-export interface CreateBillRequest {
-	userId: number;
-	customerId: number;
-	address: string;
-	billDetails: BillDetailRequest[];
-}
-export interface Order {
-	id: string;
-	orderNumber: string;
-	orderDate: string;
+export interface CustomerInfo {
+	id: number;
 	customerName: string;
 	customerPhone: string;
 	customerAddress: string;
+}
+
+export interface CreateBillRequest {
+	userId: number;
+	customerId: number;
+	address?: string;
+	billDetails: BillDetailRequest[];
+}
+
+export interface BillDetail {
+	id: number;
+	productId: number;
+	productName: string;
+	quantity: number;
+	subPrice: number;
+}
+
+export interface Bill {
+	id: number | string;
+	idString: string;
+	userId: number;
+	customerInfo: {
+		customerName: string;
+		customerPhone: string;
+		customerAddress: string;
+	};
+	totalPrice: number;
 	totalAmount: number;
-	status: OrderStatus;
-	products: OrderProduct[];
-	paymentMethod: PaymentMethod;
-	paymentStatus: PaymentStatus;
-	paymentDate?: string;
-	// Thông tin chuyển khoản
-	bankName?: string;
-	bankAccount?: string;
-	bankAccountName?: string;
-	transferContent?: string;
-	// Thông tin thẻ tín dụng
-	transactionId?: string;
-	paymentGateway?: string;
+	createdAt: string;
+	updatedAt: string;
+	billDetails: BillDetail[];
 }
 
 export interface OrderProduct {
@@ -53,7 +62,7 @@ export interface OrderFilter {
 }
 
 export interface OrderSort {
-	field: 'orderNumber' | 'orderDate' | 'customerName' | 'totalAmount' | 'status';
+	field: 'orderNumber' | 'orderDate' | 'customerName' | 'totalAmount' | 'status' | 'totalPrice';
 	direction: 'asc' | 'desc';
 }
 

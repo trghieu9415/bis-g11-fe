@@ -1,18 +1,7 @@
 import axios from '@/services/customize-axios';
+import { Bill, CreateBillRequest } from '@/types/order';
 
-export interface BillDetailRequest {
-	productId: number;
-	quantity: number;
-}
-
-export interface CreateBillRequest {
-	userId: number;
-	customerId: number;
-	address: string;
-	billDetails: BillDetailRequest[];
-}
-
-export const getListBill = async () => axios.get('/api/v1/bill/list');
+export const getListBill = async () => axios.get<Bill[]>('/api/v1/bill/list');
 
 export const getBillById = async (id: number) => axios.get(`/api/v1/bill/${id}`);
 
