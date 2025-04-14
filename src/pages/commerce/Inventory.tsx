@@ -1,5 +1,6 @@
-import CreateGoodReceipt from './Warehouse Management/InventoryNew';
-import InventoryTable from './Warehouse Management/InventoryTable';
+import CreateGoodReceipt from './Warehouse Management/Inventory/InventoryNew';
+import InventoryTable from './Warehouse Management/Inventory/InventoryTable';
+
 const Inventory = () => {
 	return (
 		<div className='flex flex-col w-full'>

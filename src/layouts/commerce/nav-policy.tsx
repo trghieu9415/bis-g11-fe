@@ -1,17 +1,18 @@
-import { ShoppingCart, Users, PackagePlus, ChartLine, Library, BookCopy, ClipboardPlus } from 'lucide-react';
+import { ShoppingCart, Users, PackagePlus, ChartLine, Library, BookCopy, ClipboardPlus, BookUser } from 'lucide-react';
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { NavLink, useLocation } from 'react-router-dom';
 
 export function NavPolicies() {
 	const location = useLocation(); // Lấy URL hiện tại
-
 	const items = [
 		{ name: 'Đơn hàng mới', url: '/new-order', icon: ClipboardPlus },
 		{ name: 'Danh sách đơn', url: '/orders', icon: ShoppingCart },
 		{ name: 'Khách hàng', url: '/customers', icon: Users },
 		{ name: 'Sản phẩm', url: '/products', icon: BookCopy },
-		{ name: 'Nhà cung cấp', url: '/suppliers', icon: Library },
-		{ name: 'Nhập sách', url: '/receipts', icon: PackagePlus },
+		{ name: 'Nhà cung cấp', url: '/supplier', icon: Library },
+		{ name: 'Tác giả', url: '/author', icon: BookUser },
+		{ name: 'Danh mục', url: '/category', icon: BookUser },
+		{ name: 'Nhập sách', url: '/inventory', icon: PackagePlus },
 		{ name: 'Thống kê', url: '/statistics', icon: ChartLine }
 	];
 

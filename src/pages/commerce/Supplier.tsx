@@ -1,5 +1,5 @@
-import CreateSupplier from './Warehouse Management/SupplierNew';
-import SupplierTable from './Warehouse Management/SupplierTable';
+import CreateSupplier from './Warehouse Management/Supplier/SupplierNew';
+import SupplierTable from './Warehouse Management/Supplier/SupplierTable';
 
 const Supplier = () => {
 	return (

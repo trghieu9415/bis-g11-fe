@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '@/services/customize-axios';
-import { Supplier } from '@/pages/commerce/Warehouse Management/SupplierTable';
+import { Supplier } from '@/pages/commerce/Warehouse Management/Supplier/SupplierTable';
 
 // export type Supplier = {
 // 	id: number;
