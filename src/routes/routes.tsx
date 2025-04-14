@@ -19,6 +19,8 @@ import SalaryYear from '@/pages/dashboard/PayrollsYear';
 import Roles from '@/pages/dashboard/Roles';
 import Customer from '@/pages/commerce/Customer';
 import NewBill from '@/pages/commerce/NewBill';
+import Author from '@/pages/commerce/Author';
+import Category from '@/pages/commerce/Category';
 
 // Dashboard routes
 const dashboardRoutes = [
@@ -27,6 +29,11 @@ const dashboardRoutes = [
 	{ path: config.routes.leaveRequests, component: AllLeaveRequests, layout: DashboardLayout },
 	{ path: config.routes.leaveRequestsByType, component: AllLeaveRequests, layout: DashboardLayout },
 	{ path: config.routes.timeTrackingToday, component: TimeTrackingToday, layout: DashboardLayout },
+	{ path: config.routes.supplier, component: Supplier, layout: CommerceLayout },
+	{ path: config.routes.products, component: Products, layout: CommerceLayout },
+	{ path: config.routes.inventory, component: Inventory, layout: CommerceLayout },
+	{ path: config.routes.author, component: Author, layout: CommerceLayout },
+	{ path: config.routes.category, component: Category, layout: CommerceLayout },
 	{ path: config.routes.holiday, component: Holiday, layout: DashboardLayout },
 	{ path: config.routes.userInformation, component: UserInformation, layout: DashboardLayout },
 	{ path: config.routes.timeTrackingMonth, component: TimeTrackingMonth, layout: DashboardLayout },

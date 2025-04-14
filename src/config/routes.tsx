@@ -14,6 +14,8 @@ const routes = {
 	orders: '/orders',
 	customers: '/customers',
 	eLogin: '/login',
+	author: '/author',
+	category: '/category',
 	eForgot: '/forgot-password',
 	hrLogin: '/hr-login',
 	salaryMonth: '/salary/month',

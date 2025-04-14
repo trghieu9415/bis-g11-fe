@@ -1,5 +1,5 @@
-import ProductsTable from './Warehouse Management/ProductsTable';
-import CreateProducts from './Warehouse Management/ProductNew';
+import ProductsTable from './Warehouse Management/Products/ProductsTable';
+import CreateProducts from './Warehouse Management/Products/ProductNew';
 export default function Products() {
 	return (
 		<div className='flex flex-col w-full'>

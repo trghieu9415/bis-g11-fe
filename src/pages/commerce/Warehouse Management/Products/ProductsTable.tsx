@@ -14,11 +14,12 @@ import { fetchProducts, Product } from '@/redux/slices/productSlice';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
-import ProductsStatus from './ProductStatus';
+
 import { toast } from 'react-toastify';
 import { deleteProduct, updateProduct } from '@/services/productService';
 import CustomProductDialog from '@/components/custom-product-dialog';
 import { AxiosError } from 'axios';
+import ProductsStatus from './ProductStatus';
 
 export type FieldProduct = {
 	image: string;
