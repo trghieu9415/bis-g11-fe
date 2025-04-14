@@ -21,6 +21,7 @@ import Customer from '@/pages/commerce/Customer';
 import NewBill from '@/pages/commerce/NewBill';
 import Author from '@/pages/commerce/Author';
 import Category from '@/pages/commerce/Category';
+import Inventory from '@/pages/commerce/Inventory';
 
 // Dashboard routes
 const dashboardRoutes = [
