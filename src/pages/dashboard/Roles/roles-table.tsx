@@ -45,9 +45,6 @@ export default function RolesTable() {
 	const { roles } = useSelector((state: RootState) => state.roles);
 	const { allowances } = useSelector((state: RootState) => state.allowances);
 
-	console.log(allowances);
-	console.log(roles);
-
 	useEffect(() => {
 		dispatch(fetchRoles());
 	}, [dispatch]);

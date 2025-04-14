@@ -1,10 +1,10 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RootState } from '@/redux/store';
 import { TextSearch } from 'lucide-react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface EmployeePayrollYearProps {
 	year: string;
@@ -14,32 +14,41 @@ interface EmployeePayrollYearProps {
 }
 
 const EmployeePayrollYear = ({ year, monthYear, onChangeYear, onChangeMonthYear }: EmployeePayrollYearProps) => {
-	const [activeTab, setActiveTab] = useState<{ currentTab: string | null; netSalary: string | null }>({
-		currentTab: null,
-		netSalary: null
-	});
-	const { payrollsYearByUserID } = useSelector((state: RootState) => state.payrollsYearByUserID);
+	const { payrollYearByUser } = useSelector((state: RootState) => state.payrollYearByUser);
 
-	const handleTabChange = (value: string | null) => {
-		if (!value) {
-			setActiveTab(prev => ({ ...prev, currentTab: null, netSalary: null }));
-			return;
+	const parseMoney = (str: string) => Number(str.replace(/,/g, ''));
+
+	const total = payrollYearByUser.reduce(
+		(acc, curr) => {
+			acc.baseSalary += parseMoney(curr.baseSalary);
+			acc.salaryCoefficient += curr.salaryCoefficient;
+			acc.grossSalary += parseMoney(curr.grossSalary);
+			acc.allowance += parseMoney(curr.allowance);
+			acc.employeeBHXH += parseMoney(curr.employeeBHXH);
+			acc.employeeBHYT += parseMoney(curr.employeeBHYT);
+			acc.employeeBHTN += parseMoney(curr.employeeBHTN);
+			acc.tax += parseMoney(curr.tax);
+			acc.penalties += parseMoney(curr.penalties);
+			acc.maternityBenefit += parseMoney(curr.maternityBenefit);
+			acc.sickBenefit += parseMoney(curr.sickBenefit);
+			acc.netSalary += parseMoney(curr.netSalary);
+			return acc;
+		},
+		{
+			baseSalary: 0,
+			salaryCoefficient: 0,
+			grossSalary: 0,
+			allowance: 0,
+			employeeBHXH: 0,
+			employeeBHYT: 0,
+			employeeBHTN: 0,
+			tax: 0,
+			penalties: 0,
+			maternityBenefit: 0,
+			sickBenefit: 0,
+			netSalary: 0
 		}
-
-		const index = parseInt(value.replace('item-', ''), 10);
-		const selectedItem = payrollsYearByUserID[index];
-
-		if (selectedItem) {
-			const netSalary = selectedItem.netSalary
-				? Math.floor(Number(selectedItem.netSalary)).toLocaleString('en-US')
-				: '0';
-
-			setActiveTab({
-				currentTab: value,
-				netSalary: `$${netSalary}`
-			});
-		}
-	};
+	);
 
 	return (
 		<>
@@ -69,218 +78,209 @@ const EmployeePayrollYear = ({ year, monthYear, onChangeYear, onChangeMonthYear 
 				</div>
 			</div>
 
-			{payrollsYearByUserID.length > 0 && monthYear.year ? (
-				<div className='overflow-y-auto max-h-[380px]' id='payroll-year-content'>
-					<Accordion
-						type='single'
-						collapsible
-						value={activeTab?.currentTab || ''}
-						className='w-full'
-						onValueChange={handleTabChange}
-					>
-						{payrollsYearByUserID.map((item, index) => {
-							const date = new Date(`${item?.monthOfYear}-01`);
-							const formatted = date.toLocaleString('vi-VN', { month: '2-digit', year: 'numeric' });
+			{payrollYearByUser.length > 0 && monthYear.year ? (
+				<>
+					<div className='text-sm mt-1 mb-2'>
+						<p className='mb-1 text-sm'>
+							<strong>Mã nhân viên:</strong> {payrollYearByUser[payrollYearByUser.length - 1].userIdStr}
+						</p>
+						<p className='text-sm'>
+							<strong>Họ và tên:</strong> {payrollYearByUser[payrollYearByUser.length - 1].fullName}
+						</p>
+					</div>
+					<div className='overflow-auto' id='payroll-year-content'>
+						<div className='rounded-lg overflow-auto border border-gray-400'>
+							<Table className='min-w-full sticky table-fixed '>
+								<TableHeader>
+									<TableRow>
+										<TableHead
+											rowSpan={2}
+											className='border py-2 border-gray-400 text-black text-center w-[70px] text-xs bg-gray-200'
+										></TableHead>
 
-							return (
-								<AccordionItem value={`item-${index}`} key={index}>
-									<AccordionTrigger>Kỳ lương {`${formatted.replace(',', ' năm ')}`}</AccordionTrigger>
-									<AccordionContent>
-										<div key={index} className='px-4 pb-2'>
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Mã Nhân Viên:</strong> {item?.userIdStr}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Ngày công đi làm:</strong> {item?.totalWorkingDays}
-												</p>
-											</div>
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Họ và tên:</strong> {item?.fullName}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Ngày nghỉ lễ:</strong> {item?.totalHolidayLeaves}
-												</p>
-											</div>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Lương cơ bản
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 w-[60px] text-black text-center text-xs bg-gray-200'
+										>
+											Hệ số
+										</TableHead>
 
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Chức danh:</strong> {item?.roleName}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Ngày nghỉ phép:</strong> {item?.totalPaidLeaves}
-												</p>
-											</div>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Lương Gross
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Phụ cấp
+										</TableHead>
 
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Lương cơ bản:</strong> {item?.baseSalary}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Ngày nghỉ bệnh:</strong> {item?.totalSickLeaves}
-												</p>
-											</div>
+										<TableHead
+											colSpan={3}
+											className='border py-1 h-[40px] border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Bảo hiểm bắt buộc
+										</TableHead>
 
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Hệ số lương:</strong> {item?.salaryCoefficient}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Nghỉ thai sản:</strong> {item?.totalMaternityLeaves}
-												</p>
-											</div>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 w-[60px] text-black text-center text-xs bg-gray-200'
+										>
+											Thuế TNCN
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Phạt
+										</TableHead>
 
-											<div className='grid grid-col grid-cols-2'>
-												<p className='mb-2 text-xs'>
-													<strong>Ngày công chuẩn:</strong> {item?.standardWorkingDays}
-												</p>
-												<p className='mb-2 text-xs'>
-													<strong>Nghỉ không phép:</strong> {item?.totalUnpaidLeaves}
-												</p>
-											</div>
+										<TableHead
+											colSpan={2}
+											className='border py-1 h-[40px] border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Trợ cấp BHXH
+										</TableHead>
 
-											<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-												<thead className='bg-gray-200'>
-													<tr>
-														<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-														<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Thu Nhập</th>
-														<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td className='border border-gray-300 p-2'>1</td>
-														<td className='border border-gray-300 p-2'>Lương chính thức</td>
-														<td className='border border-gray-300 p-2 text-right'>{item?.mainSalary} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'>2</td>
-														<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
-														<td className='border border-gray-300 p-2 text-right'>{item?.allowance}</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-															Tổng cộng:
-														</td>
-														<td className='border border-gray-300 p-2 font-bold text-right'>{item?.grossSalary} VNĐ</td>
-													</tr>
-												</tbody>
-											</table>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Tổng thực nhận <br /> (Lương Net)
+										</TableHead>
+									</TableRow>
 
-											<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-												<thead className='bg-gray-200'>
-													<tr>
-														<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-														<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Trừ Vào Lương</th>
-														<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td className='border border-gray-300 p-2'>1</td>
-														<td className='border border-gray-300 p-2 text-left font-bold' colSpan={2}>
-															Bảo hiểm bắt buộc
-														</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'></td>
-														<td className='border border-gray-300 p-2'>1.1. Bảo hiểm xã hội (8%)</td>
-														<td className='border border-gray-300 p-2 text-right'>- {item?.employeeBHXH} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'></td>
-														<td className='border border-gray-300 p-2'>1.2. Bảo hiểm y tế (1.5%)</td>
-														<td className='border border-gray-300 p-2 text-right'>- {item?.employeeBHYT} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'></td>
-														<td className='border border-gray-300 p-2'>1.3. Bảo hiểm thất nghiệp (1%)</td>
-														<td className='border border-gray-300 p-2 text-right'>- {item?.employeeBHTN} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'>2</td>
-														<td className='border border-gray-300 p-2'>Thuế TNCN</td>
-														<td className='border border-gray-300 p-2 text-right'>- {item?.tax} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'>3</td>
-														<td className='border border-gray-300 p-2'>Phạt</td>
-														<td className='border border-gray-300 p-2 text-right'>- {item?.penalties} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'>4</td>
-														<td className='border border-gray-300 p-2'>Khác</td>
-														<td className='border border-gray-300 p-2 text-right'>- 0 VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-															Tổng cộng:
-														</td>
-														<td className='border border-gray-300 p-2 font-bold text-right'>
-															- {item?.deductions} VNĐ
-														</td>
-													</tr>
-												</tbody>
-											</table>
-											<table className='min-w-full border border-gray-300 mt-4 text-xs'>
-												<thead className='bg-gray-200'>
-													<tr>
-														<th className='border border-gray-300 p-2 w-1/12'>STT</th>
-														<th className='border border-gray-300 p-2 w-7/12'>Các Khoản Phụ Cấp BHXH</th>
-														<th className='border border-gray-300 p-2 w-4/12'>Số tiền</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td className='border border-gray-300 p-2'>1</td>
-														<td className='border border-gray-300 p-2'>Phụ cấp thai sản</td>
-														<td className='border border-gray-300 p-2 text-right'>{item?.maternityBenefit} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2'>2</td>
-														<td className='border border-gray-300 p-2'>Phụ cấp nghỉ bệnh</td>
-														<td className='border border-gray-300 p-2 text-right'>{item?.sickBenefit} VNĐ</td>
-													</tr>
-													<tr>
-														<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-															Tổng cộng:
-														</td>
-														<td className='border border-gray-300 p-2 font-bold text-right'>
-															{item?.totalBenefit} VNĐ
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
-									</AccordionContent>
-								</AccordionItem>
-							);
-						})}
-					</Accordion>
-				</div>
+									<TableRow>
+										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
+											BHXH (8%)
+										</TableHead>
+										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
+											BHYT (1.5%)
+										</TableHead>
+										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
+											BHTN (1%)
+										</TableHead>
+
+										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
+											Phụ cấp <br /> thai sản
+										</TableHead>
+										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
+											Phụ cấp <br />
+											nghỉ bệnh
+										</TableHead>
+									</TableRow>
+								</TableHeader>
+
+								<TableBody>
+									{[...Array(12)].map((_, idx) => {
+										const row = payrollYearByUser?.[idx];
+										return (
+											<TableRow key={idx}>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-xs bg-gray-200'>
+													Thg {idx + 1}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.baseSalary ? `${row.baseSalary} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.salaryCoefficient ? `${row.salaryCoefficient}` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.grossSalary ? `${row.grossSalary} VNĐ` : ''}
+												</TableCell>
+
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.allowance ? `${row.allowance} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.employeeBHXH ? `${row.employeeBHXH} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.employeeBHYT ? `${row.employeeBHYT} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.employeeBHTN ? `${row.employeeBHTN} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.tax ? `${row.tax} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.penalties ? `${row.penalties} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.maternityBenefit ? `${row.maternityBenefit} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.sickBenefit ? `${row.sickBenefit} VNĐ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.netSalary ? `${Number(row.netSalary).toLocaleString('en-US')} VNĐ` : ''}
+												</TableCell>
+											</TableRow>
+										);
+									})}
+
+									<TableRow>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] bg-gray-200'>
+											Tổng cột
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.baseSalary.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.salaryCoefficient}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.grossSalary.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.allowance.toLocaleString('en-US')} VNĐ
+										</TableCell>
+
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.employeeBHXH.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.employeeBHYT.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.employeeBHTN.toLocaleString('en-US')} VNĐ
+										</TableCell>
+
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.tax.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.penalties.toLocaleString('en-US')} VNĐ
+										</TableCell>
+
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.maternityBenefit.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.sickBenefit.toLocaleString('en-US')} VNĐ
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.netSalary.toLocaleString('en-US')} VNĐ
+										</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						</div>
+					</div>
+				</>
 			) : (
 				<div className='overflow-y-auto px-4 max-h-[430px] pb-2'>
 					<p className='text-center text-sm'>Không có thông tin lương cho kỳ này.</p>
-				</div>
-			)}
-			{activeTab.currentTab && (
-				<div className='px-6' id='net-salary-year-tab'>
-					<table className='min-w-full mt-4 text-xs'>
-						<tbody>
-							<tr>
-								<td className='border border-gray-300 p-2 w-8/12 text-right font-bold' colSpan={2}>
-									Tổng Số Tiền Lương Thực Nhận:
-								</td>
-								<td
-									className='border border-gray-300 p-2 w-4/12 font-bold text-right text-green-600'
-									style={{ fontWeight: 'bold' }}
-								>
-									{activeTab.netSalary} VNĐ
-								</td>
-							</tr>
-						</tbody>
-					</table>
 				</div>
 			)}
 		</>

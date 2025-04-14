@@ -16,6 +16,7 @@ import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
 import allowancesReducer from './slices/allowancesSlice';
 import payrollsByYearReducer from './slices/payrollsByYearSlice';
 import rolesReducer from './slices/rolesSlice';
+import payrollYearByUserReducer from './slices/payrollByYearAndUserIdSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -34,8 +35,8 @@ export const store = configureStore({
 		payrollsByYearMonth: payrollsByYearMonthReducer,
 		payrollsYearByUserID: payrollsYearByUserIDReducer,
 		allowances: allowancesReducer,
-		payrollsByYear: payrollsByYearReducer
-		// roles: rolesReducer
+		payrollsByYear: payrollsByYearReducer,
+		payrollYearByUser: payrollYearByUserReducer
 	}
 });
 
