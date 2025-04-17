@@ -442,6 +442,7 @@ export default function PayrollsYearDialog({
 	// ];
 
 	useEffect(() => {
+		// dispatch(fetchPayrollYearByUser({ userId: 3, year: '2025' }));
 		dispatch(fetchPayrollYearByUser({ userId: selectedId, year }));
 	}, [dispatch, selectedId, year]);
 
@@ -461,6 +462,12 @@ export default function PayrollsYearDialog({
 			acc.maternityBenefit += parseMoney(curr.maternityBenefit);
 			acc.sickBenefit += parseMoney(curr.sickBenefit);
 			acc.netSalary += parseMoney(curr.netSalary);
+			acc.totalHolidayLeaves += curr.totalHolidayLeaves;
+			acc.totalMaternityLeaves += curr.totalMaternityLeaves;
+			acc.totalPaidLeaves += curr.totalPaidLeaves;
+			acc.totalSickLeaves += curr.totalSickLeaves;
+			acc.totalUnpaidLeaves += curr.totalUnpaidLeaves;
+			acc.totalWorkingDays += curr.totalWorkingDays;
 			return acc;
 		},
 		{
@@ -475,7 +482,13 @@ export default function PayrollsYearDialog({
 			penalties: 0,
 			maternityBenefit: 0,
 			sickBenefit: 0,
-			netSalary: 0
+			netSalary: 0,
+			totalHolidayLeaves: 0,
+			totalMaternityLeaves: 0,
+			totalPaidLeaves: 0,
+			totalSickLeaves: 0,
+			totalUnpaidLeaves: 0,
+			totalWorkingDays: 0
 		}
 	);
 
@@ -564,7 +577,7 @@ export default function PayrollsYearDialog({
 
 					<div className='text-sm mt-1'>
 						<p className='mb-1 text-sm'>
-							<strong>Mã nhân viên:</strong> {payrollYearByUser[payrollYearByUser.length - 1].userIdStr}
+							<strong>Mã nhân viên:</strong> {payrollYearByUser[payrollYearByUser.length - 1].idString}
 						</p>
 						<p className='text-sm'>
 							<strong>Họ và tên:</strong> {payrollYearByUser[payrollYearByUser.length - 1].fullName}
@@ -589,9 +602,36 @@ export default function PayrollsYearDialog({
 										</TableHead>
 										<TableHead
 											rowSpan={2}
-											className='border py-1 border-gray-400 w-[60px] text-black text-center text-xs bg-gray-200'
+											className='border py-1 px-0 border-gray-400 w-[40px] text-black text-center text-xs bg-gray-200'
 										>
-											Hệ số
+											Hệ <br /> số
+										</TableHead>
+
+										{/* <TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Lương Gross
+										</TableHead> */}
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Phụ cấp
+										</TableHead>
+
+										<TableHead
+											rowSpan={2}
+											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Phạt <br /> đi trễ
+										</TableHead>
+
+										<TableHead
+											colSpan={6}
+											className='border py-1 h-[40px] w-[300px] border-gray-400 text-black text-center text-xs bg-gray-200'
+										>
+											Số ngày
 										</TableHead>
 
 										<TableHead
@@ -599,12 +639,6 @@ export default function PayrollsYearDialog({
 											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
 										>
 											Lương Gross
-										</TableHead>
-										<TableHead
-											rowSpan={2}
-											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
-										>
-											Phụ cấp
 										</TableHead>
 
 										<TableHead
@@ -619,12 +653,6 @@ export default function PayrollsYearDialog({
 											className='border py-1 border-gray-400 w-[60px] text-black text-center text-xs bg-gray-200'
 										>
 											Thuế TNCN
-										</TableHead>
-										<TableHead
-											rowSpan={2}
-											className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'
-										>
-											Phạt
 										</TableHead>
 
 										<TableHead
@@ -643,6 +671,47 @@ export default function PayrollsYearDialog({
 									</TableRow>
 
 									<TableRow>
+										{/* LEAVE TYPE */}
+										<TableHead
+											rowSpan={2}
+											className='border py-1  px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Nghỉ <br /> không <br />
+											phép
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1  px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Nghỉ <br />
+											phép
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1  px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Nghỉ <br /> lễ
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1  px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Nghỉ <br /> thai <br /> sản
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1  px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Nghỉ bệnh
+										</TableHead>
+										<TableHead
+											rowSpan={2}
+											className='border py-1 px-0 border-gray-400 w-[50px] text-black text-center text-xs bg-gray-200'
+										>
+											Ngày làm tiêu chuẩn
+										</TableHead>
+										{/* LEAVE TYPE */}
+
 										<TableHead className='border py-1 border-gray-400 text-black text-center text-xs bg-gray-200'>
 											BHXH (8%)
 										</TableHead>
@@ -665,95 +734,148 @@ export default function PayrollsYearDialog({
 
 								<TableBody>
 									{[...Array(12)].map((_, idx) => {
-										const row = payrollYearByUser?.[idx];
+										const currentMonth = idx + 1;
+
+										const row = payrollYearByUser?.find(item => {
+											const monthStr = item.monthOfYear?.split('-')[1];
+											const month = parseInt(monthStr, 10);
+											return month === currentMonth;
+										});
+
 										return (
 											<TableRow key={idx}>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-xs bg-gray-200'>
-													Thg {idx + 1}
+													Tháng {idx + 1}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.baseSalary ? `${row.baseSalary} VNĐ` : ''}
+													{row?.baseSalary ? `${row.baseSalary} ` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
 													{row?.salaryCoefficient ? `${row.salaryCoefficient}` : ''}
 												</TableCell>
+
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.grossSalary ? `${row.grossSalary} VNĐ` : ''}
+													{row?.allowance ? `${row.allowance} ` : ''}
 												</TableCell>
 
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.allowance ? `${row.allowance} VNĐ` : ''}
+													{row?.penalties ? `${row.penalties} ` : ''}
+												</TableCell>
+
+												{/* LEAVE TYPE */}
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row && row.totalUnpaidLeaves >= 0 ? `${row.totalUnpaidLeaves}` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.employeeBHXH ? `${row.employeeBHXH} VNĐ` : ''}
+													{row && row.totalPaidLeaves >= 0 ? `${row.totalPaidLeaves}` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.employeeBHYT ? `${row.employeeBHYT} VNĐ` : ''}
+													{row && row.totalHolidayLeaves >= 0 ? `${row.totalHolidayLeaves}` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.employeeBHTN ? `${row.employeeBHTN} VNĐ` : ''}
+													{row && row?.totalMaternityLeaves >= 0 ? `${row.totalMaternityLeaves}` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.tax ? `${row.tax} VNĐ` : ''}
+													{row && row?.totalSickLeaves >= 0 ? `${row.totalSickLeaves}` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.penalties ? `${row.penalties} VNĐ` : ''}
+													{row && row?.standardWorkingDays >= 0 ? `${row.standardWorkingDays}` : ''}
+												</TableCell>
+												{/* LEAVE TYPE */}
+
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.grossSalary ? `${row.grossSalary} ` : ''}
+												</TableCell>
+
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.employeeBHXH ? `${row.employeeBHXH} ` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.maternityBenefit ? `${row.maternityBenefit} VNĐ` : ''}
+													{row?.employeeBHYT ? `${row.employeeBHYT} ` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.sickBenefit ? `${row.sickBenefit} VNĐ` : ''}
+													{row?.employeeBHTN ? `${row.employeeBHTN} ` : ''}
 												</TableCell>
 												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-													{row?.netSalary ? `${Number(row.netSalary).toLocaleString('en-US')} VNĐ` : ''}
+													{row?.tax ? `${row.tax} ` : ''}
+												</TableCell>
+
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.maternityBenefit ? `${row.maternityBenefit} ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.sickBenefit ? `${row.sickBenefit} ` : ''}
+												</TableCell>
+												<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+													{row?.netSalary ? `${Number(row.netSalary).toLocaleString('en-US')} ` : ''}
 												</TableCell>
 											</TableRow>
 										);
 									})}
 
 									<TableRow>
-										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] bg-gray-200'>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-xs bg-gray-200'>
 											Tổng cột
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.baseSalary.toLocaleString('en-US')} VNĐ
+											{total?.baseSalary.toLocaleString('en-US')}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
 											{total?.salaryCoefficient}
 										</TableCell>
+
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.grossSalary.toLocaleString('en-US')} VNĐ
+											{total?.allowance.toLocaleString('en-US')}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.allowance.toLocaleString('en-US')} VNĐ
+											{total?.penalties.toLocaleString('en-US')}
 										</TableCell>
 
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.employeeBHXH.toLocaleString('en-US')} VNĐ
+											{total?.totalUnpaidLeaves}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.employeeBHYT.toLocaleString('en-US')} VNĐ
+											{total?.totalPaidLeaves}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.employeeBHTN.toLocaleString('en-US')} VNĐ
+											{total?.totalHolidayLeaves}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.totalMaternityLeaves}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.totalSickLeaves}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.totalWorkingDays}
 										</TableCell>
 
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.tax.toLocaleString('en-US')} VNĐ
-										</TableCell>
-										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.penalties.toLocaleString('en-US')} VNĐ
+											{total?.grossSalary.toLocaleString('en-US')}
 										</TableCell>
 
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.maternityBenefit.toLocaleString('en-US')} VNĐ
+											{total?.employeeBHXH.toLocaleString('en-US')}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.sickBenefit.toLocaleString('en-US')} VNĐ
+											{total?.employeeBHYT.toLocaleString('en-US')}
 										</TableCell>
 										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
-											{total?.netSalary.toLocaleString('en-US')} VNĐ
+											{total?.employeeBHTN.toLocaleString('en-US')}
+										</TableCell>
+
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.tax.toLocaleString('en-US')}
+										</TableCell>
+
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.maternityBenefit.toLocaleString('en-US')}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.sickBenefit.toLocaleString('en-US')}
+										</TableCell>
+										<TableCell className='py-[2px] px-[3.5px] border border-gray-400 text-center text-[10px] text-[#737373]'>
+											{total?.netSalary.toLocaleString('en-US')}
 										</TableCell>
 									</TableRow>
 								</TableBody>

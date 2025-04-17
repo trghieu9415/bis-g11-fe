@@ -81,7 +81,7 @@ export default function EmployeeSalaryCal() {
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
 	const { payrollYearByUser } = useSelector((state: RootState) => state.payrollYearByUser);
-
+	console.log(payrollYearByUser);
 	const onChangeMonthYear = (year: string, month: string) => {
 		setMonthYear({ year, month });
 	};
@@ -260,7 +260,7 @@ export default function EmployeeSalaryCal() {
 				</Button>
 			</DialogTrigger>
 			<DialogContent
-				className={`!w-[50vw] !max-w-none !h-[98vh] ${activeTabList === 'year' && '!w-[94vw]'} flex flex-col`}
+				className={`py-1 !w-[50vw] !max-w-none !h-[98vh] ${activeTabList === 'year' && '!w-[94vw]'} flex flex-col`}
 				onOpenAutoFocus={e => e.preventDefault()}
 			>
 				<DialogHeader>
@@ -268,7 +268,7 @@ export default function EmployeeSalaryCal() {
 					<DialogDescription></DialogDescription>
 				</DialogHeader>
 
-				<div className='flex-1 mb-4'>
+				<div className='flex-1 mb-4 '>
 					<div>
 						<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
 							<h1 className='text-lg font-bold text-center mb-1'>Công ty Inverse</h1>

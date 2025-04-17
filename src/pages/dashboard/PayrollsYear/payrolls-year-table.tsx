@@ -112,8 +112,8 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 						)}
 					</span>
 				);
-			},
-			enableHiding: false
+			}
+			// enableHiding: false
 		},
 		{
 			accessorKey: 'role',
@@ -264,6 +264,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 	};
 
 	const hiddenColumns = {
+		gender: false,
 		date_of_birth: false,
 		address: false,
 		base_salary: false,

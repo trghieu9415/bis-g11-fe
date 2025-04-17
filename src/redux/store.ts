@@ -17,6 +17,7 @@ import allowancesReducer from './slices/allowancesSlice';
 import payrollsByYearReducer from './slices/payrollsByYearSlice';
 import rolesReducer from './slices/rolesSlice';
 import payrollYearByUserReducer from './slices/payrollByYearAndUserIdSlice';
+import postToggleSidebarReducer from './slices/toggleSideBarSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -36,7 +37,8 @@ export const store = configureStore({
 		payrollsYearByUserID: payrollsYearByUserIDReducer,
 		allowances: allowancesReducer,
 		payrollsByYear: payrollsByYearReducer,
-		payrollYearByUser: payrollYearByUserReducer
+		payrollYearByUser: payrollYearByUserReducer,
+		isHideSidebar: postToggleSidebarReducer
 	}
 });
 

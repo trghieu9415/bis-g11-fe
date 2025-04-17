@@ -42,7 +42,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 									<strong>Công thức tính lương:</strong>
 									<div className='py-2 px-4 mt-2 bg-gray-100 rounded-lg text-base flex flex-col justify-center items-start'>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>A</strong> = (lương cơ bản - hệ số lương) / số ngày làm việc
+											<strong className='italic text-lg'>A</strong> = (lương cơ bản x hệ số lương) / số ngày làm việc
 											tiêu chuẩn
 										</p>
 										<p className='text-sm'>
@@ -104,7 +104,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 										</p>
 										<p>
 											<strong className='text-base'>Phụ cấp nghỉ bệnh</strong> ={' '}
-											<strong className='italic text-lg'>A</strong> x ??%
+											<strong className='italic text-lg'>A</strong> x 75%
 										</p>
 									</div>
 								</li>
