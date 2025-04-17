@@ -13,7 +13,7 @@ const data = {
 		avatar: './avatars/black_cat.jpg'
 	},
 	team: {
-		name: 'Công ty Inverse',
+		name: 'Công ty INKVERSE',
 		logo: './logo/square.png',
 		plan: 'Enterprise'
 	}

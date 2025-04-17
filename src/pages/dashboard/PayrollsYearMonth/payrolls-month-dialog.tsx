@@ -77,7 +77,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 
 	const handleExportPayrollByMonth = () => {
 		const companyNameElement = `<div class='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
-																	<h1 class='text-lg font-bold text-center mb-1'>CÔNG TY INVERSE</h1>
+																	<h1 class='text-lg font-bold text-center mb-1'>CÔNG TY INKVERSE</h1>
 
 																	<p class='text-center text-sm mb-4'>
 																		Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
@@ -178,7 +178,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 					<div className='flex-1 mb-4'>
 						<div id='payroll-month'>
 							<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg' id='monthly-pay-period'>
-								<h1 className='text-lg font-bold text-center mb-1'>Công ty Inverse</h1>
+								<h1 className='text-lg font-bold text-center mb-1'>Công ty INKVERSE</h1>
 
 								<p className='text-center text-sm mb-4'>
 									Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
