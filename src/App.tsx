@@ -1,8 +1,6 @@
 import './index.css';
 import { ToastContainer, Bounce } from 'react-toastify';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-import DashboardLayout from '@/layouts/dashboard-layout';
 import { publicRoutes } from './routes';
 
 function App() {
@@ -11,7 +9,7 @@ function App() {
 			<Router>
 				<Routes>
 					{publicRoutes.map((route, index) => {
-						let Layout = DashboardLayout;
+						let Layout = route.layout;
 
 						if (route.layout) {
 							Layout = route.layout;
