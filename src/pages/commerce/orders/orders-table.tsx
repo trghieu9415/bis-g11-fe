@@ -1,115 +1,109 @@
-import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, ArrowUpDown } from 'lucide-react';
-import { Order, OrderStatus, OrderSort } from '@/types/order';
+import { ArrowUpDown, Clock } from 'lucide-react';
+import { OrderSort, Bill } from '@/types/order';
 import { OrderDetailDialog } from './order-detail-dialog';
-import { OrderReturnDialog } from './order-return-dialog';
 
 interface OrdersTableProps {
-	orders: Order[];
+	orders: Bill[];
 	sortField: OrderSort['field'];
 	sortDirection: OrderSort['direction'];
 	onSort: (field: OrderSort['field']) => void;
-	onDelete: (id: string) => void;
-	onReturn: (id: string, reason: string) => void;
+	onDelete: (id: string | number) => void;
+	onReturn: (id: string | number, reason: string) => void;
 }
 
-export const OrdersTable = ({ orders, sortField, sortDirection, onSort, onDelete, onReturn }: OrdersTableProps) => {
-	const navigate = useNavigate();
-
-	const getStatusColor = (status: OrderStatus) => {
-		switch (status) {
-			case 'pending':
-				return 'bg-yellow-100 text-yellow-800';
-			case 'processing':
-				return 'bg-blue-100 text-blue-800';
-			case 'completed':
-				return 'bg-green-100 text-green-800';
-			case 'cancelled':
-				return 'bg-red-100 text-red-800';
-			default:
-				return 'bg-gray-100 text-gray-800';
-		}
-	};
-
-	const getStatusText = (status: OrderStatus) => {
-		switch (status) {
-			case 'pending':
-				return 'Chờ xử lý';
-			case 'processing':
-				return 'Đang xử lý';
-			case 'completed':
-				return 'Hoàn thành';
-			case 'cancelled':
-				return 'Đã hủy';
-			default:
-				return status;
-		}
-	};
-
+export const OrdersTable = ({ orders, sortField, sortDirection, onSort }: OrdersTableProps) => {
 	return (
-		<Table>
+		<Table className='overflow-hidden rounded-md border border-gray-200'>
 			<TableHeader>
-				<TableRow>
-					<TableHead>Mã đơn hàng</TableHead>
-					<TableHead className='cursor-pointer' onClick={() => onSort('orderDate')}>
-						<div className='flex items-center gap-1'>
-							Ngày đặt
-							<ArrowUpDown className='h-4 w-4' />
-							{sortField === 'orderDate' && <span className='text-xs'>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+				<TableRow className='bg-blue-50 hover:bg-blue-100'>
+					<TableHead className='text-center font-bold text-blue-800'>Mã đơn hàng</TableHead>
+					<TableHead className='cursor-pointer text-center font-bold text-blue-800' onClick={() => onSort('orderDate')}>
+						<div className='flex items-center justify-center gap-1'>
+							Thời gian đặt
+							{sortField === 'orderDate' && (
+								<ArrowUpDown
+									className={`h-4 w-4 text-blue-600 transition-transform ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`}
+								/>
+							)}
 						</div>
 					</TableHead>
-					<TableHead>Khách hàng</TableHead>
-					<TableHead>Số điện thoại</TableHead>
-					<TableHead className='cursor-pointer' onClick={() => onSort('totalAmount')}>
-						<div className='flex items-center gap-1'>
+					<TableHead className='text-center font-bold text-blue-800'>Khách hàng</TableHead>
+					<TableHead className='text-center font-bold text-blue-800'>Số điện thoại</TableHead>
+					{/* <TableHead className='text-center font-bold text-blue-800'>Trạng thái</TableHead> */}
+					<TableHead
+						className='cursor-pointer text-center font-bold text-blue-800'
+						onClick={() => onSort('totalAmount')}
+					>
+						<div className='flex items-center justify-center gap-1'>
 							Tổng tiền
-							<ArrowUpDown className='h-4 w-4' />
-							{sortField === 'totalAmount' && <span className='text-xs'>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+							{sortField === 'totalAmount' && (
+								<ArrowUpDown
+									className={`h-4 w-4 text-blue-600 transition-transform ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`}
+								/>
+							)}
 						</div>
 					</TableHead>
-					<TableHead>Trạng thái</TableHead>
-					<TableHead>Thao tác</TableHead>
+					<TableHead
+						className='cursor-pointer text-center font-bold text-blue-800'
+						onClick={() => onSort('totalPrice')}
+					>
+						<div className='flex items-center justify-center gap-1'>
+							Tổng sản phẩm
+							{sortField === 'totalPrice' && (
+								<ArrowUpDown
+									className={`h-4 w-4 text-blue-600 transition-transform ${sortDirection === 'asc' ? 'rotate-0' : 'rotate-180'}`}
+								/>
+							)}
+						</div>
+					</TableHead>
+					<TableHead className='text-center font-bold text-blue-800'>Thao tác</TableHead>
 				</TableRow>
 			</TableHeader>
-			<TableBody>
+			<TableBody className='text-center'>
 				{orders.length === 0 ? (
 					<TableRow>
-						<TableCell colSpan={7} className='text-center py-4'>
+						<TableCell colSpan={8} className='py-8 text-center font-medium text-gray-500'>
 							Không có đơn hàng nào
 						</TableCell>
 					</TableRow>
 				) : (
-					orders.map(order => (
-						<TableRow key={order.id}>
-							<TableCell className='font-medium'>{order.orderNumber}</TableCell>
-							<TableCell>
-								{format(new Date(order.orderDate), 'dd/MM/yyyy', {
-									locale: vi
-								})}
+					orders.map((order, index) => (
+						<TableRow
+							key={order.id}
+							className={`transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
+						>
+							<TableCell className='font-medium text-blue-700'>{order.idString}</TableCell>
+							<TableCell className='font-medium'>
+								<div className='flex flex-col items-center'>
+									<span>
+										{format(new Date(order.createdAt), 'dd/MM/yyyy', {
+											locale: vi
+										})}
+									</span>
+									<span className='mt-1 flex items-center text-xs text-gray-500'>
+										<Clock className='mr-1 h-3 w-3' />
+										{format(new Date(order.createdAt), 'HH:mm', {
+											locale: vi
+										})}
+									</span>
+								</div>
 							</TableCell>
-							<TableCell>{order.customerName}</TableCell>
-							<TableCell>{order.customerPhone}</TableCell>
-							<TableCell>
-								{order.totalAmount.toLocaleString('vi-VN', {
+							<TableCell className='font-medium'>{order.customerInfo.customerName}</TableCell>
+							<TableCell className='font-medium'>{order.customerInfo.customerPhone}</TableCell>
+
+							<TableCell className='font-medium text-emerald-700'>
+								{order.totalPrice.toLocaleString('vi-VN', {
 									style: 'currency',
 									currency: 'VND'
 								})}
 							</TableCell>
+							<TableCell className='font-medium'>{order.totalAmount}</TableCell>
 							<TableCell>
-								<Badge className={getStatusColor(order.status)}>{getStatusText(order.status)}</Badge>
-							</TableCell>
-							<TableCell>
-								<div className='flex gap-2'>
+								<div className='flex items-center justify-center gap-2'>
 									<OrderDetailDialog order={order} />
-									<OrderReturnDialog order={order} onReturn={onReturn} />
-									<Button variant='destructive' size='sm' onClick={() => onDelete(order.id)} title='Xóa đơn hàng'>
-										<Trash2 className='w-4 h-4' />
-									</Button>
 								</div>
 							</TableCell>
 						</TableRow>

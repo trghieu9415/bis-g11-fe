@@ -8,17 +8,20 @@ const routes = {
 	timeTrackingToday: '/time-tracking/today',
 	timeTrackingMonth: '/time-tracking/month',
 	products: '/products',
-	supplier: '/supplier',
+	supplier: '/suppliers',
 	holiday: '/holiday',
 	newOrder: '/new-order',
 	orders: '/orders',
 	customers: '/customers',
 	eLogin: '/login',
+	author: '/author',
+	category: '/category',
 	eForgot: '/forgot-password',
 	hrLogin: '/hr-login',
 	salaryMonth: '/salary/month',
 	salaryYear: '/salary/year',
-	roles: '/roles'
+	roles: '/roles',
+	inventory: '/inventory'
 };
 
 export default routes;

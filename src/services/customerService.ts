@@ -1,0 +1,14 @@
+import axios from '@/services/customize-axios';
+import { Customer, RequestCustomer } from '@/types/customer';
+
+export const getListCustomers = async () => axios.get<Customer[]>('/api/v1/customer/list');
+
+export const getCustomerById = async (id: number) => axios.get<Customer>(`/api/v1/customer/${id}`);
+
+export const addCustomer = async (customer: RequestCustomer) =>
+	axios.post('/api/v1/customer/add', { ...customer, status: 1 });
+
+export const updateCustomer = async (customerId: number, customer: RequestCustomer) =>
+	axios.put(`/api/v1/customer/${customerId}`, customer);
+
+export const deleteCustomer = async (customerId: number) => axios.patch(`/api/v1/customer/${customerId}`);
