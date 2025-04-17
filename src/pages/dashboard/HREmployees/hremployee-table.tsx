@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen } from 'lucide-react';
+import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions } from 'react-hook-form';
@@ -110,7 +110,7 @@ export default function EmployeeTable() {
 				</Button>
 			),
 			cell: ({ row }) => (
-				<span className='flex justify-center'>{row.getValue('role') ? row.getValue('role') : '--'}</span>
+				<span className='flex justify-start'>{row.getValue('role') ? row.getValue('role') : '--'}</span>
 			)
 		},
 		{
@@ -174,7 +174,7 @@ export default function EmployeeTable() {
 				</Button>
 			),
 			cell: ({ row }) => (
-				<span className='flex justify-center'>{row.getValue('level') ? row.getValue('level') : '--'}</span>
+				<span className='flex justify-start'>{row.getValue('level') ? row.getValue('level') : '--'}</span>
 			)
 		},
 		{
@@ -194,12 +194,28 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white'
+					className='text-white w-20'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Giới tính <ArrowUpDown />
 				</Button>
-			)
+			),
+			cell: ({ row }) => {
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('gender') ? (
+							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-blue-500 rounded-sm p-1'>
+								<Mars className='w-4 h-4 mr-1' stroke='white' />
+								Nam
+							</p>
+						) : (
+							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-pink-500 rounded-sm p-1'>
+								<Venus className='w-4 h-4 mr-1' stroke='white' /> Nữ
+							</p>
+						)}
+					</span>
+				);
+			}
 		},
 		{
 			accessorKey: 'email',

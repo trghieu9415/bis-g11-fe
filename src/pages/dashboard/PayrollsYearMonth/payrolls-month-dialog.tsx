@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,11 +9,20 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter
+} from '@/components/ui/dialog';
 
+import html2pdf from 'html2pdf.js';
 import { FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import ReactDOMServer from 'react-dom/server';
-import html2pdf from 'html2pdf.js';
+import removeAccents from 'remove-accents';
 
 type Payroll = {
 	id: number;
@@ -68,8 +75,6 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 		}
 	}, [isOpen]);
 
-	console.log(selectedPayroll);
-
 	const handleExportPayrollByMonth = () => {
 		const companyNameElement = `<div class='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
 																	<h1 class='text-lg font-bold text-center mb-1'>CÔNG TY INVERSE</h1>
@@ -81,7 +86,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 																<div class='flex flex-col justify-center items-center mb-4 w-full' id='monthly-pay-period'>
 																	<h2 class='text-base font-semibold text-center'>PHIẾU LƯƠNG</h2>
 																	<label htmlFor='monthYear' class='text-md font-medium'>
-																		Kỳ lương tháng
+																		Kỳ lương ${selectedPayroll?.monthOfYear?.replace(/(\d{4})-(\d{2})/, 'tháng $2 năm $1')}
 																	</label>
 																</div>`;
 
@@ -145,9 +150,11 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 			elementClone.innerHTML +=
 				newNetSalaryElement + `<div class="page-break" style="page-break-after: always;"></div>` + signElement;
 
+			const nameSlug = removeAccents(selectedPayroll?.fullName ?? '').replace(/\s+/g, '_');
+			const monthYearFormatted = selectedPayroll?.monthOfYear?.replace(/(\d{4})-(\d{2})/, '$2_$1');
 			const options = {
 				margin: 1,
-				filename: 'payroll_report.pdf',
+				filename: `BTC_ThuNhap_${nameSlug}_${monthYearFormatted}.pdf`,
 				image: { type: 'jpeg', quality: 0.98 },
 				html2canvas: { scale: 4 },
 				jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -212,7 +219,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 
 								<div className='grid grid-col grid-cols-2'>
 									<p className='mb-2 text-xs'>
-										<strong>Lương cơ bản:</strong> {selectedPayroll?.baseSalary}
+										<strong>Ngày công chuẩn:</strong> {selectedPayroll?.standardWorkingDays}
 									</p>
 									<p className='mb-2 text-xs'>
 										<strong>Ngày nghỉ bệnh:</strong> {selectedPayroll?.totalSickLeaves}
@@ -221,7 +228,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 
 								<div className='grid grid-col grid-cols-2'>
 									<p className='mb-2 text-xs'>
-										<strong>Hệ số lương:</strong> {selectedPayroll?.salaryCoefficient}
+										<strong></strong>
 									</p>
 									<p className='mb-2 text-xs'>
 										<strong>Nghỉ thai sản:</strong> {selectedPayroll?.totalMaternityLeaves}
@@ -230,7 +237,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 
 								<div className='grid grid-col grid-cols-2'>
 									<p className='mb-2 text-xs'>
-										<strong>Ngày công chuẩn:</strong> {selectedPayroll?.standardWorkingDays}
+										<strong></strong>
 									</p>
 									<p className='mb-2 text-xs'>
 										<strong>Nghỉ không phép:</strong> {selectedPayroll?.totalUnpaidLeaves}
@@ -248,17 +255,27 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 									<tbody>
 										<tr>
 											<td className='border border-gray-300 p-2'>1</td>
-											<td className='border border-gray-300 p-2'>Lương chính thức</td>
-											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.mainSalary} VNĐ</td>
+											<td className='border border-gray-300 p-2'>Lương cơ bản</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.baseSalary} VNĐ</td>
 										</tr>
 										<tr>
 											<td className='border border-gray-300 p-2'>2</td>
-											<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
-											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.allowance}</td>
+											<td className='border border-gray-300 p-2'>Hệ số lương</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.salaryCoefficient}</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>3</td>
+											<td className='border border-gray-300 p-2'>Lương Gross</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.mainSalary} VNĐ</td>
+										</tr>
+										<tr>
+											<td className='border border-gray-300 p-2'>4</td>
+											<td className='border border-gray-300 p-2'>Phụ cấp</td>
+											<td className='border border-gray-300 p-2 text-right'>{selectedPayroll?.allowance} VNĐ</td>
 										</tr>
 										<tr>
 											<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-												Tổng cộng:
+												Tổng cộng (3) + (4):
 											</td>
 											<td className='border border-gray-300 p-2 font-bold text-right'>
 												{selectedPayroll?.grossSalary} VNĐ
@@ -372,7 +389,38 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 							</div>
 						</div>
 					</div>
-					<div className='flex items-center w-full justify-end gap-2'>
+					<DialogFooter className='sm:justify-end'>
+						<div className='flex justify-end gap-2'>
+							<Button
+								className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+								onClick={() => {
+									setIsDialogOpen(false);
+									onClose();
+								}}
+							>
+								Thoát
+							</Button>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>
+										<FileText />
+										Xuất PDF
+									</Button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Xác nhận xuất PDF</AlertDialogTitle>
+										<AlertDialogDescription>Bạn có chắc chắn muốn xuất PDF này không?</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Thoát</AlertDialogCancel>
+										<AlertDialogAction onClick={handleExportPayrollByMonth}>Xác nhận</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
+						</div>
+					</DialogFooter>
+					{/* <div className='flex items-center w-full justify-end gap-2'>
 						<Button
 							className='w-full'
 							onClick={() => {
@@ -391,11 +439,8 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 							</AlertDialogTrigger>
 							<AlertDialogContent>
 								<AlertDialogHeader>
-									<AlertDialogTitle>Thông báo xem PDF</AlertDialogTitle>
-									<AlertDialogDescription>
-										Bạn có chắc chắn muốn xem bảng lương dưới dạng PDF không? Hành động này sẽ tạo ra một tệp PDF cho
-										bảng lương của bạn.
-									</AlertDialogDescription>
+									<AlertDialogTitle>Xác nhận xuất PDF</AlertDialogTitle>
+									<AlertDialogDescription>Bạn có chắc chắn muốn xuất PDF này không?</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
 									<AlertDialogCancel>Thoát</AlertDialogCancel>
@@ -403,7 +448,7 @@ export default function PayrollsMonthDialog({ isOpen, selectedPayroll, onClose }
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
-					</div>
+					</div> */}
 				</DialogContent>
 			</Dialog>
 		</>

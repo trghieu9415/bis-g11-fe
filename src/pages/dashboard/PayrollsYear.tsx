@@ -26,7 +26,7 @@ export default function SalaryMonth() {
 		dispatch(fetchPayrollsByYear(String(currentYear)));
 	}, []);
 
-	console.log(year.input, year.input.length);
+	// console.log(year.input, year.search);
 
 	return (
 		<div className='flex flex-col w-full'>
@@ -80,7 +80,7 @@ export default function SalaryMonth() {
 				</div>
 			</div>
 			<div className='mb-2'>
-				<PayrollsYearTable />
+				<PayrollsYearTable year={year.search} />
 			</div>
 		</div>
 	);

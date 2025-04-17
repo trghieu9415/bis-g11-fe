@@ -16,11 +16,14 @@ import payrollsYearByUserIDReducer from './slices/payrollsYearByUserIDSlice';
 import allowancesReducer from './slices/allowancesSlice';
 import payrollsByYearReducer from './slices/payrollsByYearSlice';
 import rolesReducer from './slices/rolesSlice';
+import payrollYearByUserReducer from './slices/payrollByYearAndUserIdSlice';
+import postToggleSidebarReducer from './slices/toggleSideBarSlice';
 import productsReducer from './slices/productSlice';
 import supplierReducer from './slices/supplierSlice';
 import authorReducer from './slices/authorSlice';
 import categoryReducer from './slices/categorySlice';
 import goodsReceiptReducer from './slices/goodReceiptsSlice';
+
 export const store = configureStore({
 	reducer: {
 		users: usersReducer,
@@ -39,6 +42,8 @@ export const store = configureStore({
 		payrollsYearByUserID: payrollsYearByUserIDReducer,
 		allowances: allowancesReducer,
 		payrollsByYear: payrollsByYearReducer,
+		payrollYearByUser: payrollYearByUserReducer,
+		isHideSidebar: postToggleSidebarReducer,
 		products: productsReducer,
 		supplier: supplierReducer,
 		author: authorReducer,

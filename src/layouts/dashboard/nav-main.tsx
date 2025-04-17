@@ -23,12 +23,15 @@ import { useSelector } from 'react-redux';
 export function NavMain() {
 	const dispatch = useAppDispatch();
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
+	const { isHideSidebar } = useSelector((state: RootState) => state.isHideSidebar);
 
 	useEffect(() => {
 		if (leaveRequests?.length == 0) {
 			dispatch(fetchAllLeaveRequests());
 		}
 	}, [dispatch]);
+
+	console.log('IS HIDE ON NAV MAIN: ', isHideSidebar);
 
 	const leaveStats = {
 		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,
@@ -59,14 +62,6 @@ export function NavMain() {
 					title: 'Hợp đồng lao động',
 					url: '/contracts'
 				}
-				// {
-				// 	title: 'Vi phạm',
-				// 	url: '#'
-				// },
-				// {
-				// 	title: 'Báo cáo nhân sự',
-				// 	url: '#'
-				// }
 			]
 		},
 		{
@@ -75,44 +70,14 @@ export function NavMain() {
 			icon: Hourglass,
 			isActive: true,
 			total: leaveStats.all,
-			items: [
-				// {
-				// 	title: 'Nghỉ phép',
-				// 	url: '/leave-requests/paid',
-				// 	total: leaveStats.leave
-				// },
-				// {
-				// 	title: 'Nghỉ thai sản',
-				// 	url: '/leave-requests/maternity',
-				// 	total: leaveStats.maternity
-				// },
-				// {
-				// 	title: 'Nghỉ bệnh',
-				// 	url: '/leave-requests/sick',
-				// 	total: leaveStats.sick
-				// },
-				// {
-				// 	title: 'Tất cả đơn',
-				// 	url: '/leave-requests',
-				// 	total: leaveStats.all
-				// }
-			]
+			items: []
 		},
 		{
 			title: 'Chấm công',
 			url: '/time-tracking/today',
 			icon: CalendarDays,
 			isActive: true,
-			items: [
-				// {
-				// 	title: 'Theo ngày',
-				// 	url: '/time-tracking/today'
-				// }
-				// {
-				// 	title: 'Theo tháng',
-				// 	url: '/time-tracking/month'
-				// }
-			]
+			items: []
 		},
 		{
 			title: 'Bảng lương',
@@ -184,9 +149,9 @@ export function NavMain() {
 						<SidebarMenuItem key={item.title}>
 							<SidebarMenuButton tooltip={item.title} asChild>
 								<div className='flex items-center justify-between'>
-									<NavLink to={item.url} className='flex  items-center gap-2 w-full'>
+									<NavLink to={item.url} className={`flex items-center gap-2 w-full`}>
 										{item.icon && <item.icon size={16} />}
-										<span>{item.title}</span>
+										<span className={`${isHideSidebar && 'hidden'}`}>{item.title}</span>
 									</NavLink>
 									{typeof item.total === 'number' && item.total > 0 && (
 										<Badge className='w-1 flex justify-center bg-red-800'>{item.total}</Badge>
