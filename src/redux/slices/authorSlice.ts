@@ -60,6 +60,5 @@ const authorSlice = createSlice({
 	}
 });
 
-export const {} = authorSlice.actions;
 
 export default authorSlice.reducer;

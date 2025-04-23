@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/services/customize-axios';
+import { json } from 'stream/consumers';
 
 interface LoginResponse {
 	accessToken: string;
@@ -80,6 +81,7 @@ export const loginUser = createAsyncThunk(
 				}
 			});
 
+			localStorage.setItem('profile', JSON.stringify(profileResponse.data));
 			console.log('Profile response:', profileResponse.data);
 
 			// Return combined result

@@ -43,7 +43,7 @@ const LoginForm = () => {
 			// This will handle both login and profile fetch
 			const profile = await dispatch(loginUser(payload)).unwrap();
 			console.log('Login successful with profile:', profile);
-
+				
 			toast.success('Đăng nhập thành công!');
 			navigate('/dashboard');
 		} catch (err: any) {
