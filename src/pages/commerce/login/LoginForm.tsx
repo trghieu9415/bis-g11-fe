@@ -39,24 +39,22 @@ const LoginForm = () => {
 		try {
 			const payload = { ...values, platform: 'WEB' };
 			console.log('Submitting login form:', payload);
-			
+
 			// This will handle both login and profile fetch
 			const profile = await dispatch(loginUser(payload)).unwrap();
 			console.log('Login successful with profile:', profile);
-			
+
 			toast.success('Đăng nhập thành công!');
 			navigate('/dashboard');
 		} catch (err: any) {
 			console.error('Login error:', err);
-			toast.error(typeof err === 'string' ? err : (error || 'Đăng nhập thất bại, vui lòng thử lại!'));
+			toast.error(typeof err === 'string' ? err : error || 'Đăng nhập thất bại, vui lòng thử lại!');
 		}
 	};
 
 	return (
-		<div className='flex min-h-screen flex-col items-center justify-center'>
-			<form onSubmit={handleSubmit(onSubmit)} className='w-96 rounded-lg bg-gray-800 p-6 shadow-md'>
-				<h2 className='mb-4 text-2xl text-white'>Đăng nhập</h2>
-
+		<div className='relative left-0 top-0 z-50 flex flex-col items-center justify-center'>
+			<form onSubmit={handleSubmit(onSubmit)} className='w-96 p-6'>
 				{/* Username Field */}
 				<div className='mb-4'>
 					<label className='mb-1 block text-white'>Username</label>
