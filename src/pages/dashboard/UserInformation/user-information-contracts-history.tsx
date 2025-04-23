@@ -272,7 +272,7 @@ export default function UserInformationContractsHistory() {
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Đại diện cho: </strong>
-																		Công ty TNHH Inverse
+																		Công ty TNHH INKVERSE
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Chức vụ: </strong>
@@ -318,7 +318,7 @@ export default function UserInformationContractsHistory() {
 																				</p>
 																				<p className='ml-2'>
 																					<strong>Địa điểm làm việc: </strong>
-																					Công ty TNHH Inverse
+																					Công ty TNHH INKVERSE
 																				</p>
 																				<p className='ml-2'>
 																					<strong>Chức vụ/chức danh chuyên môn: </strong>
