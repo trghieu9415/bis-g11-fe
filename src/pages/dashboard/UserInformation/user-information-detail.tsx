@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
@@ -35,9 +35,44 @@ type Employee = {
 	password: string | null;
 };
 
-export default function UserInformationDetail() {
-	const dispatch = useAppDispatch();
-	const { user } = useSelector((state: RootState) => state.user);
+type ResContractDTO = {
+	baseSalary: number;
+	endDate: string;
+	expiryDate: string;
+	fullName: string;
+	id: number;
+	idString: string;
+	levelName: string;
+	roleName: string;
+	salaryCoefficient: number;
+	seniorityId: number;
+	startDate: string;
+	status: number;
+	userId: number;
+};
+
+type UserInfo = {
+	id: number;
+	idString: string;
+	fullName: string;
+	email: string;
+	phoneNumber: string;
+	gender: 'MALE' | 'FEMALE' | string;
+	dateOfBirth: string;
+	address: string;
+	username: string;
+	createdAt: string;
+	status: number;
+	resContractDTO?: ResContractDTO;
+};
+
+interface userInformationDetailProps {
+	userInfo: UserInfo;
+}
+
+export default function UserInformationDetail({ userInfo }: userInformationDetailProps) {
+	// const dispatch = useAppDispatch();
+	// const { user } = useSelector((state: RootState) => state.user);
 	const { users } = useSelector((state: RootState) => state.users);
 	const {
 		register,
@@ -50,13 +85,13 @@ export default function UserInformationDetail() {
 		formState: { errors }
 	} = useForm<Employee>({
 		defaultValues: {
-			fullName: user.fullName,
-			gender: user.gender,
-			email: user.email,
-			phoneNumber: user.phoneNumber,
-			dateOfBirth: user.dateOfBirth,
-			address: user.address,
-			username: user.username,
+			fullName: userInfo?.fullName,
+			gender: userInfo?.gender,
+			email: userInfo?.email,
+			phoneNumber: userInfo?.phoneNumber,
+			dateOfBirth: userInfo?.dateOfBirth,
+			address: userInfo?.address,
+			username: userInfo?.username,
 			password: ''
 		}
 	});
@@ -64,25 +99,19 @@ export default function UserInformationDetail() {
 	const formData = watch();
 
 	useEffect(() => {
-		if (!user || !user.id) {
-			dispatch(fetchUserDetail(2));
-		} else {
+		if (userInfo) {
 			reset({
-				fullName: user.fullName,
-				gender: user.gender,
-				email: user.email,
-				phoneNumber: user.phoneNumber,
-				dateOfBirth: user.dateOfBirth,
-				address: user.address,
-				username: user.username,
+				fullName: userInfo?.fullName,
+				gender: userInfo?.gender,
+				email: userInfo?.email,
+				phoneNumber: userInfo?.phoneNumber,
+				dateOfBirth: userInfo?.dateOfBirth,
+				address: userInfo?.address,
+				username: userInfo?.username,
 				password: ''
 			});
 		}
-
-		if (users.length === 0) {
-			dispatch(fetchUsers());
-		}
-	}, [dispatch, user, reset]);
+	}, [userInfo, reset]);
 
 	const handleResetClick = () => {
 		reset();
@@ -122,11 +151,14 @@ export default function UserInformationDetail() {
 
 		const email = getValues('email');
 		const phone = getValues('phoneNumber');
-		const isExist = checkUserExistence(user.id, email, phone, setError);
+		let isExist = true;
 
-		if (isValid && !isExist && user?.id) {
+		if (userInfo?.id) {
+			isExist = checkUserExistence(userInfo?.id, email, phone, setError);
+		}
+
+		if (isValid && !isExist && userInfo?.id) {
 			try {
-				const userId = user.id;
 				const updatedUserData = {
 					fullName: formData.fullName,
 					phoneNumber: formData.phoneNumber,
@@ -138,9 +170,19 @@ export default function UserInformationDetail() {
 					password: ''
 				};
 
-				await updateUser(userId, updatedUserData);
+				await updateUser(userInfo?.id, updatedUserData);
 				toast.success('Cập nhật thông tin nhân viên thành công!');
-				dispatch(fetchUserDetail(2));
+
+				userInfo.fullName = formData.fullName;
+				userInfo.phoneNumber = formData.phoneNumber;
+				userInfo.email = formData.email;
+				userInfo.dateOfBirth = formData.dateOfBirth;
+				userInfo.address = formData.address;
+				userInfo.gender = formData.gender;
+				userInfo.username = formData.username;
+				localStorage.setItem('profile', JSON.stringify(userInfo));
+
+				// dispatch(fetchUserDetail(2));
 			} catch (error) {
 				const err = error as AxiosError;
 
@@ -158,24 +200,25 @@ export default function UserInformationDetail() {
 	};
 
 	return (
-		user?.id && (
-			<div className='bg-white px-4 py-6 border-gray-200 border-solid border rounded-md h-full max-w-[50vw]'>
-				<h1 className='text-lg font-bold uppercase text-center'>Chào mừng đến với thông tin tài khoản</h1>
+		userInfo &&
+		userInfo?.id && (
+			<div className='h-full max-w-[50vw] rounded-md border border-solid border-gray-200 bg-white px-4 py-6'>
+				<h1 className='text-center text-lg font-bold uppercase'>Chào mừng đến với thông tin tài khoản</h1>
 				<p className='text-center'>Quản lý thông tin cá nhân, cập nhật hồ sơ và thiết lập tài khoản của bạn tại đây.</p>
-				<div className='mt-6 p-4 overflow-auto'>
-					<span className='mb-5 pb-[2px] block font-bold text-lg border-solid border-b-2 border-gray-200'>
+				<div className='mt-6 overflow-auto p-4'>
+					<span className='mb-5 block border-b-2 border-solid border-gray-200 pb-[2px] text-lg font-bold'>
 						<h2>Thông tin cá nhân</h2>
 					</span>
 					<div className='grid grid-cols-2 gap-4'>
 						<div className='grid grid-cols-4 gap-4'>
 							<div className='col-span-1'>
-								<label htmlFor='id' className='text-sm mb-1 block'>
+								<label htmlFor='id' className='mb-1 block text-sm'>
 									<strong>Mã ID</strong>
 								</label>
-								<Input type='text' id='id' readOnly value={2} disabled />
+								<Input type='text' id='id' readOnly value={`${userInfo?.idString}`} disabled />
 							</div>
 							<div className='col-span-3'>
-								<label htmlFor='fullname' className='text-sm mb-1 block'>
+								<label htmlFor='fullname' className='mb-1 block text-sm'>
 									<strong>Họ và tên</strong>
 								</label>
 								<Input
@@ -189,12 +232,12 @@ export default function UserInformationDetail() {
 										}
 									})}
 								/>
-								{errors.fullName && <p className='text-red-500 text-sm'>{errors.fullName.message}</p>}
+								{errors.fullName && <p className='text-sm text-red-500'>{errors.fullName.message}</p>}
 							</div>
 						</div>
 						<div className='grid grid-cols-2 gap-4'>
 							<div>
-								<label htmlFor='gender' className='text-sm mb-1 block'>
+								<label htmlFor='gender' className='mb-1 block text-sm'>
 									<strong>Giới tính</strong>
 								</label>
 								<Select
@@ -202,10 +245,10 @@ export default function UserInformationDetail() {
 									onValueChange={value => setValue('gender', value)}
 									{...register('gender', { required: 'Vui lòng chọn giới tính' })}
 								>
-									<SelectTrigger id='gender' className='text-sm w-full border p-2 rounded-md'>
+									<SelectTrigger id='gender' className='w-full rounded-md border p-2 text-sm'>
 										<SelectValue placeholder='Chọn giới tính' />
 									</SelectTrigger>
-									<SelectContent className='bg-white border border-gray-300 shadow-lg rounded-md z-10 w-full'>
+									<SelectContent className='z-10 w-full rounded-md border border-gray-300 bg-white shadow-lg'>
 										<SelectItem value='MALE' className='w-full flex-1'>
 											Nam
 										</SelectItem>
@@ -214,15 +257,15 @@ export default function UserInformationDetail() {
 										</SelectItem>
 									</SelectContent>
 								</Select>
-								{errors.gender && <p className='text-red-500 text-sm'>{errors.gender.message}</p>}
+								{errors.gender && <p className='text-sm text-red-500'>{errors.gender.message}</p>}
 							</div>
 							<div>
-								<label htmlFor='date_of_birth' className='text-sm mb-1 block'>
+								<label htmlFor='date_of_birth' className='mb-1 block text-sm'>
 									<strong>Ngày sinh</strong>
 								</label>
 								<Input
 									type='date'
-									className='text-sm block w-full'
+									className='block w-full text-sm'
 									id='date_of_birth'
 									{...register('dateOfBirth', {
 										required: 'Vui lòng chọn ngày sinh',
@@ -246,19 +289,19 @@ export default function UserInformationDetail() {
 										}
 									})}
 								/>
-								{errors.dateOfBirth && <p className='text-red-500 text-sm'>{errors.dateOfBirth.message}</p>}
+								{errors.dateOfBirth && <p className='text-sm text-red-500'>{errors.dateOfBirth.message}</p>}
 							</div>
 						</div>
 					</div>
 
-					<div className='grid grid-cols-2 gap-4 mt-4'>
+					<div className='mt-4 grid grid-cols-2 gap-4'>
 						<div>
-							<label htmlFor='email' className='text-sm mb-1 block'>
+							<label htmlFor='email' className='mb-1 block text-sm'>
 								<strong>Email</strong>
 							</label>
 							<Input
 								type='email'
-								className='text-sm block w-full'
+								className='block w-full text-sm'
 								id='email'
 								{...register('email', {
 									required: 'Vui lòng nhập email',
@@ -268,15 +311,15 @@ export default function UserInformationDetail() {
 									}
 								})}
 							/>
-							{errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}{' '}
+							{errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}{' '}
 						</div>
 						<div>
-							<label htmlFor='phone' className='text-sm mb-1 block'>
+							<label htmlFor='phone' className='mb-1 block text-sm'>
 								<strong>Số điện thoại</strong>
 							</label>
 							<Input
 								type='number'
-								className='text-sm block w-full'
+								className='block w-full text-sm'
 								id='phone'
 								{...register('phoneNumber', {
 									required: 'Vui lòng nhập số điện thoại',
@@ -286,13 +329,13 @@ export default function UserInformationDetail() {
 									}
 								})}
 							/>
-							{errors.phoneNumber && <p className='text-red-500 text-sm'>{errors.phoneNumber.message}</p>}{' '}
+							{errors.phoneNumber && <p className='text-sm text-red-500'>{errors.phoneNumber.message}</p>}{' '}
 						</div>
 					</div>
 
-					<div className='grid grid-cols-1 gap-4 mt-4'>
+					<div className='mt-4 grid grid-cols-1 gap-4'>
 						<div>
-							<label htmlFor='address' className='text-sm mb-1 block'>
+							<label htmlFor='address' className='mb-1 block text-sm'>
 								<strong>Địa chỉ</strong>
 							</label>
 							<Input
@@ -301,29 +344,33 @@ export default function UserInformationDetail() {
 								id='address'
 								{...register('address', {
 									required: 'Vui lòng nhập địa chỉ',
-									pattern: {
-										value:
-											/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-										message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+									minLength: {
+										value: 3,
+										message: 'Địa chỉ phải có ít nhất 10 ký tự'
 									}
+									// pattern: {
+									// 	value:
+									// 		/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
+									// 	message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+									// }
 								})}
 							/>
-							{errors.address && <p className='text-red-500 text-sm'>{errors.address.message}</p>}
+							{errors.address && <p className='text-sm text-red-500'>{errors.address.message}</p>}
 						</div>
 					</div>
 
-					<span className='mt-8 mb-5 pb-[2px] block font-bold text-lg border-solid border-b-2 border-gray-200'>
+					<span className='mb-5 mt-8 block border-b-2 border-solid border-gray-200 pb-[2px] text-lg font-bold'>
 						<h2>Thông tin tài khoản</h2>
 					</span>
 					<div className='grid grid-cols-2 gap-4'>
 						<div>
-							<label htmlFor='username' className='text-sm mb-1 block'>
+							<label htmlFor='username' className='mb-1 block text-sm'>
 								<strong>Tên tài khoản</strong>
 							</label>
-							<Input type='text' className='block w-full' id='username' disabled value={user.username} />
+							<Input type='text' className='block w-full' id='username' disabled value={userInfo?.username} />
 						</div>
 						<div>
-							<label htmlFor='password' className='text-sm mb-1 block'>
+							<label htmlFor='password' className='mb-1 block text-sm'>
 								<strong>Mật khẩu (Để trống để giữ nguyên)</strong>
 							</label>
 							<Input
@@ -337,14 +384,14 @@ export default function UserInformationDetail() {
 									}
 								})}
 							/>
-							{errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
+							{errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
 						</div>
 					</div>
 				</div>
 
-				<div className='mt-4 flex justify-center items-center gap-2 float-end'>
+				<div className='float-end mt-4 flex items-center justify-center gap-2'>
 					<Button
-						className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+						className='rounded-md border bg-white px-4 py-2 text-black transition hover:bg-gray-100'
 						onClick={handleResetClick}
 					>
 						Reset

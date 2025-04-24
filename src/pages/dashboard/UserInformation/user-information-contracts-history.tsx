@@ -37,13 +37,48 @@ interface ApiResponse {
 	salaryCoefficient: number;
 }
 
-export default function UserInformationContractsHistory() {
+type ResContractDTO = {
+	baseSalary: number;
+	endDate: string;
+	expiryDate: string;
+	fullName: string;
+	id: number;
+	idString: string;
+	levelName: string;
+	roleName: string;
+	salaryCoefficient: number;
+	seniorityId: number;
+	startDate: string;
+	status: number;
+	userId: number;
+};
+
+type UserInfo = {
+	id: number;
+	idString: string;
+	fullName: string;
+	email: string;
+	phoneNumber: string;
+	gender: 'MALE' | 'FEMALE' | string;
+	dateOfBirth: string;
+	address: string;
+	username: string;
+	createdAt: string;
+	status: number;
+	resContractDTO?: ResContractDTO;
+};
+
+interface userInformationDetailProps {
+	userInfo: UserInfo;
+}
+
+export default function UserInformationContractsHistory({ userInfo }: userInformationDetailProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [filteredContracts, setFilteredContracts] = useState<ApiResponse[]>([]);
 	const [openItem, setOpenItem] = useState('');
 
 	const dispatch = useAppDispatch();
-	const { user } = useSelector((state: RootState) => state.user);
+	// const { user } = useSelector((state: RootState) => state.user);
 	const { contracts } = useSelector((state: RootState) => state.contractsByUserID);
 
 	const {
@@ -66,10 +101,10 @@ export default function UserInformationContractsHistory() {
 	const formData = watch();
 
 	useEffect(() => {
-		if (contracts?.length == 0 && user?.id) {
-			dispatch(fetchAllContractsByUserId(user.id));
+		if (contracts?.length == 0 && userInfo?.id) {
+			dispatch(fetchAllContractsByUserId(userInfo?.id));
 		}
-	}, [dispatch, user]);
+	}, [dispatch, userInfo]);
 
 	useEffect(() => {
 		if (contracts && contracts.length > 0) {
@@ -109,18 +144,18 @@ export default function UserInformationContractsHistory() {
 	};
 
 	return (
-		<div className='bg-white flex flex-col items-center justify-between flex-1 gap-4 h-full max-h-[100%]'>
-			<div className='px-4 py-6 flex-1 w-full  border-gray-200 border-solid border rounded-md h-full overflow-y-auto'>
-				<h1 className='text-base font-bold uppercase text-center'>Lịch sử hợp đồng</h1>
-				<div className='flex justify-center items-center gap-2 mt-2 '>
-					<div className='flex gap-2 mb-4'>
+		<div className='flex h-full max-h-[100%] flex-1 flex-col items-center justify-between gap-4 bg-white'>
+			<div className='h-full w-full flex-1 overflow-y-auto rounded-md border border-solid border-gray-200 px-4 py-6'>
+				<h1 className='text-center text-base font-bold uppercase'>Lịch sử hợp đồng</h1>
+				<div className='mt-2 flex items-center justify-center gap-2'>
+					<div className='mb-4 flex gap-2'>
 						<div>
 							<Input
 								type='date'
 								placeholder='Từ ngày'
 								{...register('startDate', { required: 'Vui lòng chọn ngày bắt đầu' })}
 							/>
-							{errors.startDate && <p className='text-red-500 text-sm text-start mb-2'>{errors.startDate.message}</p>}
+							{errors.startDate && <p className='mb-2 text-start text-sm text-red-500'>{errors.startDate.message}</p>}
 						</div>
 
 						<div>
@@ -140,7 +175,7 @@ export default function UserInformationContractsHistory() {
 									}
 								})}
 							/>
-							{errors.endDate && <p className='text-red-500 text-sm text-start mb-2'>{errors.endDate.message}</p>}
+							{errors.endDate && <p className='mb-2 text-start text-sm text-red-500'>{errors.endDate.message}</p>}
 						</div>
 						<Button variant='outline' onClick={handleReset}>
 							<ListRestart />
@@ -174,16 +209,16 @@ export default function UserInformationContractsHistory() {
 											year: 'numeric'
 										})}
 										{item.status === 0 ? (
-											<span className='flex items-center text-red-500 font-bold flex-1 justify-end mr-2 float-end'>
-												<XCircle className='w-4 h-4 text-red-500 mr-1' /> Hết hạn
+											<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-red-500'>
+												<XCircle className='mr-1 h-4 w-4 text-red-500' /> Hết hạn
 											</span>
 										) : item.status === 1 ? (
-											<span className='flex items-center text-green-600 font-bold flex-1 justify-end mr-2 float-end'>
-												<CheckCircle className='w-4 h-4 text-green-600 mr-1' /> Còn hiệu lực
+											<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-green-600'>
+												<CheckCircle className='mr-1 h-4 w-4 text-green-600' /> Còn hiệu lực
 											</span>
 										) : (
-											<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
-												<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
+											<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-gray-400'>
+												<HelpCircle className='mr-1 h-4 w-4 text-gray-400' /> Không xác định
 											</span>
 										)}
 									</AccordionTrigger>
@@ -225,15 +260,15 @@ export default function UserInformationContractsHistory() {
 											year: 'numeric'
 										})}
 									</p> */}
-										<div className='flex items-center justify-end gap-1 mt-4'>
+										<div className='mt-4 flex items-center justify-end gap-1'>
 											<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 												<DialogTrigger asChild>
-													<Button className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center bg-gray-100 text-black hover:bg-gray-200'>
+													<Button className='h-[32px] w-full items-center justify-start border-none bg-gray-100 px-[8px] py-[6px] text-black hover:bg-gray-200'>
 														<Info /> Chi tiết
 													</Button>
 												</DialogTrigger>
 												<DialogContent
-													className='!w-[70vw] !max-w-none !max-h-[90vh] h-[800px] flex items-start justify-start flex-col'
+													className='flex h-[800px] !max-h-[90vh] !w-[70vw] !max-w-none flex-col items-start justify-start'
 													onOpenAutoFocus={e => e.preventDefault()}
 												>
 													<DialogHeader>
@@ -244,28 +279,28 @@ export default function UserInformationContractsHistory() {
 														</DialogDescription>
 													</DialogHeader>
 
-													<div className='flex flex-col gap-2 w-full flex-1'>
+													<div className='flex w-full flex-1 flex-col gap-2'>
 														{item.status === 0 ? (
-															<span className='flex items-center text-red-500 font-bold flex-1 justify-end mr-2 float-end'>
-																<XCircle className='w-4 h-4 text-red-500 mr-1' /> Hết hạn
+															<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-red-500'>
+																<XCircle className='mr-1 h-4 w-4 text-red-500' /> Hết hạn
 															</span>
 														) : item.status === 1 ? (
-															<span className='flex items-center text-green-600 font-bold flex-1 justify-end mr-2 float-end'>
-																<CheckCircle className='w-4 h-4 text-green-600 mr-1' /> Còn hiệu lực
+															<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-green-600'>
+																<CheckCircle className='mr-1 h-4 w-4 text-green-600' /> Còn hiệu lực
 															</span>
 														) : (
-															<span className='flex items-center text-gray-400 font-bold flex-1 justify-end mr-2 float-end'>
-																<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
+															<span className='float-end mr-2 flex flex-1 items-center justify-end font-bold text-gray-400'>
+																<HelpCircle className='mr-1 h-4 w-4 text-gray-400' /> Không xác định
 															</span>
 														)}
 														<div className='h-full'>
-															<Tabs defaultValue='general-info' className='text-center h-[460px] overflow-y-auto'>
+															<Tabs defaultValue='general-info' className='h-[460px] overflow-y-auto text-center'>
 																<TabsList className='mb-1'>
 																	<TabsTrigger value='general-info'>Thông tin chung</TabsTrigger>
 																	<TabsTrigger value='term-job'>Điều khoản</TabsTrigger>
 																</TabsList>
 																<TabsContent value='general-info' className='text-start'>
-																	<h2 className='font-bold text-base border-b-[1px] mb-2 pb-1'>Bên sử dụng lao động</h2>
+																	<h2 className='mb-2 border-b-[1px] pb-1 text-base font-bold'>Bên sử dụng lao động</h2>
 																	<p className='ml-2'>
 																		<strong>Chúng tôi, một bên là: </strong>
 																		Ông Lữ Quang Minh
@@ -280,35 +315,35 @@ export default function UserInformationContractsHistory() {
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Địa chỉ: </strong>
-																		118/1 Nguyên Hồng, Phường 1, Quận Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam
+																		273 An Dương Vương, P.3, Q.5, TP.HCM
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Điện thoại: </strong>
-																		0931814480
+																		(028) 38 354409 – 38 352309
 																	</p>
 
-																	<h2 className='font-bold text-base mt-4 border-b-[1px] mb-2 pb-1'>Bên lao động</h2>
+																	<h2 className='mb-2 mt-4 border-b-[1px] pb-1 text-base font-bold'>Bên lao động</h2>
 																	<p className='ml-2'>
 																		<strong>Họ và tên: </strong>
-																		{user.fullName}
+																		{userInfo?.fullName}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Ngày sinh: </strong>
-																		{user.dateOfBirth}
+																		{userInfo?.dateOfBirth}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Địa chỉ: </strong>
-																		{user.address}
+																		{userInfo?.address}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Số điện thoại: </strong>
-																		{user.phoneNumber}
+																		{userInfo?.phoneNumber}
 																	</p>
 																</TabsContent>
 																<TabsContent value='term-job' className='text-start'>
 																	<Accordion type='single' collapsible>
 																		<AccordionItem value='item-1'>
-																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																			<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																				Điều 1: Điều khoản và công việc
 																			</AccordionTrigger>
 																			<AccordionContent className='ml-2 text-base'>
@@ -331,7 +366,7 @@ export default function UserInformationContractsHistory() {
 																			</AccordionContent>
 																		</AccordionItem>
 																		<AccordionItem value='item-2'>
-																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																			<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																				Điều 2: Thời Gian Làm Việc
 																			</AccordionTrigger>
 																			<AccordionContent className='ml-2 text-base'>
@@ -339,13 +374,13 @@ export default function UserInformationContractsHistory() {
 																			</AccordionContent>
 																		</AccordionItem>
 																		<AccordionItem value='item-3'>
-																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																			<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																				Điều 3: Quyền Lợi và Nghĩa Vụ của Người Lao Động
 																			</AccordionTrigger>
 																			<AccordionContent className='ml-2 text-base'>
 																				<Accordion type='single' collapsible>
 																					<AccordionItem value='item-3-1'>
-																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																						<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																							Điều 3.1: Quyền lợi
 																						</AccordionTrigger>
 																						<AccordionContent className='ml-2 text-base'>
@@ -381,7 +416,7 @@ export default function UserInformationContractsHistory() {
 																						</AccordionContent>
 																					</AccordionItem>
 																					<AccordionItem value='item-3-2'>
-																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																						<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																							Điều 3.2: Nghĩa vụ
 																						</AccordionTrigger>
 																						<AccordionContent className='ml-2 text-base'>
@@ -397,13 +432,13 @@ export default function UserInformationContractsHistory() {
 																			</AccordionContent>
 																		</AccordionItem>
 																		<AccordionItem value='item-4'>
-																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																			<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																				Điều 4: Quyền và Nghĩa Vụ của Người Sử Dụng Lao Động
 																			</AccordionTrigger>
 																			<AccordionContent className='ml-2 text-base'>
 																				<Accordion type='single' collapsible>
 																					<AccordionItem value='item-4-1'>
-																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																						<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																							Điều 4.1: Nghĩa vụ
 																						</AccordionTrigger>
 																						<AccordionContent className='ml-2 text-base'>
@@ -416,7 +451,7 @@ export default function UserInformationContractsHistory() {
 																						</AccordionContent>
 																					</AccordionItem>
 																					<AccordionItem value='item-4-2'>
-																						<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																						<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																							Điều 4.2: Quyền hạn
 																						</AccordionTrigger>
 																						<AccordionContent className='ml-2 text-base'>
@@ -430,7 +465,7 @@ export default function UserInformationContractsHistory() {
 																			</AccordionContent>
 																		</AccordionItem>
 																		<AccordionItem value='item-5'>
-																			<AccordionTrigger className='font-bold text-base border-b-[1px] mb-2 pb-1'>
+																			<AccordionTrigger className='mb-2 border-b-[1px] pb-1 text-base font-bold'>
 																				Điều 5: Điều Khoản Chung
 																			</AccordionTrigger>
 																			<AccordionContent className='ml-2 text-base'>
@@ -464,10 +499,10 @@ export default function UserInformationContractsHistory() {
 														</div>
 													</div>
 
-													<div className={`flex items-center justify-end gap-2 w-full`}>
+													<div className={`flex w-full items-center justify-end gap-2`}>
 														<Button
 															onClick={() => setIsDialogOpen(false)}
-															className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-800 transition '
+															className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-800'
 														>
 															Thoát
 														</Button>
@@ -480,7 +515,7 @@ export default function UserInformationContractsHistory() {
 							);
 						})
 					) : (
-						<p className='text-center text-gray-500 py-4'>Không có hợp đồng</p>
+						<p className='py-4 text-center text-gray-500'>Không có hợp đồng</p>
 					)}
 				</Accordion>
 			</div>

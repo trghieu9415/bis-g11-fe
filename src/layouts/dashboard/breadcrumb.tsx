@@ -20,6 +20,7 @@ export function DashboardBreadcrumb() {
 	useEffect(() => {
 		for (const [key, pattern] of Object.entries(routes)) {
 			if (matchPath({ path: pattern, end: true }, location.pathname)) {
+				console.log('KEY: ', key);
 				switch (key) {
 					case 'userInformation':
 						setNav([
@@ -100,6 +101,52 @@ export function DashboardBreadcrumb() {
 						]);
 						break;
 
+					// For sales
+					case 'newOrder':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Đơn hàng mới', link: routes.newOrder }
+						]);
+						break;
+					case 'orders':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Danh sách đơn hàng', link: routes.orders }
+						]);
+						break;
+					case 'customers':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Danh sách khách hàng', link: routes.customers }
+						]);
+						break;
+
+					// For warehouse
+					case 'products':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Danh sách sản phẩm', link: routes.products }
+						]);
+						break;
+					case 'author':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Danh sách tác giả', link: routes.author }
+						]);
+						break;
+					case 'category':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Danh sách danh mục', link: routes.category }
+						]);
+						break;
+					case 'inventory':
+						setNav([
+							{ title: 'Trang chủ', link: '/' },
+							{ title: 'Nhập sách', link: routes.inventory }
+						]);
+						break;
+
 					default:
 						setNav([{ title: 'Trang chủ', link: '/' }]);
 						break;
@@ -122,7 +169,7 @@ export function DashboardBreadcrumb() {
 						);
 					} else {
 						return (
-							<div className='flex justify-center items-center gap-2' key={idx}>
+							<div className='flex items-center justify-center gap-2' key={idx}>
 								<BreadcrumbItem>
 									{item.link ? (
 										<BreadcrumbLink href={item.link}>{item.title}</BreadcrumbLink>

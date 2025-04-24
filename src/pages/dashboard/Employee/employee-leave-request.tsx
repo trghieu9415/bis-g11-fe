@@ -205,7 +205,7 @@ export default function EmployeeLeaveRequest() {
 												const selectedDate = new Date(value);
 												selectedDate.setHours(0, 0, 0, 0);
 
-												return selectedDate > today || 'Ngày bắt đầu phải sau hôm nay';
+												return selectedDate >= today || 'Ngày bắt đầu phải là ngày hôm nay hoặc sau hôm nay';
 											}
 										})}
 									/>
