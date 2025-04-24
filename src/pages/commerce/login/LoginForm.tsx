@@ -32,7 +32,7 @@ const LoginForm = () => {
 	useEffect(() => {
 		// Redirect if already authenticated
 		if (isAuthenticated) {
-			navigate('/dashboard');
+			navigate('/');
 		}
 	}, [isAuthenticated, navigate]);
 
@@ -46,7 +46,7 @@ const LoginForm = () => {
 			console.log('Login successful with profile:', profile);
 
 			toast.success('Đăng nhập thành công!');
-			navigate('/dashboard');
+			navigate('/');
 		} catch (err: any) {
 			console.error('Login error:', err);
 			toast.error(typeof err === 'string' ? err : error || 'Đăng nhập thất bại, vui lòng thử lại!');
@@ -80,7 +80,7 @@ const LoginForm = () => {
 				</button>
 
 				{/* Forgot password */}
-				<div className='w-100 pb-4 pt-2 text-end text-white underline'>
+				<div className='w-100 pb-4 pt-4 text-end text-white underline'>
 					<Link to='/forgot-password' className='hover:text-blue-400'>
 						Quên mật khẩu?
 					</Link>
