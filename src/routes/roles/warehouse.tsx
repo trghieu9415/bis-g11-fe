@@ -9,6 +9,7 @@ import Supplier from '@/pages/commerce/Supplier';
 
 // WAREHOUSE routes
 export const warehouseRoutes = [
+	{ path: config.routes.warehouse, component: Products, layout: CommerceLayout },
 	{ path: config.routes.products, component: Products, layout: CommerceLayout },
 	{ path: config.routes.supplier, component: Supplier, layout: CommerceLayout },
 	{ path: config.routes.author, component: Author, layout: CommerceLayout },

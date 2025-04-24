@@ -50,6 +50,7 @@ function App() {
 
 	const role = profile?.resContractDTO?.roleName;
 	const roleRoutes = getRoutesByRole(role);
+	console.log(roleRoutes);
 
 	return (
 		<Router>

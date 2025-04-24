@@ -1,8 +1,11 @@
+import { businessRoutes } from '@/routes/roles/business';
+
 const routes = {
 	home: '/',
 	userInformation: '/user',
 
 	// For HR
+	hr: '/',
 	hremployee: '/hr/hremployee',
 	contracts: '/hr/contracts',
 	leaveRequests: '/hr/leave-requests',
@@ -15,17 +18,20 @@ const routes = {
 	roles: '/hr/roles',
 
 	// For sales
+	sales: '/',
 	newOrder: `/sales/new-order`,
 	orders: `/sales/orders`,
 	customers: `/sales/customers`,
 
 	// For business
+	business: '/',
 	newOrderBussiness: `/business/new-order`,
 	ordersBussiness: `/business/orders`,
 	customersBussiness: `/business/customers`,
 	// statistics: ???
 
 	// For warehouse employee
+	warehouse: '/',
 	products: '/warehouse/products',
 	supplier: '/warehouse/suppliers',
 	author: '/warehouse/author',

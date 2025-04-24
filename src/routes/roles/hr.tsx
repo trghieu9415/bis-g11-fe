@@ -12,6 +12,7 @@ import TimeTrackingToday from '@/pages/dashboard/TimeTrackingToday';
 
 // HR routes
 export const hrRoutes = [
+	{ path: config.routes.hr, component: HREmployees, layout: DashboardLayout },
 	{ path: config.routes.hremployee, component: HREmployees, layout: DashboardLayout },
 	{ path: config.routes.contracts, component: Contracts, layout: DashboardLayout },
 	{ path: config.routes.leaveRequests, component: AllLeaveRequests, layout: DashboardLayout },
