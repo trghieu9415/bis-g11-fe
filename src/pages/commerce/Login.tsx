@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import LoginForm from './login/LoginForm';
-import { Link } from 'react-router-dom';
 
 const Login = () => {
 	return (
@@ -20,21 +19,16 @@ const Login = () => {
 
 				<div className='relative'>
 					<LoginForm />
+
 					<div className='absolute left-0 top-0 z-10 h-full w-full rounded-2xl border border-black bg-black opacity-40 shadow-md' />
 				</div>
 
-				<div className='mt-4 text-center text-white'>
-					<Link to='/forgot-password' className='hover:underline'>
-						Quên mật khẩu?
-					</Link>
-				</div>
-
-				<div className='mt-2 text-center text-white'>
+				{/* <div className='mt-2 text-center text-white'>
 					Trở về{' '}
 					<Link to='/new-order' className='hover:underline'>
 						Trang chủ
 					</Link>
-				</div>
+				</div> */}
 			</motion.div>
 		</div>
 	);

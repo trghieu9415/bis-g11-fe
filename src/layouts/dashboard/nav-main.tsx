@@ -1,5 +1,22 @@
 'use client';
-import { CalendarDays, ChevronRight, Hourglass, UsersRound, PartyPopper, BadgeDollarSign, UserCog } from 'lucide-react';
+import { useState } from 'react';
+import {
+	CalendarDays,
+	ChevronRight,
+	Hourglass,
+	UsersRound,
+	PartyPopper,
+	BadgeDollarSign,
+	UserCog,
+	ClipboardPlus,
+	ShoppingCart,
+	Users,
+	BookCopy,
+	Library,
+	BookUser,
+	PackagePlus,
+	ChartLine
+} from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -20,18 +37,65 @@ import { RootState, useAppDispatch } from '@/redux/store';
 import { ElementType, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
+type ResContractDTO = {
+	baseSalary: number;
+	endDate: string;
+	expiryDate: string;
+	fullName: string;
+	id: number;
+	idString: string;
+	levelName: string;
+	roleName: string;
+	salaryCoefficient: number;
+	seniorityId: number;
+	startDate: string;
+	status: number;
+	userId: number;
+};
+
+type UserInfo = {
+	id: number;
+	idString: string;
+	fullName: string;
+	email: string;
+	phoneNumber: string;
+	gender: 'MALE' | 'FEMALE' | string;
+	dateOfBirth: string;
+	address: string;
+	username: string;
+	createdAt: string;
+	status: number;
+	resContractDTO?: ResContractDTO;
+};
+
+interface MenuItem {
+	title: string;
+	url: string;
+	icon?: ElementType;
+	isActive: boolean;
+	total?: number;
+	items: { title: string; url: string; total?: number }[];
+}
+
 export function NavMain() {
 	const dispatch = useAppDispatch();
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
 	const { isHideSidebar } = useSelector((state: RootState) => state.isHideSidebar);
 
+	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
 	useEffect(() => {
+		const profile = localStorage.getItem('profile');
+		if (profile) {
+			setUserInfo(JSON.parse(profile));
+		}
+
 		if (leaveRequests?.length == 0) {
 			dispatch(fetchAllLeaveRequests());
 		}
 	}, [dispatch]);
 
-	console.log('IS HIDE ON NAV MAIN: ', isHideSidebar);
+	console.log(userInfo);
 
 	const leaveStats = {
 		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,
@@ -40,14 +104,7 @@ export function NavMain() {
 		all: leaveRequests.filter(req => req.status === 2).length
 	};
 
-	const data: {
-		title: string;
-		url: string;
-		icon?: ElementType;
-		isActive: boolean;
-		total?: number;
-		items: { title: string; url: string; total?: number }[];
-	}[] = [
+	const hremployee = [
 		{
 			title: 'Nhân viên',
 			url: '#',
@@ -56,17 +113,17 @@ export function NavMain() {
 			items: [
 				{
 					title: 'Danh sách nhân sự',
-					url: '/hremployee'
+					url: '/hr/hremployee'
 				},
 				{
 					title: 'Hợp đồng lao động',
-					url: '/contracts'
+					url: '/hr/contracts'
 				}
 			]
 		},
 		{
 			title: 'Đơn nghỉ phép',
-			url: '/leave-requests',
+			url: '/hr/leave-requests',
 			icon: Hourglass,
 			isActive: true,
 			total: leaveStats.all,
@@ -74,7 +131,7 @@ export function NavMain() {
 		},
 		{
 			title: 'Chấm công',
-			url: '/time-tracking/today',
+			url: '/hr/time-tracking/today',
 			icon: CalendarDays,
 			isActive: true,
 			items: []
@@ -87,33 +144,153 @@ export function NavMain() {
 			items: [
 				{
 					title: 'Theo tháng',
-					url: '/salary/month'
+					url: '/hr/salary/month'
 				},
 				{
 					title: 'Theo năm',
-					url: '/salary/year'
+					url: '/hr/salary/year'
 				}
 			]
 		},
 		{
 			title: 'Chức vụ & Cấp bậc',
-			url: '/roles',
+			url: '/hr/roles',
 			icon: UserCog,
 			isActive: true,
 			items: []
 		},
 		{
 			title: 'Lịch nghỉ lễ',
-			url: '/holiday',
+			url: '/hr/holiday',
 			icon: PartyPopper,
 			isActive: true,
 			items: []
 		}
 	];
 
+	const sales = [
+		{
+			title: 'Đơn hàng mới',
+			url: '/sales/new-order',
+			icon: ClipboardPlus,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Danh sách đơn',
+			url: '/sales/orders',
+			icon: ShoppingCart,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Khách hàng',
+			url: '/sales/customers',
+			icon: Users,
+			isActive: true,
+			items: []
+		}
+	];
+
+	const warehouse_manager = [
+		{
+			title: 'Sản phẩm',
+			url: '/warehouse/products',
+			icon: BookCopy,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Nhà cung cấp',
+			url: '/warehouse/suppliers',
+			icon: Library,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Tác giả',
+			url: '/warehouse/author',
+			icon: BookUser,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Danh mục',
+			url: '/warehouse/category',
+			icon: BookUser,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Nhập sách',
+			url: '/warehouse/inventory',
+			icon: PackagePlus,
+			isActive: true,
+			items: []
+		}
+	];
+
+	const business_manager = [
+		{
+			title: 'Đơn hàng mới',
+			url: '/business/new-order',
+			icon: ClipboardPlus,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Danh sách đơn',
+			url: '/business/orders',
+			icon: ShoppingCart,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Khách hàng',
+			url: '/business/customers',
+			icon: Users,
+			isActive: true,
+			items: []
+		},
+		{
+			title: 'Thống kê',
+			url: '/business/statistics',
+			icon: ChartLine,
+			isActive: true,
+			items: []
+		}
+	];
+
+	let trueDataForRenderMenu: MenuItem[] = [];
+	let title = '';
+
+	switch (userInfo?.resContractDTO?.roleName) {
+		case 'EMPLOYEE':
+			trueDataForRenderMenu = sales;
+			title = 'Quản lý bán hàng';
+			break;
+		case 'HR_MANAGER':
+			trueDataForRenderMenu = hremployee;
+			title = 'Quản lý nhân sự';
+			break;
+		case 'WAREHOUSE_MANAGER':
+			trueDataForRenderMenu = warehouse_manager;
+			title = 'Quản lý kho';
+			break;
+		case 'BUSINESS_MANAGER':
+			trueDataForRenderMenu = business_manager;
+			title = 'Quản lý kinh doanh';
+			break;
+		default:
+			trueDataForRenderMenu = [];
+			break;
+	}
+
+	const data: MenuItem[] = trueDataForRenderMenu;
+
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Quản lý nhân sự</SidebarGroupLabel>
+			<SidebarGroupLabel>{title}</SidebarGroupLabel>
 			<SidebarMenu>
 				{data.map(item =>
 					item.items?.length > 0 ? (
@@ -149,12 +326,12 @@ export function NavMain() {
 						<SidebarMenuItem key={item.title}>
 							<SidebarMenuButton tooltip={item.title} asChild>
 								<div className='flex items-center justify-between'>
-									<NavLink to={item.url} className={`flex items-center gap-2 w-full`}>
+									<NavLink to={item.url} className={`flex w-full items-center gap-2`}>
 										{item.icon && <item.icon size={16} />}
 										<span className={`${isHideSidebar && 'hidden'}`}>{item.title}</span>
 									</NavLink>
 									{typeof item.total === 'number' && item.total > 0 && (
-										<Badge className='w-1 flex justify-center bg-red-800'>{item.total}</Badge>
+										<Badge className='flex w-1 justify-center bg-red-800'>{item.total}</Badge>
 									)}
 								</div>
 							</SidebarMenuButton>

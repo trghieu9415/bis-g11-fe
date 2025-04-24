@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { loginUser } from '@/redux/slices/authSlice';
+import { Link } from 'react-router-dom';
 
 const formSchema = z.object({
 	username: z.string().min(1, { message: 'Username không được để trống' }),
@@ -43,7 +44,7 @@ const LoginForm = () => {
 			// This will handle both login and profile fetch
 			const profile = await dispatch(loginUser(payload)).unwrap();
 			console.log('Login successful with profile:', profile);
-				
+
 			toast.success('Đăng nhập thành công!');
 			navigate('/dashboard');
 		} catch (err: any) {
@@ -78,7 +79,14 @@ const LoginForm = () => {
 					{isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
 				</button>
 
-				{error && <p className='mt-2 text-red-400'>{error}</p>}
+				{/* Forgot password */}
+				<div className='w-100 pb-4 pt-2 text-end text-white underline'>
+					<Link to='/forgot-password' className='hover:text-blue-400'>
+						Quên mật khẩu?
+					</Link>
+				</div>
+
+				{error && <p className='mt-2 text-center text-red-400'>{error}</p>}
 			</form>
 		</div>
 	);

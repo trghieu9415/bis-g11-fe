@@ -308,7 +308,7 @@ export default function EmployeeCreateNew() {
 	};
 
 	return (
-		<div className='text-end mb-4'>
+		<div className='mb-4 text-end'>
 			<Button className='bg-green-800 hover:bg-green-900' onClick={openDialog}>
 				<Plus />
 				Thêm
@@ -316,18 +316,18 @@ export default function EmployeeCreateNew() {
 
 			{/* Dialog */}
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogContent className='w-full max-w-2xl mx-auto p-6 space-y-4' onOpenAutoFocus={e => e.preventDefault()}>
+				<DialogContent className='mx-auto w-full max-w-2xl space-y-4 p-6' onOpenAutoFocus={e => e.preventDefault()}>
 					<DialogHeader>
-						<DialogTitle className='text-2xl font-bold text-center'>Tạo nhân viên & hợp đồng mới</DialogTitle>
+						<DialogTitle className='text-center text-2xl font-bold'>Tạo nhân viên & hợp đồng mới</DialogTitle>
 						<DialogDescription className='text-center text-gray-500'>
 							Điền thông tin để tạo nhân viên và hợp đồng mới
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className='flex items-center justify-center '>
-						<div className='flex items-centers '>
-							<Button className='p-2 outline-none border border-solid border-black text-black rounded-3xl bg-white hover:bg-* hover:text-* cursor-default'>
-								<span className='border border-solid border-black h-6 w-6 flex text-center justify-center rounded-full'>
+					<div className='flex items-center justify-center'>
+						<div className='items-centers flex'>
+							<Button className='hover:bg-* hover:text-* cursor-default rounded-3xl border border-solid border-black bg-white p-2 text-black outline-none'>
+								<span className='flex h-6 w-6 justify-center rounded-full border border-solid border-black text-center'>
 									1
 								</span>
 								General Info
@@ -335,19 +335,19 @@ export default function EmployeeCreateNew() {
 						</div>
 						<div>
 							<div
-								className={`${isNumberStep > 1 ? 'w-0' : 'w-16 h-px border border-solid border-gray-300'} transition duration-800 ease-in-out`}
+								className={`${isNumberStep > 1 ? 'w-0' : 'h-px w-16 border border-solid border-gray-300'} duration-800 transition ease-in-out`}
 							></div>
 							<div
-								className={`${isNumberStep > 1 ? 'w-16 h-px border border-solid border-black' : 'w-0 '} transition duration-800 ease-in-out`}
+								className={`${isNumberStep > 1 ? 'h-px w-16 border border-solid border-black' : 'w-0'} duration-800 transition ease-in-out`}
 							></div>
 						</div>
 						<div className='flex items-center'>
 							<Button
 								disabled={isNumberStep < 2}
-								className={`p-2 outline-none border border-solid ${isNumberStep > 1 ? 'border-black' : 'border-gray-300'} text-black rounded-3xl bg-white hover:bg-* hover:text-* cursor-default`}
+								className={`border border-solid p-2 outline-none ${isNumberStep > 1 ? 'border-black' : 'border-gray-300'} hover:bg-* hover:text-* cursor-default rounded-3xl bg-white text-black`}
 							>
 								<span
-									className={`border border-solid ${isNumberStep > 1 ? 'border-black' : 'border-gray-300'} h-6 w-6 flex text-center justify-center rounded-full`}
+									className={`border border-solid ${isNumberStep > 1 ? 'border-black' : 'border-gray-300'} flex h-6 w-6 justify-center rounded-full text-center`}
 								>
 									2
 								</span>{' '}
@@ -356,19 +356,19 @@ export default function EmployeeCreateNew() {
 						</div>
 						<div>
 							<div
-								className={`${isNumberStep > 2 ? 'w-0' : 'w-16 h-px border border-solid border-gray-300'}  transition duration-800 ease-in-out`}
+								className={`${isNumberStep > 2 ? 'w-0' : 'h-px w-16 border border-solid border-gray-300'} duration-800 transition ease-in-out`}
 							></div>
 							<div
-								className={`${isNumberStep > 2 ? 'w-16 h-px border border-solid border-black' : 'w-0 '} transition duration-800 ease-in-out`}
+								className={`${isNumberStep > 2 ? 'h-px w-16 border border-solid border-black' : 'w-0'} duration-800 transition ease-in-out`}
 							></div>
 						</div>
 						<div className='flex items-center'>
 							<Button
 								disabled={isNumberStep < 3}
-								className={`p-2 outline-none border border-solid ${isNumberStep > 2 ? 'border-black' : 'border-gray-300'} text-black rounded-3xl bg-white hover:bg-* hover:text-* cursor-default`}
+								className={`border border-solid p-2 outline-none ${isNumberStep > 2 ? 'border-black' : 'border-gray-300'} hover:bg-* hover:text-* cursor-default rounded-3xl bg-white text-black`}
 							>
 								<span
-									className={`border border-solid ${isNumberStep > 2 ? 'border-black' : 'border-gray-300'} h-6 w-6 flex text-center justify-center rounded-full`}
+									className={`border border-solid ${isNumberStep > 2 ? 'border-black' : 'border-gray-300'} flex h-6 w-6 justify-center rounded-full text-center`}
 								>
 									3
 								</span>{' '}
@@ -381,15 +381,15 @@ export default function EmployeeCreateNew() {
 					{/* Start: General Info */}
 					<div className='space-y-4'>
 						{isNumberStep === 1 && (
-							<div className='overflow-y-auto max-h-[55vh] pl-1'>
-								<div className='pb-4 border-b border-solid border-b-gray-300 mb-4 mr-2'>
-									<h3 className='text-gray-500 font-bold text-sm'>Bước 1</h3>
-									<h2 className='text-black font-bold text-lg'>Thông tin cá nhân</h2>
+							<div className='max-h-[55vh] overflow-y-auto pl-1'>
+								<div className='mb-4 mr-2 border-b border-solid border-b-gray-300 pb-4'>
+									<h3 className='text-sm font-bold text-gray-500'>Bước 1</h3>
+									<h2 className='text-lg font-bold text-black'>Thông tin cá nhân</h2>
 								</div>
 
 								<div className='mr-2'>
-									<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Personal Infomation</h2>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<h2 className='mb-2 inline-block border-b border-solid border-gray-300'>Personal Infomation</h2>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
 											<label className='text-sm' htmlFor='fullname'>
 												<strong>Họ và tên</strong>
@@ -406,7 +406,7 @@ export default function EmployeeCreateNew() {
 													}
 												})}
 											/>
-											{errors.fullname && <p className='text-red-500 text-sm'>{errors.fullname.message}</p>}
+											{errors.fullname && <p className='text-sm text-red-500'>{errors.fullname.message}</p>}
 										</div>
 										<div>
 											<label className='text-sm' htmlFor='phone'>
@@ -424,10 +424,10 @@ export default function EmployeeCreateNew() {
 													}
 												})}
 											/>
-											{errors.phone && <p className='text-red-500 text-sm'>{errors.phone.message}</p>}{' '}
+											{errors.phone && <p className='text-sm text-red-500'>{errors.phone.message}</p>}{' '}
 										</div>
 									</div>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
 											<label className='text-sm' htmlFor='email'>
 												<strong>Email</strong>
@@ -444,7 +444,7 @@ export default function EmployeeCreateNew() {
 													}
 												})}
 											/>
-											{errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}{' '}
+											{errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}{' '}
 										</div>
 										<div className='grid grid-cols-2 gap-4'>
 											<div>
@@ -479,7 +479,7 @@ export default function EmployeeCreateNew() {
 														})}
 													/>
 													{errors.date_of_birth && (
-														<p className='text-red-500 text-sm'>{errors.date_of_birth.message}</p>
+														<p className='text-sm text-red-500'>{errors.date_of_birth.message}</p>
 													)}
 												</div>
 											</div>
@@ -501,12 +501,12 @@ export default function EmployeeCreateNew() {
 															<SelectItem value='female'>Nữ</SelectItem>
 														</SelectContent>
 													</Select>
-													{errors.gender && <p className='text-red-500 text-sm'>{errors.gender.message}</p>}
+													{errors.gender && <p className='text-sm text-red-500'>{errors.gender.message}</p>}
 												</div>
 											</div>
 										</div>
 									</div>
-									<div className='grid grid-cols-1 mb-2'>
+									<div className='mb-2 grid grid-cols-1'>
 										<div>
 											<label className='text-sm' htmlFor='address'>
 												<strong>Địa chỉ</strong>
@@ -517,20 +517,19 @@ export default function EmployeeCreateNew() {
 												className='mt-1'
 												{...register('address', {
 													required: 'Vui lòng nhập địa chỉ',
-													pattern: {
-														value:
-															/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-														message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+													minLength: {
+														value: 3,
+														message: 'Địa chỉ phải có ít nhất 10 ký tự'
 													}
 												})}
 											/>
-											{errors.address && <p className='text-red-500 text-sm'>{errors.address.message}</p>}
+											{errors.address && <p className='text-sm text-red-500'>{errors.address.message}</p>}
 										</div>
 									</div>
 								</div>
 								<div className='mr-2'>
-									<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Account Info</h2>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<h2 className='mb-2 inline-block border-b border-solid border-gray-300'>Account Info</h2>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
 											<label className='text-sm' htmlFor='username'>
 												<strong>Tên đăng nhập</strong>
@@ -548,7 +547,7 @@ export default function EmployeeCreateNew() {
 													}
 												})}
 											/>
-											{errors.username && <p className='text-red-500 text-sm'>{errors.username.message}</p>}
+											{errors.username && <p className='text-sm text-red-500'>{errors.username.message}</p>}
 										</div>
 										<div>
 											<label className='text-sm' htmlFor='password'>
@@ -570,7 +569,7 @@ export default function EmployeeCreateNew() {
 															}
 														})}
 													/>
-													{errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
+													{errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
 												</div>
 
 												<Button type='button' className='mt-1' onClick={generatePassword}>
@@ -587,14 +586,14 @@ export default function EmployeeCreateNew() {
 						{/* Start: Contract Info */}
 						{isNumberStep === 2 && (
 							<>
-								<div className='pb-4 border-b border-solid border-b-gray-300'>
-									<h3 className='text-gray-500 font-bold text-sm'>Bước 2</h3>
-									<h2 className='text-black font-bold text-lg'>Thông tin hợp đồng</h2>
+								<div className='border-b border-solid border-b-gray-300 pb-4'>
+									<h3 className='text-sm font-bold text-gray-500'>Bước 2</h3>
+									<h2 className='text-lg font-bold text-black'>Thông tin hợp đồng</h2>
 								</div>
 
 								<div>
-									<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Contract Infomation</h2>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<h2 className='mb-2 inline-block border-b border-solid border-gray-300'>Contract Infomation</h2>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
 											<label className='text-sm' htmlFor='role'>
 												<strong>Vai trò</strong>
@@ -623,7 +622,7 @@ export default function EmployeeCreateNew() {
 														})}
 												</SelectContent>
 											</Select>
-											{errors.role_id && <p className='text-red-500 text-sm'>{errors.role_id.message}</p>}
+											{errors.role_id && <p className='text-sm text-red-500'>{errors.role_id.message}</p>}
 										</div>
 										<div>
 											<label className='text-sm' htmlFor='level'>
@@ -648,10 +647,10 @@ export default function EmployeeCreateNew() {
 														))}
 												</SelectContent>
 											</Select>
-											{errors.level_id && <p className='text-red-500 text-sm'>{errors.level_id.message}</p>}{' '}
+											{errors.level_id && <p className='text-sm text-red-500'>{errors.level_id.message}</p>}{' '}
 										</div>
 									</div>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
 											<label className='text-sm' htmlFor='base_salary'>
 												<strong>Lương cơ bản</strong>
@@ -665,9 +664,9 @@ export default function EmployeeCreateNew() {
 												})}
 												onChange={e => formatSalary(e.target.value)}
 											/>
-											{errors.base_salary && <p className='text-red-500 text-sm'>{errors.base_salary.message}</p>}{' '}
+											{errors.base_salary && <p className='text-sm text-red-500'>{errors.base_salary.message}</p>}{' '}
 										</div>
-										<div className='grid grid-cols-1 '>
+										<div className='grid grid-cols-1'>
 											<div>
 												<label className='text-sm' htmlFor=''>
 													<strong>Hệ số lương</strong>
@@ -683,7 +682,7 @@ export default function EmployeeCreateNew() {
 										</div>
 									</div>
 								</div>
-								<div className='grid grid-cols-2 gap-4 mb-2'>
+								<div className='mb-2 grid grid-cols-2 gap-4'>
 									<div>
 										<label className='text-sm' htmlFor='start_date'>
 											<strong>Ngày bắt đầu</strong>
@@ -711,7 +710,7 @@ export default function EmployeeCreateNew() {
 												}
 											})}
 										/>
-										{errors.start_date && <p className='text-red-500 text-sm'>{errors.start_date.message}</p>}
+										{errors.start_date && <p className='text-sm text-red-500'>{errors.start_date.message}</p>}
 									</div>
 									<div>
 										<label className='text-sm' htmlFor='end_date'>
@@ -748,7 +747,7 @@ export default function EmployeeCreateNew() {
 												}
 											})}
 										/>
-										{errors.end_date && <p className='text-red-500 text-sm'>{errors.end_date.message}</p>}
+										{errors.end_date && <p className='text-sm text-red-500'>{errors.end_date.message}</p>}
 									</div>
 								</div>
 							</>
@@ -758,35 +757,35 @@ export default function EmployeeCreateNew() {
 						{/* Start: Review & Submit */}
 						{isNumberStep === 3 && (
 							<>
-								<div className='pb-4 border-b border-solid border-b-gray-300'>
-									<h3 className='text-gray-500 font-bold text-sm'>Bước 3</h3>
-									<h2 className='text-black font-bold text-lg'>Xem và xác nhận</h2>
+								<div className='border-b border-solid border-b-gray-300 pb-4'>
+									<h3 className='text-sm font-bold text-gray-500'>Bước 3</h3>
+									<h2 className='text-lg font-bold text-black'>Xem và xác nhận</h2>
 								</div>
 								<div>
-									<div className='grid grid-cols-2 gap-4 mb-2'>
+									<div className='mb-2 grid grid-cols-2 gap-4'>
 										<div>
-											<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Thông tin cá nhân</h2>
+											<h2 className='mb-2 inline-block border-b border-solid border-gray-300'>Thông tin cá nhân</h2>
 											{personalInfo.map((item, index) => (
-												<label key={index} className='text-sm flex items-center gap-1 mt-1'>
+												<label key={index} className='mt-1 flex items-center gap-1 text-sm'>
 													<strong>{item.label}:</strong>
 													<p>{item.value || 'Chưa có dữ liệu'}</p>
 												</label>
 											))}
 
-											<h2 className='mb-2 mt-4 border-solid border-b border-gray-300 inline-block'>
+											<h2 className='mb-2 mt-4 inline-block border-b border-solid border-gray-300'>
 												Thông tin tài khoản
 											</h2>
 											{accountInfo.map((item, index) => (
-												<label key={index} className='text-sm flex items-center gap-1 mt-1'>
+												<label key={index} className='mt-1 flex items-center gap-1 text-sm'>
 													<strong>{item.label}:</strong>
 													<p>{item.value || 'Chưa có dữ liệu'}</p>
 												</label>
 											))}
 										</div>
 										<div>
-											<h2 className='mb-2 border-solid border-b border-gray-300 inline-block'>Thông tin hợp đồng</h2>
+											<h2 className='mb-2 inline-block border-b border-solid border-gray-300'>Thông tin hợp đồng</h2>
 											{contractInfo.map((item, index) => (
-												<label key={index} className='text-sm flex items-center gap-1 mt-1'>
+												<label key={index} className='mt-1 flex items-center gap-1 text-sm'>
 													<strong>{item.label}:</strong>
 													<p>{item.value || 'Chưa có dữ liệu'}</p>
 												</label>
@@ -806,7 +805,7 @@ export default function EmployeeCreateNew() {
 								<div>
 									<Button
 										type='button'
-										className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
+										className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'
 										onClick={() => setIsNumberStep(prev => Math.max(1, prev - 1))}
 									>
 										Trở về
@@ -817,14 +816,14 @@ export default function EmployeeCreateNew() {
 								<Button
 									type='button'
 									onClick={closeDialog}
-									className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+									className='rounded-md border bg-white px-4 py-2 text-black transition hover:bg-gray-100'
 								>
 									Thoát
 								</Button>
 								{isNumberStep < 3 ? (
 									<Button
 										type='button'
-										className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'
+										className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'
 										// onClick={() => setIsNumberStep(prev => Math.min(3, prev + 1))}
 										onClick={handleNextClick}
 									>
@@ -833,7 +832,7 @@ export default function EmployeeCreateNew() {
 								) : (
 									<AlertDialog>
 										<AlertDialogTrigger asChild>
-											<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
+											<button className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'>
 												Xác nhận
 											</button>
 										</AlertDialogTrigger>
