@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createListenerMiddleware } from '@reduxjs/toolkit';
 import axios from '@/services/customize-axios';
-import { json } from 'stream/consumers';
 
 interface LoginResponse {
 	accessToken: string;
@@ -111,11 +110,61 @@ export const refreshUserProfile = createAsyncThunk('auth/refreshUserProfile', as
 // Thunk to handle logout
 export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { rejectWithValue }) => {
 	try {
+		// Lấy accessToken để gửi yêu cầu logout
+		const accessToken = localStorage.getItem('accessToken');
+
+		if (accessToken) {
+			// Gọi API logout để vô hiệu hóa token ở phía server
+			try {
+				await axios.post('/api/v1/auth/logout', null, {
+					headers: {
+						Authorization: `Bearer ${accessToken}`
+					}
+				});
+				console.log('Logout API called successfully');
+			} catch (apiError) {
+				// Chỉ log lỗi, tiếp tục xử lý logout ở client
+				console.error('Failed to call logout API:', apiError);
+			}
+		}
+
+		// Xóa tất cả thông tin người dùng từ localStorage
 		localStorage.removeItem('accessToken');
 		localStorage.removeItem('refreshToken');
+		localStorage.removeItem('profile');
+
+		// Phát event logout để các component khác có thể lắng nghe
+		window.dispatchEvent(new Event('auth-logout'));
+
 		return null;
 	} catch (error: any) {
+		console.error('Logout error:', error);
+		// Vẫn xóa dữ liệu local ngay cả khi API thất bại
+		localStorage.removeItem('accessToken');
+		localStorage.removeItem('refreshToken');
+		localStorage.removeItem('profile');
+
 		return rejectWithValue('Logout failed');
+	}
+});
+
+export const authStorageListener = createListenerMiddleware();
+
+authStorageListener.startListening({
+	actionCreator: loginUser.fulfilled,
+	effect: (action, listenerApi) => {
+		// Phát event để các component khác biết trạng thái đã thay đổi
+		window.dispatchEvent(new Event('auth-change'));
+	}
+});
+
+export const authLogoutListener = createListenerMiddleware();
+
+authLogoutListener.startListening({
+	actionCreator: logoutUser.fulfilled,
+	effect: (action, listenerApi) => {
+		// Phát event để các component khác biết đã logout
+		window.dispatchEvent(new Event('auth-logout'));
 	}
 });
 
@@ -156,8 +205,11 @@ const authSlice = createSlice({
 
 			// Handle logout
 			.addCase(logoutUser.fulfilled, state => {
-				state.isAuthenticated = false;
-				state.profile = null;
+				// Reset toàn bộ state về giá trị khởi tạo
+				return {
+					...initialState,
+					isAuthenticated: false // Đảm bảo isAuthenticated luôn false khi logout
+				};
 			});
 	}
 });

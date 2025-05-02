@@ -1,11 +1,9 @@
-import { businessRoutes } from '@/routes/roles/business';
-
 const routes = {
 	home: '/',
 	userInformation: '/user',
 
 	// For HR
-	hr: '/',
+	hr: '/hr',
 	hremployee: '/hr/hremployee',
 	contracts: '/hr/contracts',
 	leaveRequests: '/hr/leave-requests',
@@ -18,20 +16,20 @@ const routes = {
 	roles: '/hr/roles',
 
 	// For sales
-	sales: '/',
+	sales: '/sales',
 	newOrder: `/sales/new-order`,
 	orders: `/sales/orders`,
 	customers: `/sales/customers`,
 
 	// For business
-	business: '/',
-	newOrderBussiness: `/business/new-order`,
-	ordersBussiness: `/business/orders`,
-	customersBussiness: `/business/customers`,
+	bussiness: '/bussiness',
+	newOrderBussiness: `/bussiness/new-order`,
+	ordersBussiness: `/bussiness/orders`,
+	customersBussiness: `/bussiness/customers`,
 	// statistics: ???
 
 	// For warehouse employee
-	warehouse: '/',
+	warehouse: '/warehouse',
 	products: '/warehouse/products',
 	supplier: '/warehouse/suppliers',
 	author: '/warehouse/author',

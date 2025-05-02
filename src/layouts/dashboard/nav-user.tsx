@@ -17,6 +17,8 @@ import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTrackin
 import EmployeeLeaveRequest from '@/pages/dashboard/Employee/employee-leave-request';
 import EmployeeSalaryCal from '@/pages/dashboard/Employee/employee-payroll';
 import { NavLink } from 'react-router-dom';
+import { useAppDispatch } from '@/redux/store';
+import { logoutUser } from '@/redux/slices/authSlice';
 
 type ResContractDTO = {
 	baseSalary: number;
@@ -52,6 +54,12 @@ type UserInfo = {
 export function NavUser({ user }: { user: UserInfo }) {
 	const navigate = useNavigate();
 	const { isMobile } = useSidebar();
+	const dispatch = useAppDispatch();
+
+	const handleLogout = async () => {
+		await dispatch(logoutUser());
+		navigate('/login');
+	};
 
 	return (
 		<SidebarMenu>
@@ -111,15 +119,7 @@ export function NavUser({ user }: { user: UserInfo }) {
 							</DropdownMenuItem> */}
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							className='hover:cursor-pointer hover:bg-gray-100'
-							onClick={() => {
-								localStorage.removeItem('accessToken');
-								localStorage.removeItem('profile');
-								localStorage.removeItem('refreshToken');
-								navigate('/login');
-							}}
-						>
+						<DropdownMenuItem className='hover:cursor-pointer hover:bg-gray-100' onClick={handleLogout}>
 							<LogOut />
 							Đăng xuất
 						</DropdownMenuItem>
