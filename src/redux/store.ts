@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 import usersReducer from './slices/usersSlice';
 import userDetailReducer from './slices/userDetailSlice';
 import leaveRequestByUserIDReducer from './slices/leaveRequestByUserIDSlice';
@@ -23,7 +23,7 @@ import supplierReducer from './slices/supplierSlice';
 import authorReducer from './slices/authorSlice';
 import categoryReducer from './slices/categorySlice';
 import goodsReceiptReducer from './slices/goodReceiptsSlice';
-import authReducer from './slices/authSlice';
+import authReducer, { authStorageListener, authLogoutListener } from './slices/authSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -51,10 +51,13 @@ export const store = configureStore({
 		category: categoryReducer,
 		goodsReceipt: goodsReceiptReducer,
 		auth: authReducer
-	}
+	},
+	middleware: getDefaultMiddleware =>
+		getDefaultMiddleware().prepend(authStorageListener.middleware).prepend(authLogoutListener.middleware)
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
-export const useAppSelector = useSelector.withTypes<RootState>();
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
