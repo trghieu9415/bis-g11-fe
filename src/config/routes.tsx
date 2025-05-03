@@ -1,5 +1,3 @@
-import { businessRoutes } from '@/routes/roles/business';
-
 const routes = {
 	home: '/',
 	userInformation: '/user',
