@@ -95,7 +95,7 @@ export function NavMain() {
 		}
 	}, [dispatch]);
 
-	console.log(userInfo);
+	// console.log(userInfo);
 
 	const leaveStats = {
 		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,

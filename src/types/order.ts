@@ -7,6 +7,7 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed';
 export interface BillDetailRequest {
 	productId: number;
 	quantity: number;
+	price: number;
 }
 
 export interface CustomerInfo {

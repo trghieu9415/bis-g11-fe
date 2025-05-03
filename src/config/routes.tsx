@@ -22,10 +22,10 @@ const routes = {
 	customers: `/sales/customers`,
 
 	// For business
-	bussiness: '/bussiness',
-	newOrderBussiness: `/bussiness/new-order`,
-	ordersBussiness: `/bussiness/orders`,
-	customersBussiness: `/bussiness/customers`,
+	business: '/business',
+	newOrderBussiness: `/business/new-order`,
+	ordersBusiness: `/business/orders`,
+	customersBusiness: `/business/customers`,
 	// statistics: ???
 
 	// For warehouse employee
