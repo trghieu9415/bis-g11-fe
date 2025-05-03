@@ -16,16 +16,19 @@ const routes = {
 	roles: '/hr/roles',
 
 	// For sales
-	sales: '/sales',
-	newOrder: `/sales/new-order`,
-	orders: `/sales/orders`,
-	customers: `/sales/customers`,
+	// sales: '/sales',
+	// newOrder: `/sales/new-order`,
+	// orders: `/sales/orders`,
+	// customers: `/sales/customers`,
+
+	// For normal employee
+	employee: '/employee',
 
 	// For business
-	bussiness: '/bussiness',
-	newOrderBussiness: `/bussiness/new-order`,
-	ordersBussiness: `/bussiness/orders`,
-	customersBussiness: `/bussiness/customers`,
+	business: '/business',
+	newOrderBusiness: `/business/new-order`,
+	ordersBusiness: `/business/orders`,
+	customersBusiness: `/business/customers`,
 	// statistics: ???
 
 	// For warehouse employee

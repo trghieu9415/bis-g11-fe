@@ -98,10 +98,16 @@ export function NavMain() {
 	console.log(userInfo);
 
 	const leaveStats = {
-		sick: leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length,
-		leave: leaveRequests.filter(req => req.leaveReason === 1 && req.status === 2).length,
-		maternity: leaveRequests.filter(req => req.leaveReason === 2 && req.status === 2).length,
-		all: leaveRequests.filter(req => req.status === 2).length
+		sick: Array.isArray(leaveRequests)
+			? leaveRequests.filter(req => req.leaveReason === 0 && req.status === 2).length
+			: 0,
+		leave: Array.isArray(leaveRequests)
+			? leaveRequests.filter(req => req.leaveReason === 1 && req.status === 2).length
+			: 0,
+		maternity: Array.isArray(leaveRequests)
+			? leaveRequests.filter(req => req.leaveReason === 2 && req.status === 2).length
+			: 0,
+		all: Array.isArray(leaveRequests) ? leaveRequests.filter(req => req.status === 2).length : 0
 	};
 
 	const hremployee = [
@@ -163,30 +169,6 @@ export function NavMain() {
 			title: 'Lịch nghỉ lễ',
 			url: '/hr/holiday',
 			icon: PartyPopper,
-			isActive: true,
-			items: []
-		}
-	];
-
-	const sales = [
-		{
-			title: 'Đơn hàng mới',
-			url: '/sales/new-order',
-			icon: ClipboardPlus,
-			isActive: true,
-			items: []
-		},
-		{
-			title: 'Danh sách đơn',
-			url: '/sales/orders',
-			icon: ShoppingCart,
-			isActive: true,
-			items: []
-		},
-		{
-			title: 'Khách hàng',
-			url: '/sales/customers',
-			icon: Users,
 			isActive: true,
 			items: []
 		}
@@ -265,10 +247,6 @@ export function NavMain() {
 	let title = '';
 
 	switch (userInfo?.resContractDTO?.roleName) {
-		case 'EMPLOYEE':
-			trueDataForRenderMenu = sales;
-			title = 'Quản lý bán hàng';
-			break;
 		case 'HR_MANAGER':
 			trueDataForRenderMenu = hremployee;
 			title = 'Quản lý nhân sự';
@@ -281,6 +259,10 @@ export function NavMain() {
 			trueDataForRenderMenu = business_manager;
 			title = 'Quản lý kinh doanh';
 			break;
+		case 'ADMIN':
+			trueDataForRenderMenu = [...hremployee, ...warehouse_manager, ...business_manager];
+			title = 'Quản lý hệ thống';
+			break;
 		default:
 			trueDataForRenderMenu = [];
 			break;
@@ -288,57 +270,66 @@ export function NavMain() {
 
 	const data: MenuItem[] = trueDataForRenderMenu;
 
-	return (
-		<SidebarGroup>
-			<SidebarGroupLabel>{title}</SidebarGroupLabel>
-			<SidebarMenu>
-				{data.map(item =>
-					item.items?.length > 0 ? (
-						<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
-							<SidebarMenuItem>
-								<CollapsibleTrigger asChild>
-									<SidebarMenuButton tooltip={item.title}>
-										{item.icon && <item.icon />}
-										<span>{item.title}</span>
-										<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-									</SidebarMenuButton>
-								</CollapsibleTrigger>
+	console.log(data);
 
-								<CollapsibleContent>
-									<SidebarMenuSub>
-										{item.items.map(subItem => (
-											<SidebarMenuSubItem key={subItem.title}>
-												<SidebarMenuSubButton asChild>
-													<NavLink to={subItem.url} className='flex justify-between'>
-														<span>{subItem.title}</span>
-														{/* {subItem?.total && (
+	return (
+		<>
+			{data?.length > 0 && (
+				<SidebarGroup>
+					<SidebarGroupLabel>{title}</SidebarGroupLabel>
+					<SidebarMenu>
+						{data.map(item =>
+							item.items?.length > 0 ? (
+								<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
+									<SidebarMenuItem>
+										<CollapsibleTrigger asChild>
+											<SidebarMenuButton tooltip={item.title}>
+												{item.icon && <item.icon />}
+												<span>{item.title}</span>
+												<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+											</SidebarMenuButton>
+										</CollapsibleTrigger>
+
+										<CollapsibleContent>
+											<SidebarMenuSub>
+												{item.items.map(subItem => (
+													<SidebarMenuSubItem key={subItem.title}>
+														<SidebarMenuSubButton asChild>
+															<NavLink to={subItem.url} className='flex justify-between'>
+																<span>{subItem.title}</span>
+																{/* {subItem?.total && (
 															<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
 														)} */}
-													</NavLink>
-												</SidebarMenuSubButton>
-											</SidebarMenuSubItem>
-										))}
-									</SidebarMenuSub>
-								</CollapsibleContent>
-							</SidebarMenuItem>
-						</Collapsible>
-					) : (
-						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton tooltip={item.title} asChild>
-								<div className='flex items-center justify-between'>
-									<NavLink to={item.url} className={`flex w-full items-center gap-2`}>
-										{item.icon && <item.icon size={16} />}
-										<span className={`${isHideSidebar && 'hidden'}`}>{item.title}</span>
-									</NavLink>
-									{typeof item.total === 'number' && item.total > 0 && (
-										<Badge className='flex w-1 justify-center bg-red-800'>{item.total}</Badge>
-									)}
-								</div>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-					)
-				)}
-			</SidebarMenu>
-		</SidebarGroup>
+															</NavLink>
+															{/* {subItem?.total && (
+															<Badge className='w-1 flex justify-center bg-red-800'>{subItem.total}</Badge>
+														)} */}
+														</SidebarMenuSubButton>
+													</SidebarMenuSubItem>
+												))}
+											</SidebarMenuSub>
+										</CollapsibleContent>
+									</SidebarMenuItem>
+								</Collapsible>
+							) : (
+								<SidebarMenuItem key={item.title}>
+									<SidebarMenuButton tooltip={item.title} asChild>
+										<div className='flex items-center justify-between'>
+											<NavLink to={item.url} className={`flex w-full items-center gap-2`}>
+												{item.icon && <item.icon size={16} />}
+												<span className={`${isHideSidebar && 'hidden'}`}>{item.title}</span>
+											</NavLink>
+											{typeof item.total === 'number' && item.total > 0 && (
+												<Badge className='flex w-1 justify-center bg-red-800'>{item.total}</Badge>
+											)}
+										</div>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							)
+						)}
+					</SidebarMenu>
+				</SidebarGroup>
+			)}
+		</>
 	);
 }
