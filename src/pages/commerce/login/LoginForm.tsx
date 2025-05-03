@@ -48,7 +48,9 @@ const LoginForm = () => {
 				} else if (role === 'WAREHOUSE_MANAGER') {
 					redirectPath = '/warehouse';
 				} else if (role === 'EMPLOYEE') {
-					redirectPath = '/sales';
+					redirectPath = '/employee';
+				} else if (role === 'ADMIN') {
+					redirectPath = '/hr';
 				}
 			}
 

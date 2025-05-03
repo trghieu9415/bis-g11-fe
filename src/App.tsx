@@ -102,8 +102,12 @@ function App() {
 								<Navigate to='/business' />
 							) : role === 'WAREHOUSE_MANAGER' ? (
 								<Navigate to='/warehouse' />
+							) : role === 'EMPLOYEE' ? (
+								<Navigate to='/employee' />
+							) : role === 'ADMIN' ? (
+								<Navigate to='/hr' />
 							) : (
-								<Navigate to='/sales' />
+								<Navigate to='/login' />
 							)
 						) : (
 							<Navigate to='/login' />

@@ -10,6 +10,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -46,6 +47,9 @@ export default function AllLeaveRequestsTable() {
 
 	const dispatch = useAppDispatch();
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
+	const user = JSON.parse(localStorage.getItem('profile') || '{}');
+
+	console.log(user, selectedLeaveRequest);
 
 	useEffect(() => {
 		if (leaveRequests?.length === 0) {
@@ -59,7 +63,7 @@ export default function AllLeaveRequestsTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -72,7 +76,7 @@ export default function AllLeaveRequestsTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tiêu đề <ArrowUpDown />
@@ -90,7 +94,7 @@ export default function AllLeaveRequestsTable() {
 						column.setFilterValue(newValue);
 					}}
 				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+					<SelectTrigger className='bg-bg-green-800 w-40 border-0 text-white ring-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
 						<SelectValue placeholder='Loại nghỉ phép' />
 					</SelectTrigger>
 					<SelectContent>
@@ -122,7 +126,7 @@ export default function AllLeaveRequestsTable() {
 						column.setFilterValue(value === 'all' ? undefined : Number(value));
 					}}
 				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+					<SelectTrigger className='bg-bg-green-800 w-40 border-0 text-white ring-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
 						<SelectValue placeholder='Trạng thái' />
 					</SelectTrigger>
 					<SelectContent>
@@ -136,21 +140,21 @@ export default function AllLeaveRequestsTable() {
 			cell: ({ row }) => (
 				<span className='flex justify-center gap-2'>
 					{row.getValue('status') === 1 ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+						<p className='flex w-[80%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+							<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 							Đã duyệt
 						</p>
 					) : row.getValue('status') === 2 ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-yellow-500 rounded-sm p-1'>
-							<Clock className='w-4 h-4 mr-1' stroke='white' /> Chờ duyệt
+						<p className='flex w-[80%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+							<Clock className='mr-1 h-4 w-4' stroke='white' /> Chờ duyệt
 						</p>
 					) : row.getValue('status') === 3 ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-red-500 rounded-sm p-1'>
-							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Đã từ chối
+						<p className='flex w-[80%] items-center justify-center gap-1 rounded-sm bg-red-500 p-1 text-white'>
+							<XCircle className='mr-1 h-4 w-4' stroke='white' /> Đã từ chối
 						</p>
 					) : (
-						<p className='text-white flex items-center gap-1 justify-center w-[80%] bg-gray-500 rounded-sm p-1'>
-							<HelpCircle className='w-4 h-4 mr-1' stroke='white' /> Không xác định
+						<p className='flex w-[80%] items-center justify-center gap-1 rounded-sm bg-gray-500 p-1 text-white'>
+							<HelpCircle className='mr-1 h-4 w-4' stroke='white' /> Không xác định
 						</p>
 					)}
 				</span>
@@ -202,7 +206,7 @@ export default function AllLeaveRequestsTable() {
 			header: 'Thao tác',
 			cell: ({ row }) => (
 				<Button
-					className='bg-transparent text-black p-2 hover:bg-gray-200'
+					className='bg-transparent p-2 text-black hover:bg-gray-200'
 					onClick={() => handleOpenDialog(row.original)}
 				>
 					<Info />
@@ -268,12 +272,12 @@ export default function AllLeaveRequestsTable() {
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={leaveRequests} />
+			<CustomTable columns={columns} data={leaveRequests} stickyClassIndex={0} />
 			{selectedLeaveRequest && (
-				<div className='flex items-center justify-end gap-1 mt-4'>
+				<div className='mt-4 flex items-center justify-end gap-1'>
 					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 						<DialogContent
-							className='!w-[50vw] !max-w-none !max-h-[90vh] h-[570px]'
+							className='h-[570px] !max-h-[90vh] !w-[50vw] !max-w-none'
 							onOpenAutoFocus={e => e.preventDefault()}
 						>
 							<DialogHeader>
@@ -282,36 +286,36 @@ export default function AllLeaveRequestsTable() {
 									Chi tiết về đơn xin nghỉ phép của bạn, bao gồm thời gian nghỉ, lý do và trạng thái phê duyệt.
 								</DialogDescription>
 							</DialogHeader>
-							<div className='flex flex-col gap-2 max-h-[50vh]'>
+							<div className='flex max-h-[50vh] flex-col gap-2'>
 								<div className='h-full'>
-									<div className='p-4 h-full max-w-[690px] border border-solid border-gray-200 rounded-sm'>
+									<div className='h-full max-w-[690px] rounded-sm border border-solid border-gray-200 p-4'>
 										<div className='float-end text-sm'>
 											{selectedLeaveRequest.status === 1 ? (
-												<span className='flex items-center  text-green-600 font-bold'>
-													<CheckCircle className='w-4 h-4 text-green-600 mr-1' /> Đã duyệt
+												<span className='flex items-center font-bold text-green-600'>
+													<CheckCircle className='mr-1 h-4 w-4 text-green-600' /> Đã duyệt
 												</span>
 											) : selectedLeaveRequest.status === 2 ? (
-												<span className='flex items-center text-yellow-500 font-bold'>
-													<Clock className='w-4 h-4 text-yellow-500 mr-1' /> Đang chờ duyệt
+												<span className='flex items-center font-bold text-yellow-500'>
+													<Clock className='mr-1 h-4 w-4 text-yellow-500' /> Đang chờ duyệt
 												</span>
 											) : selectedLeaveRequest.status === 3 ? (
-												<span className='flex items-center text-red-500 font-bold'>
-													<XCircle className='w-4 h-4 text-red-500 mr-1' /> Đã từ chối
+												<span className='flex items-center font-bold text-red-500'>
+													<XCircle className='mr-1 h-4 w-4 text-red-500' /> Đã từ chối
 												</span>
 											) : (
-												<span className='flex items-center text-gray-400 font-bold'>
-													<HelpCircle className='w-4 h-4 text-gray-400 mr-1' /> Không xác định
+												<span className='flex items-center font-bold text-gray-400'>
+													<HelpCircle className='mr-1 h-4 w-4 text-gray-400' /> Không xác định
 												</span>
 											)}
 										</div>
 										<input
 											type='text'
-											className='outline-none border-none font-bold w-full text-center mx-auto my-3 block'
+											className='mx-auto my-3 block w-full border-none text-center font-bold outline-none'
 											readOnly
 											value={selectedLeaveRequest.title}
 										/>
 
-										<div className='overflow-y-auto max-h-[calc(100%-55px)] pl-2'>
+										<div className='max-h-[calc(100%-55px)] overflow-y-auto pl-2'>
 											<p className='text-gray-900'>
 												<strong className='italic underline'>Kính gửi:</strong> Trưởng phòng Nhân sự
 											</p>
@@ -322,10 +326,10 @@ export default function AllLeaveRequestsTable() {
 												<strong>Chức vụ:</strong> {selectedLeaveRequest.roleName}
 											</p>
 											<div className='flex items-center justify-start gap-2'>
-												<strong className='text-gray-900 text-base'>Loại nghỉ phép: </strong>
+												<strong className='text-base text-gray-900'>Loại nghỉ phép: </strong>
 												{`${selectedLeaveRequest.leaveReason === 0 ? 'Nghỉ bệnh' : selectedLeaveRequest.leaveReason === 1 ? 'Nghỉ phép' : selectedLeaveRequest.leaveReason === 2 ? 'Nghỉ thai sản' : 'Không xác định'}`}
 											</div>
-											<div className='text-black mt-4'>
+											<div className='mt-4 text-black'>
 												<div>
 													{new Date(selectedLeaveRequest.sendDate).toLocaleDateString('vi-VN', {
 														day: 'numeric',
@@ -346,7 +350,7 @@ export default function AllLeaveRequestsTable() {
 													})}
 												</div>
 												<div className='mt-3'>
-													<p className='min-h-[100px] break-words whitespace-pre-wrap overflow-hidden'>
+													<p className='min-h-[100px] overflow-hidden whitespace-pre-wrap break-words'>
 														{selectedLeaveRequest.description}
 													</p>
 												</div>
@@ -356,18 +360,36 @@ export default function AllLeaveRequestsTable() {
 								</div>
 							</div>
 							<div
-								className={`flex items-center ${selectedLeaveRequest.status === 2 ? 'justify-between' : 'justify-end'}  gap-2`}
+								className={`flex items-center ${selectedLeaveRequest.status === 2 ? 'justify-between' : 'justify-end'} gap-2`}
 							>
 								<div className='flex items-center justify-center gap-2'>
 									{selectedLeaveRequest.status === 2 && (
 										<>
 											<AlertDialog>
-												<AlertDialogTrigger asChild>
-													<Button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition'>
-														<Trash2 />
-														Từ chối
-													</Button>
-												</AlertDialogTrigger>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<div
+																className={`${user.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
+															>
+																<AlertDialogTrigger asChild>
+																	<Button
+																		className={`rounded-md border bg-red-500 px-4 py-2 text-white transition hover:bg-red-600`}
+																		disabled={user.id === selectedLeaveRequest.userId}
+																	>
+																		<Trash2 />
+																		Từ chối
+																	</Button>
+																</AlertDialogTrigger>
+															</div>
+														</TooltipTrigger>
+														{user.id === selectedLeaveRequest.userId && (
+															<TooltipContent>
+																<p>Bạn không thể từ chối đơn của chính mình</p>
+															</TooltipContent>
+														)}
+													</Tooltip>
+												</TooltipProvider>
 												<AlertDialogContent>
 													<AlertDialogHeader>
 														<AlertDialogTitle>Xác nhận hủy đơn xin nghỉ phép</AlertDialogTitle>
@@ -385,12 +407,30 @@ export default function AllLeaveRequestsTable() {
 												</AlertDialogContent>
 											</AlertDialog>
 											<AlertDialog>
-												<AlertDialogTrigger asChild>
-													<Button className='px-4 py-2 border bg-green-500 text-white rounded-md hover:bg-green-600 transition'>
-														<CheckCircle />
-														Duyệt
-													</Button>
-												</AlertDialogTrigger>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<div
+																className={`${user.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
+															>
+																<AlertDialogTrigger asChild>
+																	<Button
+																		className={`rounded-md border bg-green-500 px-4 py-2 text-white transition hover:bg-green-600`}
+																		disabled={user.id === selectedLeaveRequest.userId}
+																	>
+																		<CheckCircle />
+																		Duyệt
+																	</Button>
+																</AlertDialogTrigger>
+															</div>
+														</TooltipTrigger>
+														{user.id === selectedLeaveRequest.userId && (
+															<TooltipContent>
+																<p>Bạn không thể duyệt đơn của chính mình</p>
+															</TooltipContent>
+														)}
+													</Tooltip>
+												</TooltipProvider>
 												<AlertDialogContent>
 													<AlertDialogHeader>
 														<AlertDialogTitle>Xác nhận duyệt đơn xin nghỉ phép</AlertDialogTitle>
@@ -412,7 +452,7 @@ export default function AllLeaveRequestsTable() {
 								</div>
 								<Button
 									onClick={() => setIsDialogOpen(false)}
-									className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-800 transition '
+									className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-800'
 								>
 									Thoát
 								</Button>
