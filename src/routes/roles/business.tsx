@@ -7,7 +7,7 @@ import Orders from '@/pages/commerce/Orders';
 // For business
 export const businessRoutes = [
 	{ path: config.routes.business, component: NewBill, layout: CommerceLayout },
-	{ path: config.routes.newOrderBussiness, component: NewBill, layout: CommerceLayout },
+	{ path: config.routes.newOrderBusiness, component: NewBill, layout: CommerceLayout },
 	{ path: config.routes.ordersBusiness, component: Orders, layout: CommerceLayout },
 	{ path: config.routes.customersBusiness, component: Customer, layout: CommerceLayout }
 ];

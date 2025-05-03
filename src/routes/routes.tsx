@@ -5,7 +5,7 @@ import UserInformation from '@/pages/dashboard/UserInformation';
 import { authRoutes } from './roles/auth';
 import { businessRoutes } from './roles/business';
 import { hrRoutes } from './roles/hr';
-import { salesRoutes } from './roles/sales';
+import { normalEmployeeRoutes } from './roles/normal-employee';
 import { warehouseRoutes } from './roles/warehouse';
 
 export const getRoutesByRole = (role: string | undefined) => {
@@ -15,6 +15,8 @@ export const getRoutesByRole = (role: string | undefined) => {
 		layout: DashboardLayout
 	};
 
+	console.log(role);
+
 	switch (role) {
 		case 'HR_MANAGER':
 			return [...hrRoutes, commonRoute, ...authRoutes];
@@ -23,7 +25,9 @@ export const getRoutesByRole = (role: string | undefined) => {
 		case 'BUSINESS_MANAGER':
 			return [...businessRoutes, commonRoute, ...authRoutes];
 		case 'EMPLOYEE':
-			return [...salesRoutes, commonRoute, ...authRoutes];
+			return [...normalEmployeeRoutes, commonRoute, ...authRoutes];
+		case 'ADMIN':
+			return [...hrRoutes, ...warehouseRoutes, ...businessRoutes, commonRoute, ...authRoutes];
 		default:
 			return [commonRoute, ...authRoutes];
 	}
