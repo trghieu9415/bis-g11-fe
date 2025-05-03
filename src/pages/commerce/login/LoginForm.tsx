@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { loginUser } from '@/redux/slices/authSlice';
-import { Link } from 'react-router-dom';
 
 const formSchema = z.object({
 	username: z.string().min(1, { message: 'Username không được để trống' }),
@@ -20,6 +19,7 @@ const LoginForm = () => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const { isAuthenticated, isLoading, error } = useAppSelector(state => state.auth);
+	const [hasAttemptedLogin, setHasAttemptedLogin] = useState(false);
 
 	const {
 		register,
@@ -29,27 +29,46 @@ const LoginForm = () => {
 		resolver: zodResolver(formSchema)
 	});
 
+	// Handle redirection after successful authentication
 	useEffect(() => {
-		// Redirect if already authenticated
-		if (isAuthenticated) {
-			navigate('/');
+		if (hasAttemptedLogin && isAuthenticated) {
+			// Get user role from localStorage to determine where to redirect
+			const profile = localStorage.getItem('profile');
+			let redirectPath = '/';
+
+			if (profile) {
+				const parsedProfile = JSON.parse(profile);
+				const role = parsedProfile?.resContractDTO?.roleName;
+
+				// Redirect based on role
+				if (role === 'HR_MANAGER') {
+					redirectPath = '/hr';
+				} else if (role === 'BUSINESS_MANAGER') {
+					redirectPath = '/business';
+				} else if (role === 'WAREHOUSE_MANAGER') {
+					redirectPath = '/warehouse';
+				} else if (role === 'EMPLOYEE') {
+					redirectPath = '/sales';
+				}
+			}
+
+			toast.success('Đăng nhập thành công!');
+			navigate(redirectPath);
 		}
-	}, [isAuthenticated, navigate]);
+	}, [isAuthenticated, hasAttemptedLogin, navigate]);
 
 	const onSubmit = async (values: FormValues) => {
 		try {
 			const payload = { ...values, platform: 'WEB' };
-			console.log('Submitting login form:', payload);
 
-			// This will handle both login and profile fetch
-			const profile = await dispatch(loginUser(payload)).unwrap();
-			console.log('Login successful with profile:', profile);
+			setHasAttemptedLogin(true);
+			await dispatch(loginUser(payload)).unwrap();
 
-			toast.success('Đăng nhập thành công!');
-			navigate('/');
+			// Navigation will be handled by the useEffect
 		} catch (err: any) {
 			console.error('Login error:', err);
 			toast.error(typeof err === 'string' ? err : error || 'Đăng nhập thất bại, vui lòng thử lại!');
+			setHasAttemptedLogin(false);
 		}
 	};
 
