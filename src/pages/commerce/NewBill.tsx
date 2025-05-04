@@ -19,7 +19,8 @@ export default function NewBill() {
 			return;
 		}
 
-		const userId = Number(localStorage.getItem('userId'));
+		const profile = localStorage.getItem('profile');
+		const userId = profile ? JSON.parse(profile).id : null;
 		if (!userId) {
 			toast.warning('Không tìm thấy userId, vui lòng đăng nhập lại!');
 			return;
@@ -31,7 +32,8 @@ export default function NewBill() {
 			address: customer.address || 'Không có địa chỉ',
 			billDetails: products.map(product => ({
 				productId: product.id,
-				quantity: product.quantity
+				quantity: product.quantity,
+				price: product.price
 			}))
 		};
 
@@ -53,8 +55,8 @@ export default function NewBill() {
 	};
 
 	return (
-		<div className='flex w-full p-2 gap-5'>
-			<div className='flex flex-col gap-2 flex-grow'>
+		<div className='flex w-full gap-5 p-2'>
+			<div className='flex flex-grow flex-col gap-2'>
 				<div className='flex w-full'>
 					<OrderProduct products={products} setProducts={setProducts} />
 				</div>

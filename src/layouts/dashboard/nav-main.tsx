@@ -95,7 +95,7 @@ export function NavMain() {
 		}
 	}, [dispatch]);
 
-	console.log(userInfo);
+	// console.log(userInfo);
 
 	const leaveStats = {
 		sick: Array.isArray(leaveRequests)

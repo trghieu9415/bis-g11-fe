@@ -10,6 +10,8 @@ interface OrderDetailDialogProps {
 }
 
 export const OrderDetailDialog = ({ order }: OrderDetailDialogProps) => {
+	// console.log(order);
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -76,7 +78,7 @@ export const OrderDetailDialog = ({ order }: OrderDetailDialogProps) => {
 								</thead>
 								<tbody className='divide-y divide-gray-200'>
 									{order.billDetails.map(item => (
-										<tr key={item.id} className='hover:bg-gray-50'>
+										<tr key={item.productId} className='hover:bg-gray-50'>
 											<td className='px-4 py-2 font-medium'>{item.productName}</td>
 											<td className='px-4 py-2 text-right'>{item.quantity}</td>
 											<td className='px-4 py-2 text-right'>
