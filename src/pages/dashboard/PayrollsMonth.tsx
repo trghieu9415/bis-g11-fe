@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import PayrollsYearMonthTable from './PayrollsYearMonth/payrolls-month-table';
 import { Input } from '@/components/ui/input';
+import PayrollsYearMonthTable from './PayrollsYearMonth/payrolls-month-table';
+import PayrollsMonthStatistics from './PayrollsYearMonth/payrolls-month-statictisc';
 
 export default function SalaryMonth() {
 	const [today, setToday] = useState(new Date());
@@ -21,22 +22,25 @@ export default function SalaryMonth() {
 	}, [today]);
 
 	return (
-		<div className='flex flex-col w-full'>
-			<h1 className='text-lg font-bold py-4 uppercase'>
+		<div className='flex w-full flex-col'>
+			<h1 className='py-4 text-lg font-bold uppercase'>
 				Danh sách lương theo{' '}
-				<span className='text-lg pb-[2px] font-bold border-b-4 border-blue-300 '>tháng {month} năm {year}</span>
-				{isThisMonth && <span className='bg-yellow-200 text-black px-2 py-1 rounded ml-2'>Tháng này</span>}
+				<span className='border-b-4 border-blue-300 pb-[2px] text-lg font-bold'>
+					tháng {month} năm {year}
+				</span>
+				{isThisMonth && <span className='ml-2 rounded bg-yellow-200 px-2 py-1 text-black'>Tháng này</span>}
 			</h1>
 			<div>
-				<div className='inline-block float-end mr-1'>
+				<div className='float-end mr-1 inline-block'>
 					<Input
 						type='month'
-						className='border-gray-200 outline-none mb-2 !text-base'
+						className='mb-2 border-gray-200 !text-base outline-none'
 						value={`${year}-${month}`}
 						onChange={updateDate}
 					/>
 				</div>
 			</div>
+			<PayrollsMonthStatistics month={month} year={year} />
 			<div className='mb-2'>
 				<PayrollsYearMonthTable month={month} year={year} />
 			</div>

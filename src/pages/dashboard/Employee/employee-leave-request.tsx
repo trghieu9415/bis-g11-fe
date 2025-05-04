@@ -81,7 +81,7 @@ export default function EmployeeLeaveRequest() {
 	const getMaxLeaveDays = () => {
 		switch (formData.typeLeave) {
 			case 'PAID_LEAVE':
-				return 1;
+				return 5;
 			case 'MATERNITY_LEAVE':
 				if (user.gender === 'MALE') {
 					return 7;
