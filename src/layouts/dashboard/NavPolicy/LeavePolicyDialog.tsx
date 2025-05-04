@@ -30,7 +30,7 @@ const LeavePolicyDialog: React.FC<LeavePolicyDialogProps> = ({ isOpen, onClose }
 						<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về chính sách nghỉ phép như sau:</p>
 						<ul className='list-disc pl-6 space-y-2'>
 							<li>
-								<strong>Nghỉ phép</strong>: 12 ngày / 1 năm.
+								<strong>Nghỉ phép</strong>: 12 ngày / 1 năm (tối đa 5 ngày / 1 đơn).
 							</li>
 							<li>
 								<strong>Nghỉ thai sản</strong>: 6 tháng đối với nữ, 7 ngày đối với nam.

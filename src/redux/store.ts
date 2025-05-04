@@ -23,6 +23,8 @@ import supplierReducer from './slices/supplierSlice';
 import authorReducer from './slices/authorSlice';
 import categoryReducer from './slices/categorySlice';
 import goodsReceiptReducer from './slices/goodReceiptsSlice';
+import salaryMonthStatisticsReducer from './slices/salaryMonthStatisticsSlice';
+import employeeMonthStatisticsReducer from './slices/employeeMonthStatisticsSlice';
 import authReducer, { authStorageListener, authLogoutListener } from './slices/authSlice';
 
 export const store = configureStore({
@@ -50,7 +52,9 @@ export const store = configureStore({
 		author: authorReducer,
 		category: categoryReducer,
 		goodsReceipt: goodsReceiptReducer,
-		auth: authReducer
+		auth: authReducer,
+		salaryMonthStatistics: salaryMonthStatisticsReducer,
+		employeeMonthStatistics: employeeMonthStatisticsReducer
 	},
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware().prepend(authStorageListener.middleware).prepend(authLogoutListener.middleware)
