@@ -11,45 +11,14 @@ interface LoginResponse {
 	roleName: string;
 }
 
-interface UserProfile {
-	id: number;
-	idString: string;
-	fullName: string;
-	phoneNumber: string;
-	email: string;
-	dateOfBirth: string;
-	address: string;
-	gender: string;
-	username: string;
-	createdAt: string;
-	status: number;
-	resContractDTO?: {
-		id: number;
-		idString: string;
-		userId: number;
-		fullName: string;
-		seniorityId: number;
-		baseSalary: number;
-		status: number;
-		startDate: string;
-		endDate: string;
-		expiryDate: string;
-		roleName: string;
-		levelName: string;
-		salaryCoefficient: number;
-	};
-}
-
 interface AuthState {
 	isAuthenticated: boolean;
-	profile: UserProfile | null;
 	isLoading: boolean;
 	error: string | null;
 }
 
 const initialState: AuthState = {
 	isAuthenticated: !!localStorage.getItem('accessToken'),
-	profile: null,
 	isLoading: false,
 	error: null
 };
@@ -73,18 +42,8 @@ export const loginUser = createAsyncThunk(
 			localStorage.setItem('accessToken', accessToken);
 			localStorage.setItem('refreshToken', refreshToken);
 
-			// Step 2: Fetch user profile
-			const profileResponse = await axios.get('/api/v1/users/me', {
-				headers: {
-					Authorization: `Bearer ${accessToken}`
-				}
-			});
-
-			localStorage.setItem('profile', JSON.stringify(profileResponse.data));
-			console.log('Profile response:', profileResponse.data);
-
 			// Return combined result
-			return profileResponse.data;
+			// return loginResponse.data;
 		} catch (error: any) {
 			console.error('Auth error:', error.response?.data || error);
 
@@ -131,7 +90,6 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
 		// Xóa tất cả thông tin người dùng từ localStorage
 		localStorage.removeItem('accessToken');
 		localStorage.removeItem('refreshToken');
-		localStorage.removeItem('profile');
 
 		// Phát event logout để các component khác có thể lắng nghe
 		window.dispatchEvent(new Event('auth-logout'));
@@ -142,7 +100,6 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
 		// Vẫn xóa dữ liệu local ngay cả khi API thất bại
 		localStorage.removeItem('accessToken');
 		localStorage.removeItem('refreshToken');
-		localStorage.removeItem('profile');
 
 		return rejectWithValue('Logout failed');
 	}
@@ -182,7 +139,6 @@ const authSlice = createSlice({
 			.addCase(loginUser.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.isAuthenticated = true;
-				state.profile = action.payload;
 			})
 			.addCase(loginUser.rejected, (state, action) => {
 				state.isLoading = false;
@@ -196,7 +152,6 @@ const authSlice = createSlice({
 			})
 			.addCase(refreshUserProfile.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.profile = action.payload;
 			})
 			.addCase(refreshUserProfile.rejected, (state, action) => {
 				state.isLoading = false;

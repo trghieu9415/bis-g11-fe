@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import OrderProduct from './new-bill/OrderProduct';
 import OrderCustomer from './new-bill/OrderCustomer';
 import OrderPaid from './new-bill/OrderPaid';
+import { useAppSelector } from '@/redux/store';
 
 export default function NewBill() {
 	const [products, setProducts] = useState<SelectedProduct[]>([]);
@@ -19,8 +20,9 @@ export default function NewBill() {
 			return;
 		}
 
-		const profile = localStorage.getItem('profile');
-		const userId = profile ? JSON.parse(profile).id : null;
+		const { profile } = useAppSelector(state => state.profile);
+
+		const userId = profile ? profile?.id : null;
 		if (!userId) {
 			toast.warning('Không tìm thấy userId, vui lòng đăng nhập lại!');
 			return;

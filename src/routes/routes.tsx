@@ -29,6 +29,6 @@ export const getRoutesByRole = (role: string | undefined) => {
 		case 'ADMIN':
 			return [...hrRoutes, ...warehouseRoutes, ...businessRoutes, commonRoute, ...authRoutes];
 		default:
-			return [commonRoute, ...authRoutes];
+			return [...normalEmployeeRoutes, commonRoute, ...authRoutes];
 	}
 };

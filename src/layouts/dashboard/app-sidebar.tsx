@@ -4,6 +4,7 @@ import { NavPolicies } from './nav-policy';
 import { NavUser } from './nav-user';
 import { NavCompany } from './nav-company';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
+import { useAppSelector } from '@/redux/store';
 
 type ResContractDTO = {
 	baseSalary: number;
@@ -37,28 +38,7 @@ type UserInfo = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-	useEffect(() => {
-		const profile = localStorage.getItem('profile');
-		if (profile) {
-			setUserInfo(JSON.parse(profile));
-		}
-	}, []);
-
-	// const data = {
-	// 	user: {
-	// 		id: userInfo?.id,
-	// 		name: userInfo?.resContractDTO?.roleName,
-	// 		email: userInfo?.email,
-	// 		avatar: './avatars/black_cat.jpg'
-	// 	},
-	// 	team: {
-	// 		name: 'Công ty INKVERSE',
-	// 		logo: './logo/square.png',
-	// 		plan: 'Enterprise'
-	// 	}
-	// };
+	const { profile } = useAppSelector(state => state.profile);
 
 	return (
 		<Sidebar collapsible='icon' {...props}>
@@ -69,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavMain />
 				<NavPolicies />
 			</SidebarContent>
-			<SidebarFooter>{userInfo && <NavUser user={userInfo} />}</SidebarFooter>
+			<SidebarFooter>{profile && <NavUser user={profile} />}</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
 	);

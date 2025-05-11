@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { fetchAllLeaveRequests } from '@/redux/slices/leaveRequestsSlice';
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import { approveLeaveRequest, rejectLeaveRequest } from '@/services/leaveRequestService';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -47,9 +47,7 @@ export default function AllLeaveRequestsTable() {
 
 	const dispatch = useAppDispatch();
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
-	const user = JSON.parse(localStorage.getItem('profile') || '{}');
-
-	console.log(user, selectedLeaveRequest);
+	const { profile } = useAppSelector(state => state.profile);
 
 	useEffect(() => {
 		if (leaveRequests?.length === 0) {
@@ -370,12 +368,12 @@ export default function AllLeaveRequestsTable() {
 													<Tooltip>
 														<TooltipTrigger asChild>
 															<div
-																className={`${user.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
+																className={`${profile?.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
 															>
 																<AlertDialogTrigger asChild>
 																	<Button
 																		className={`rounded-md border bg-red-500 px-4 py-2 text-white transition hover:bg-red-600`}
-																		disabled={user.id === selectedLeaveRequest.userId}
+																		disabled={profile?.id === selectedLeaveRequest.userId}
 																	>
 																		<Trash2 />
 																		Từ chối
@@ -383,7 +381,7 @@ export default function AllLeaveRequestsTable() {
 																</AlertDialogTrigger>
 															</div>
 														</TooltipTrigger>
-														{user.id === selectedLeaveRequest.userId && (
+														{profile?.id === selectedLeaveRequest.userId && (
 															<TooltipContent>
 																<p>Bạn không thể từ chối đơn của chính mình</p>
 															</TooltipContent>
@@ -411,12 +409,12 @@ export default function AllLeaveRequestsTable() {
 													<Tooltip>
 														<TooltipTrigger asChild>
 															<div
-																className={`${user.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
+																className={`${profile?.id === selectedLeaveRequest.userId ? 'cursor-not-allowed opacity-40' : ''}`}
 															>
 																<AlertDialogTrigger asChild>
 																	<Button
 																		className={`rounded-md border bg-green-500 px-4 py-2 text-white transition hover:bg-green-600`}
-																		disabled={user.id === selectedLeaveRequest.userId}
+																		disabled={profile?.id === selectedLeaveRequest.userId}
 																	>
 																		<CheckCircle />
 																		Duyệt
@@ -424,7 +422,7 @@ export default function AllLeaveRequestsTable() {
 																</AlertDialogTrigger>
 															</div>
 														</TooltipTrigger>
-														{user.id === selectedLeaveRequest.userId && (
+														{profile?.id === selectedLeaveRequest.userId && (
 															<TooltipContent>
 																<p>Bạn không thể duyệt đơn của chính mình</p>
 															</TooltipContent>

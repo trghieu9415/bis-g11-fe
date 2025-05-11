@@ -20,6 +20,7 @@ const LoginForm = () => {
 	const dispatch = useAppDispatch();
 	const { isAuthenticated, isLoading, error } = useAppSelector(state => state.auth);
 	const [hasAttemptedLogin, setHasAttemptedLogin] = useState(false);
+	const { profile } = useAppSelector(state => state.profile);
 
 	const {
 		register,
@@ -33,26 +34,24 @@ const LoginForm = () => {
 	useEffect(() => {
 		if (hasAttemptedLogin && isAuthenticated) {
 			// Get user role from localStorage to determine where to redirect
-			const profile = localStorage.getItem('profile');
-			let redirectPath = '/';
+			const redirectPath = '/';
 
-			if (profile) {
-				const parsedProfile = JSON.parse(profile);
-				const role = parsedProfile?.resContractDTO?.roleName;
+			// if (profile) {
+			// 	const role = profile?.resContractDTO?.roleName;
 
-				// Redirect based on role
-				if (role === 'HR_MANAGER') {
-					redirectPath = '/hr';
-				} else if (role === 'BUSINESS_MANAGER') {
-					redirectPath = '/business';
-				} else if (role === 'WAREHOUSE_MANAGER') {
-					redirectPath = '/warehouse';
-				} else if (role === 'EMPLOYEE') {
-					redirectPath = '/employee';
-				} else if (role === 'ADMIN') {
-					redirectPath = '/hr';
-				}
-			}
+			// Redirect based on role
+			// 	if (role === 'HR_MANAGER') {
+			// 		redirectPath = '/hr';
+			// 	} else if (role === 'BUSINESS_MANAGER') {
+			// 		redirectPath = '/business';
+			// 	} else if (role === 'WAREHOUSE_MANAGER') {
+			// 		redirectPath = '/warehouse';
+			// 	} else if (role === 'EMPLOYEE') {
+			// 		redirectPath = '/employee';
+			// 	} else if (role === 'ADMIN') {
+			// 		redirectPath = '/hr';
+			// 	}
+			// }
 
 			toast.success('Đăng nhập thành công!');
 			navigate(redirectPath);
@@ -64,7 +63,7 @@ const LoginForm = () => {
 			const payload = { ...values, platform: 'WEB' };
 
 			setHasAttemptedLogin(true);
-			await dispatch(loginUser(payload)).unwrap();
+			dispatch(loginUser(payload)).unwrap();
 
 			// Navigation will be handled by the useEffect
 		} catch (err: any) {
