@@ -232,7 +232,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 	return (
 		<div className='mt-2'>
 			<div>
-				<div className='flex justify-between items-center'>
+				<div className='flex items-center justify-between'>
 					<h3 className='text-base font-semibold'>Danh sách cấp bậc</h3>
 					{mode === 'edit' && !isShowAdd ? (
 						<ChevronDown className='hover:cursor-pointer' onClick={() => setIsShowAdd(!isShowAdd)} />
@@ -242,10 +242,10 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 				</div>
 				{mode === 'edit' && isShowAdd && selectedRole?.status === 1 ? (
 					<>
-						<div className='grid grid-cols-2 gap-4 mt-1'>
+						<div className='mt-1 grid grid-cols-2 gap-4'>
 							<div className='grid grid-cols-2 gap-4'>
 								<div>
-									<label htmlFor='level-id' className='w-full text-sm mb-1 text-start font-semibold'>
+									<label htmlFor='level-id' className='mb-1 w-full text-start text-sm font-semibold'>
 										Tên cấp bậc
 									</label>
 									<Input
@@ -260,10 +260,10 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 											}
 										})}
 									/>
-									{errors.levelName && <p className='text-red-500 text-sm'>{errors.levelName.message}</p>}
+									{errors.levelName && <p className='text-sm text-red-500'>{errors.levelName.message}</p>}
 								</div>
 								<div>
-									<label htmlFor='level-salary-coefficient' className='w-full text-sm mb-1 text-start font-semibold'>
+									<label htmlFor='level-salary-coefficient' className='mb-1 w-full text-start text-sm font-semibold'>
 										Hệ số lương
 									</label>
 									<Input
@@ -285,12 +285,12 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 										})}
 									/>
 									{errors.salaryCoefficient && (
-										<p className='text-red-500 text-sm'>{errors.salaryCoefficient.message}</p>
+										<p className='text-sm text-red-500'>{errors.salaryCoefficient.message}</p>
 									)}
 								</div>
 							</div>
 							<div>
-								<label htmlFor='level-description' className='w-full text-sm mb-1 text-start font-semibold'>
+								<label htmlFor='level-description' className='mb-1 w-full text-start text-sm font-semibold'>
 									Mô tả
 								</label>
 								<Input
@@ -305,12 +305,12 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 										}
 									})}
 								/>
-								{errors.description && <p className='text-red-500 text-sm'>{errors.description.message}</p>}
+								{errors.description && <p className='text-sm text-red-500'>{errors.description.message}</p>}
 							</div>
 						</div>
-						<div className='h-[40px] mb-2'>
+						<div className='mb-2 h-[40px]'>
 							<Button
-								className='bg-green-800 hover:bg-green-900  mt-2 float-end'
+								className='float-end mt-2 bg-green-800 hover:bg-green-900'
 								onClick={() => handleAddLevel(formData)}
 							>
 								<Plus />
@@ -322,7 +322,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 					mode === 'edit' &&
 					isShowAdd && (
 						<>
-							<span className='text-center '>
+							<span className='text-center'>
 								<p className='my-2'>
 									Vui lòng cập nhật sang trạng thái <strong>"Hoạt động"</strong> để có thể thêm cấp bậc
 								</p>
@@ -331,17 +331,17 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 					)
 				)}
 			</div>
-			<div className={`overflow-y-auto ${isShowAdd ? 'max-h-[300px]' : 'max-h-[400px]'}  pr-1`}>
-				<Table className='min-w-full table-fixed border border-gray-300 mt-2'>
+			<div className={`overflow-y-auto ${isShowAdd ? 'max-h-[300px]' : 'max-h-[400px]'} pr-1`}>
+				<Table className='mt-2 min-w-full table-fixed border border-gray-300'>
 					<TableHeader className='bg-gray-100'>
 						<TableRow>
-							<TableCell className='border border-gray-300 py-2 px-2  w-20 text-center'>ID</TableCell>
-							<TableCell className='border border-gray-300 py-2 px-2 w-80 text-center'>Mô tả</TableCell>
-							<TableCell className='border border-gray-300 py-2 px-2 text-center'>Tên cấp bậc</TableCell>
-							<TableCell className='border border-gray-300 py-2 px-2 min-w-[160px] text-center'>Trạng thái</TableCell>
-							<TableCell className='border border-gray-300 py-2 px-2 w-28 text-center'>Hệ số lương</TableCell>
+							<TableCell className='w-20 border border-gray-300 px-2 py-2 text-center'>ID</TableCell>
+							<TableCell className='w-80 border border-gray-300 px-2 py-2 text-center'>Mô tả</TableCell>
+							<TableCell className='border border-gray-300 px-2 py-2 text-center'>Tên cấp bậc</TableCell>
+							<TableCell className='min-w-[160px] border border-gray-300 px-2 py-2 text-center'>Trạng thái</TableCell>
+							<TableCell className='w-28 border border-gray-300 px-2 py-2 text-center'>Hệ số lương</TableCell>
 							{mode === 'edit' && (
-								<TableCell className='border border-gray-300 py-2 px-2 w-20 text-center'>Thao tác</TableCell>
+								<TableCell className='w-20 border border-gray-300 px-2 py-2 text-center'>Thao tác</TableCell>
 							)}
 						</TableRow>
 					</TableHeader>
@@ -351,17 +351,17 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 								if (seniority.status !== 0) {
 									return (
 										<TableRow key={seniority.idString} className='hover:bg-gray-50'>
-											<TableCell className='border border-gray-300 py-1 px-2 text-center'>
+											<TableCell className='border border-gray-300 px-2 py-1 text-center'>
 												{seniority.idString}
 											</TableCell>
 											<TableCell
-												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-0' : 'py-1  px-2 '}`}
+												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-0' : 'px-2 py-1'}`}
 											>
 												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
 													<>
 														<Input
 															value={selectedLevel?.description || ''}
-															className={`w-full h-[40px] px-2 ${selectedLevel.description.length < 3 ? 'mt-2' : ''}`}
+															className={`h-[40px] w-full px-2 ${selectedLevel.description.length < 3 ? 'mt-2' : ''}`}
 															onChange={e => {
 																setSelectedLevel(prev => ({
 																	...prev,
@@ -375,7 +375,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 															}}
 														/>
 														{selectedLevel?.description?.length < 3 && (
-															<p className='text-red-500 text-sm my-1'>Mô tả cấp bậc không được nhỏ hơn 3 ký tự</p>
+															<p className='my-1 text-sm text-red-500'>Mô tả cấp bậc không được nhỏ hơn 3 ký tự</p>
 														)}
 													</>
 												) : (
@@ -383,13 +383,13 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 												)}
 											</TableCell>
 											<TableCell
-												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+												className={`border border-gray-300 ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'px-2 py-1'}`}
 											>
 												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
 													<>
 														<Input
 															value={selectedLevel?.levelName || ''}
-															className={`w-full h-[40px] px-2 ${selectedLevel.levelName.length < 3 ? 'mt-2' : ''}`}
+															className={`h-[40px] w-full px-2 ${selectedLevel.levelName.length < 3 ? 'mt-2' : ''}`}
 															onChange={e => {
 																setSelectedLevel(prev => ({
 																	...prev,
@@ -403,7 +403,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 															}}
 														/>
 														{selectedLevel?.levelName?.length < 3 && (
-															<p className='text-red-500 text-sm my-1'>Tên cấp bậc không được nhỏ hơn 3 ký tự</p>
+															<p className='my-1 text-sm text-red-500'>Tên cấp bậc không được nhỏ hơn 3 ký tự</p>
 														)}
 													</>
 												) : (
@@ -411,7 +411,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 												)}
 											</TableCell>
 											<TableCell
-												className={`border border-gray-300 text-center ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+												className={`border border-gray-300 text-center ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'px-2 py-1'}`}
 											>
 												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
 													<Select
@@ -439,25 +439,25 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 														</SelectContent>
 													</Select>
 												) : seniority.status === 1 ? (
-													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-														<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+													<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+														<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 														Kích hoạt
 													</p>
 												) : (
-													<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-yellow-500 rounded-sm p-1'>
-														<XCircle className='w-4 h-4 mr-1' stroke='white' />
+													<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+														<XCircle className='mr-1 h-4 w-4' stroke='white' />
 														Chưa kích hoạt
 													</p>
 												)}
 											</TableCell>
 											<TableCell
-												className={`border border-gray-300 ${!selectedLevel?.salaryCoefficient ? 'w-40' : 'w20'} text-end ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'py-1  px-2 '}`}
+												className={`border border-gray-300 ${!selectedLevel?.salaryCoefficient ? 'w-40' : 'w20'} text-end ${mode === 'edit' && selectedLevel?.id === seniority.id ? 'py-1' : 'px-2 py-1'}`}
 											>
 												{mode === 'edit' && selectedLevel?.id === seniority.id ? (
 													<>
 														<Input
 															value={selectedLevel?.salaryCoefficient || ''}
-															className={`w-full h-[40px] px-2 ${!selectedLevel.salaryCoefficient ? 'mt-2' : ''}`}
+															className={`h-[40px] w-full px-2 ${!selectedLevel.salaryCoefficient ? 'mt-2' : ''}`}
 															onChange={e => {
 																const value = e.target.value;
 																if (/^\d*\.?\d*$/.test(value) || value === '') {
@@ -474,7 +474,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 															}}
 														/>
 														{!selectedLevel?.salaryCoefficient && (
-															<p className='text-red-500 text-sm text-start my-1'>Hệ số lương không được rỗng</p>
+															<p className='my-1 text-start text-sm text-red-500'>Hệ số lương không được rỗng</p>
 														)}
 													</>
 												) : (
@@ -482,17 +482,17 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 												)}
 											</TableCell>
 											{mode === 'edit' && seniority.status === 2 && (
-												<TableCell className='border border-gray-300 py-1 px-2'>
+												<TableCell className='border border-gray-300 px-2 py-1'>
 													{mode === 'edit' && selectedLevel?.id === seniority.id ? (
-														<div className='flex justify-center items-center gap-1'>
+														<div className='flex items-center justify-center gap-1'>
 															<Button
-																className='bg-green-500 hover:bg-green-600 h-[30px] w-[30px]'
+																className='h-[30px] w-[30px] bg-green-500 hover:bg-green-600'
 																onClick={() => handleUpdateLevel(selectedLevel?.id, selectedLevel)}
 															>
 																<CheckCheck />
 															</Button>
 															<Button
-																className='bg-red-500 hover:bg-red-600  h-[30px] w-[30px]'
+																className='h-[30px] w-[30px] bg-red-500 hover:bg-red-600'
 																onClick={() =>
 																	setSelectedLevel({
 																		id: -1,
@@ -512,7 +512,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 															<DropdownMenu>
 																<DropdownMenuTrigger asChild>
 																	<Button variant='ghost' size='icon'>
-																		<Ellipsis className='w-4 h-4' />
+																		<Ellipsis className='h-4 w-4' />
 																	</Button>
 																</DropdownMenuTrigger>
 																<DropdownMenuContent align='end'>
@@ -566,7 +566,7 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 							})
 						) : (
 							<TableRow>
-								<TableCell colSpan={6} className='border border-gray-300 text-start'>
+								<TableCell colSpan={mode === 'edit' ? 6 : 5} className='border border-gray-300 text-start'>
 									Không có cấp bậc nào
 								</TableCell>
 							</TableRow>

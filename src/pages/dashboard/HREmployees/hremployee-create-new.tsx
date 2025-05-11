@@ -660,7 +660,11 @@ export default function EmployeeCreateNew() {
 												type='text'
 												className='mt-1'
 												{...register('base_salary', {
-													required: 'Vui lòng nhập lương cơ bản'
+													required: 'Vui lòng nhập lương cơ bản',
+													validate: value => {
+														const numericValue = Number(value.replace(/,/g, ''));
+														return numericValue > 0 || 'Lương cơ bản phải lớn hơn 0';
+													}
 												})}
 												onChange={e => formatSalary(e.target.value)}
 											/>

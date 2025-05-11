@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useAppSelector } from '@/redux/store';
 
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import UserInformationDetail from '@/pages/dashboard/UserInformation/user-information-detail';
@@ -37,27 +38,20 @@ type UserInfo = {
 };
 
 export default function UserInformation() {
-	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-	useEffect(() => {
-		const profile = localStorage.getItem('profile');
-		if (profile) {
-			setUserInfo(JSON.parse(profile));
-		}
-	}, []);
+	const { profile } = useAppSelector(state => state.profile);
 
 	return (
-		userInfo && (
+		profile && (
 			<div className='mb-2 flex max-h-[calc(100vh-60px)] w-full items-start justify-between gap-4'>
 				{/* Thông tin User */}
-				<UserInformationDetail userInfo={userInfo} />
+				<UserInformationDetail userInfo={profile} />
 
 				{/* Khung chứa lịch sử */}
 				<div className='flex h-full flex-1 flex-col gap-4'>
 					<PanelGroup direction='vertical' className='h-full w-full rounded-sm'>
 						{/* Panel Contract */}
 						<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-							<UserInformationContractsHistory userInfo={userInfo} />
+							<UserInformationContractsHistory userInfo={profile} />
 						</Panel>
 
 						{/* Scroll */}
@@ -65,7 +59,7 @@ export default function UserInformation() {
 
 						{/* Panel Leave Request */}
 						<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-							<UserInformationLeaveRequestsHistory userInfo={userInfo} />
+							<UserInformationLeaveRequestsHistory userInfo={profile} />
 						</Panel>
 					</PanelGroup>
 				</div>

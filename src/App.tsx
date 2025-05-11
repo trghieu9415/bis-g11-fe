@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { getRoutesByRole } from './routes';
 import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { refreshUserProfile } from '@/redux/slices/authSlice';
+import { fetchProfile } from '@/redux/slices/profileSlice';
 import NotFound from './pages/NotFound';
 
 type ResContractDTO = {
@@ -40,53 +41,23 @@ type UserInfo = {
 };
 
 function App() {
-	const [profile, setProfile] = useState<UserInfo | null>(null);
-	const [loading, setLoading] = useState(true);
+	// const [profile, setProfile] = useState<UserInfo | null>(null);
+	// const [loading, setLoading] = useState(true);
 	const dispatch = useAppDispatch();
 	const { isAuthenticated } = useAppSelector(state => state.auth);
-
+	const { profile, isLoading } = useAppSelector(state => state.profile);
 	useEffect(() => {
-		const loadProfile = async () => {
-			const storedProfile = localStorage.getItem('profile');
-			const accessToken = localStorage.getItem('accessToken');
-
-			if (storedProfile) {
-				setProfile(JSON.parse(storedProfile));
-			}
-
-			// If we have an access token but no profile in Redux, fetch it
-			if (accessToken && isAuthenticated) {
-				try {
-					await dispatch(refreshUserProfile()).unwrap();
-				} catch (error) {
-					console.error('Failed to refresh profile:', error);
-				}
-			}
-
-			setLoading(false);
-		};
-
-		loadProfile();
-
-		// Listen for auth changes
-		const handleAuthChange = () => {
-			const storedProfile = localStorage.getItem('profile');
-			if (storedProfile) {
-				setProfile(JSON.parse(storedProfile));
-			}
-		};
-
-		window.addEventListener('auth-change', handleAuthChange);
-		return () => window.removeEventListener('auth-change', handleAuthChange);
+		dispatch(fetchProfile());
 	}, [dispatch, isAuthenticated]);
 
-	if (loading) {
+	if (isLoading) {
 		return <div className='flex h-screen items-center justify-center'>Loading...</div>;
 	}
 
 	const role = profile?.resContractDTO?.roleName;
 	const roleRoutes = getRoutesByRole(role);
-	// console.log(roleRoutes);
+
+	console.log(role);
 
 	return (
 		<Router>
@@ -107,7 +78,7 @@ function App() {
 							) : role === 'ADMIN' ? (
 								<Navigate to='/hr' />
 							) : (
-								<Navigate to='/login' />
+								<Navigate to='/employee' />
 							)
 						) : (
 							<Navigate to='/login' />

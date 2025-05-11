@@ -3,6 +3,7 @@ import { RootState, useAppDispatch } from '@/redux/store';
 import { useSelector } from 'react-redux';
 import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
 import { fetchUsers } from '@/redux/slices/usersSlice';
+import { fetchProfile } from '@/redux/slices/profileSlice';
 import { useForm, UseFormSetError } from 'react-hook-form';
 
 import { Input } from '@/components/ui/input';
@@ -66,14 +67,12 @@ type UserInfo = {
 	resContractDTO?: ResContractDTO;
 };
 
-interface userInformationDetailProps {
-	userInfo: UserInfo;
-}
-
-export default function UserInformationDetail({ userInfo }: userInformationDetailProps) {
-	// const dispatch = useAppDispatch();
+export default function UserInformationDetail() {
+	const dispatch = useAppDispatch();
 	// const { user } = useSelector((state: RootState) => state.user);
-	const { users } = useSelector((state: RootState) => state.users);
+	// const { users } = useSelector((state: RootState) => state.users);
+	const { profile } = useSelector((state: RootState) => state.profile);
+
 	const {
 		register,
 		reset,
@@ -85,13 +84,13 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 		formState: { errors }
 	} = useForm<Employee>({
 		defaultValues: {
-			fullName: userInfo?.fullName,
-			gender: userInfo?.gender,
-			email: userInfo?.email,
-			phoneNumber: userInfo?.phoneNumber,
-			dateOfBirth: userInfo?.dateOfBirth,
-			address: userInfo?.address,
-			username: userInfo?.username,
+			fullName: profile?.fullName,
+			gender: profile?.gender,
+			email: profile?.email,
+			phoneNumber: profile?.phoneNumber,
+			dateOfBirth: profile?.dateOfBirth,
+			address: profile?.address,
+			username: profile?.username,
 			password: ''
 		}
 	});
@@ -99,40 +98,32 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 	const formData = watch();
 
 	useEffect(() => {
-		if (userInfo) {
+		if (profile) {
 			reset({
-				fullName: userInfo?.fullName,
-				gender: userInfo?.gender,
-				email: userInfo?.email,
-				phoneNumber: userInfo?.phoneNumber,
-				dateOfBirth: userInfo?.dateOfBirth,
-				address: userInfo?.address,
-				username: userInfo?.username,
+				fullName: profile?.fullName,
+				gender: profile?.gender,
+				email: profile?.email,
+				phoneNumber: profile?.phoneNumber,
+				dateOfBirth: profile?.dateOfBirth,
+				address: profile?.address,
+				username: profile?.username,
 				password: ''
 			});
 		}
-	}, [userInfo, reset]);
+	}, [profile, reset]);
 
 	const handleResetClick = () => {
-		reset();
-	};
-
-	const checkUserExistence = (userId: number, email: string, phone: string, setError: UseFormSetError<Employee>) => {
-		const existingEmail = users.find(user => user.email === email && user.id !== userId);
-		const existingPhone = users.find(user => user.phone === phone && user.id !== userId);
-
-		if (existingEmail) {
-			setError('email', { type: 'manual', message: 'Email đã tồn tại' });
-		}
-		if (existingPhone) {
-			setError('phoneNumber', { type: 'manual', message: 'Số điện thoại đã tồn tại' });
-		}
-
-		if (existingEmail || existingPhone) {
-			return true;
-		}
-
-		return false;
+		console.log(profile);
+		reset({
+			fullName: profile?.fullName,
+			gender: profile?.gender,
+			email: profile?.email,
+			phoneNumber: profile?.phoneNumber,
+			dateOfBirth: profile?.dateOfBirth,
+			address: profile?.address,
+			username: profile?.username,
+			password: ''
+		});
 	};
 
 	const handleSubmitClick = async () => {
@@ -149,15 +140,15 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 
 		const isValid = await trigger(fieldsToValidate);
 
-		const email = getValues('email');
-		const phone = getValues('phoneNumber');
-		let isExist = true;
+		// const email = getValues('email');
+		// const phone = getValues('phoneNumber');
+		// let isExist = true;
 
-		if (userInfo?.id) {
-			isExist = checkUserExistence(userInfo?.id, email, phone, setError);
-		}
+		// if (userInfo?.id) {
+		// 	isExist = checkUserExistence(userInfo?.id, email, phone, setError);
+		// }
 
-		if (isValid && !isExist && userInfo?.id) {
+		if (isValid && profile?.id) {
 			try {
 				const updatedUserData = {
 					fullName: formData.fullName,
@@ -170,19 +161,10 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 					password: ''
 				};
 
-				await updateUser(userInfo?.id, updatedUserData);
+				await updateUser(profile?.id, updatedUserData);
 				toast.success('Cập nhật thông tin nhân viên thành công!');
 
-				userInfo.fullName = formData.fullName;
-				userInfo.phoneNumber = formData.phoneNumber;
-				userInfo.email = formData.email;
-				userInfo.dateOfBirth = formData.dateOfBirth;
-				userInfo.address = formData.address;
-				userInfo.gender = formData.gender;
-				userInfo.username = formData.username;
-				localStorage.setItem('profile', JSON.stringify(userInfo));
-
-				// dispatch(fetchUserDetail(2));
+				dispatch(fetchProfile());
 			} catch (error) {
 				const err = error as AxiosError;
 
@@ -200,8 +182,7 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 	};
 
 	return (
-		userInfo &&
-		userInfo?.id && (
+		profile?.id && (
 			<div className='h-full max-w-[50vw] rounded-md border border-solid border-gray-200 bg-white px-4 py-6'>
 				<h1 className='text-center text-lg font-bold uppercase'>Chào mừng đến với thông tin tài khoản</h1>
 				<p className='text-center'>Quản lý thông tin cá nhân, cập nhật hồ sơ và thiết lập tài khoản của bạn tại đây.</p>
@@ -215,7 +196,7 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 								<label htmlFor='id' className='mb-1 block text-sm'>
 									<strong>Mã ID</strong>
 								</label>
-								<Input type='text' id='id' readOnly value={`${userInfo?.idString}`} disabled />
+								<Input type='text' id='id' readOnly value={`${profile?.idString}`} disabled />
 							</div>
 							<div className='col-span-3'>
 								<label htmlFor='fullname' className='mb-1 block text-sm'>
@@ -367,7 +348,7 @@ export default function UserInformationDetail({ userInfo }: userInformationDetai
 							<label htmlFor='username' className='mb-1 block text-sm'>
 								<strong>Tên tài khoản</strong>
 							</label>
-							<Input type='text' className='block w-full' id='username' disabled value={userInfo?.username} />
+							<Input type='text' className='block w-full' id='username' disabled value={profile?.username} />
 						</div>
 						<div>
 							<label htmlFor='password' className='mb-1 block text-sm'>

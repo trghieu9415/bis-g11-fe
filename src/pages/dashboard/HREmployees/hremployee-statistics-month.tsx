@@ -68,8 +68,8 @@ export default function EmployeeMonthStatistics() {
 	];
 
 	const constractStatus = [
-		{ title: 'Permanent', value: statistics?.permanentEmployees },
-		{ title: 'Probation', value: statistics?.probationEmployees }
+		{ title: 'Chính thức', value: statistics?.permanentEmployees },
+		{ title: 'Thử việc', value: statistics?.probationEmployees }
 	];
 
 	const genderRatio = [

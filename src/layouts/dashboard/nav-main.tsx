@@ -36,6 +36,7 @@ import { fetchAllLeaveRequests } from '@/redux/slices/leaveRequestsSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { ElementType, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/store';
 
 type ResContractDTO = {
 	baseSalary: number;
@@ -82,20 +83,13 @@ export function NavMain() {
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequests);
 	const { isHideSidebar } = useSelector((state: RootState) => state.isHideSidebar);
 
-	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+	const { profile } = useAppSelector(state => state.profile);
 
 	useEffect(() => {
-		const profile = localStorage.getItem('profile');
-		if (profile) {
-			setUserInfo(JSON.parse(profile));
-		}
-
 		if (leaveRequests?.length == 0) {
 			dispatch(fetchAllLeaveRequests());
 		}
 	}, [dispatch]);
-
-	// console.log(userInfo);
 
 	const leaveStats = {
 		sick: Array.isArray(leaveRequests)
@@ -246,7 +240,7 @@ export function NavMain() {
 	let trueDataForRenderMenu: MenuItem[] = [];
 	let title = '';
 
-	switch (userInfo?.resContractDTO?.roleName) {
+	switch (profile?.resContractDTO?.roleName) {
 		case 'HR_MANAGER':
 			trueDataForRenderMenu = hremployee;
 			title = 'Quản lý nhân sự';

@@ -26,6 +26,7 @@ import goodsReceiptReducer from './slices/goodReceiptsSlice';
 import salaryMonthStatisticsReducer from './slices/salaryMonthStatisticsSlice';
 import employeeMonthStatisticsReducer from './slices/employeeMonthStatisticsSlice';
 import authReducer, { authStorageListener, authLogoutListener } from './slices/authSlice';
+import profileReducer from './slices/profileSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -54,7 +55,8 @@ export const store = configureStore({
 		goodsReceipt: goodsReceiptReducer,
 		auth: authReducer,
 		salaryMonthStatistics: salaryMonthStatisticsReducer,
-		employeeMonthStatistics: employeeMonthStatisticsReducer
+		employeeMonthStatistics: employeeMonthStatisticsReducer,
+		profile: profileReducer
 	},
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware().prepend(authStorageListener.middleware).prepend(authLogoutListener.middleware)
