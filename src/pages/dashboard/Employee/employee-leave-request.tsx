@@ -38,7 +38,7 @@ export default function EmployeeLeaveRequest() {
 
 	const dispatch = useAppDispatch();
 	const { profile } = useAppSelector(state => state.profile);
-
+	console.log('profile', profile);
 	const {
 		register,
 		watch,
@@ -181,7 +181,7 @@ export default function EmployeeLeaveRequest() {
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value='PAID_LEAVE'>Nghỉ phép</SelectItem>
-										<SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>
+										{profile?.gender === 'FEMALE' && <SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>}
 										<SelectItem value='SICK_LEAVE'>Nghỉ bệnh</SelectItem>
 									</SelectContent>
 								</Select>

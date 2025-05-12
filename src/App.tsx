@@ -1,44 +1,14 @@
+import { useEffect } from 'react';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Bounce, ToastContainer } from 'react-toastify';
 import './index.css';
-import { useState, useEffect } from 'react';
-import { ToastContainer, Bounce } from 'react-toastify';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import { getRoutesByRole } from './routes';
-import { useAppDispatch, useAppSelector } from '@/redux/store';
-import { refreshUserProfile } from '@/redux/slices/authSlice';
 import { fetchProfile } from '@/redux/slices/profileSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/store';
 import NotFound from './pages/NotFound';
-
-type ResContractDTO = {
-	baseSalary: number;
-	endDate: string;
-	expiryDate: string;
-	fullName: string;
-	id: number;
-	idString: string;
-	levelName: string;
-	roleName: string;
-	salaryCoefficient: number;
-	seniorityId: number;
-	startDate: string;
-	status: number;
-	userId: number;
-};
-
-type UserInfo = {
-	id: number;
-	idString: string;
-	fullName: string;
-	email: string;
-	phoneNumber: string;
-	gender: 'MALE' | 'FEMALE' | string;
-	dateOfBirth: string;
-	address: string;
-	username: string;
-	createdAt: string;
-	status: number;
-	resContractDTO?: ResContractDTO;
-};
+import { getRoutesByRole } from './routes';
+import { logoutUser } from './redux/slices/authSlice';
+import { getMe } from './services/userService';
 
 function App() {
 	// const [profile, setProfile] = useState<UserInfo | null>(null);
@@ -50,14 +20,41 @@ function App() {
 		dispatch(fetchProfile());
 	}, [dispatch, isAuthenticated]);
 
+	useEffect(() => {
+		if (!profile) {
+			// Refresh token
+			// But we don't have a refresh token
+			// So we need to logout
+			const accessToken = localStorage.getItem('accessToken');
+			if (!accessToken) {
+				dispatch(logoutUser());
+				<Navigate to='/login' />;
+			}
+
+			const checkAccessTokenExpired = async () => {
+				try {
+					const response = await getMe();
+					if (!response.id) {
+						dispatch(logoutUser());
+						<Navigate to='/login' />;
+					}
+				} catch (error) {
+					console.error('Error fetching profile:', error);
+					dispatch(logoutUser());
+					<Navigate to='/login' />;
+				}
+			};
+
+			checkAccessTokenExpired();
+		}
+	}, [profile, dispatch]);
+
 	if (isLoading) {
 		return <div className='flex h-screen items-center justify-center'>Loading...</div>;
 	}
 
 	const role = profile?.resContractDTO?.roleName;
 	const roleRoutes = getRoutesByRole(role);
-
-	console.log(role);
 
 	return (
 		<Router>

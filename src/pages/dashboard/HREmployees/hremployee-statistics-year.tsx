@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '@/redux/store';
-import { fetchEmployeeMonthStatistics } from '@/redux/slices/employeeMonthStatisticsSlice';
+import { fetchEmployeeYearStatistics } from '@/redux/slices/employeeYearStatisticsSlice';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { TextSearch } from 'lucide-react';
 
 import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#E91E63'];
 
 interface Statistics {
 	id: number;
-	monthOfYear: string;
+	year: string;
 	activeEmployees: number;
 	newEmployees: number;
 	contractExpired: number;
@@ -20,32 +22,26 @@ interface Statistics {
 	avgTenure: number;
 }
 
-export default function EmployeeMonthStatistics() {
+export default function EmployeeYearStatistics() {
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
-	const { statistics } = useSelector((state: RootState) => state.employeeMonthStatistics); // Changed from employeeMonthStatistics to employeeStatistics
+	const { statistics } = useSelector((state: RootState) => state.employeeYearStatistics);
 
 	const [hasValidData, setHasValidData] = useState<boolean>(false);
+	const [year, setYear] = useState('2025');
 
-	const getCurrentYearMonth = () => {
-		const now = new Date();
-		const year = now.getFullYear();
-		const month = String(now.getMonth() + 1).padStart(2, '0');
-		return `${year}-${month}`;
-	};
+	console.log(hasValidData);
 
 	const checkHasData = (stats: Statistics | null) => {
 		if (!stats) return false;
-		const { id, monthOfYear, ...relevantStats } = stats;
+		const { id, year, ...relevantStats } = stats;
 		return Object.values(relevantStats).some(
 			value => (typeof value === 'number' && value > 0) || (typeof value === 'string' && value !== '0.0%')
 		);
 	};
 
 	useEffect(() => {
-		const currentYearMonth = getCurrentYearMonth();
-		const [year, month] = currentYearMonth.split('-');
-		dispatch(fetchEmployeeMonthStatistics(`${year}-${month}`));
+		dispatch(fetchEmployeeYearStatistics(`${year}`));
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -85,19 +81,25 @@ export default function EmployeeMonthStatistics() {
 
 	return (
 		<div className='mb-2'>
-			<div className='mb-2'>
+			<div className='mb-2 flex justify-center gap-2'>
 				<Input
-					type='month'
-					id='monthYear'
-					defaultValue={getCurrentYearMonth()}
-					className='m-auto block h-[30px] w-[160px] rounded-md border p-2'
-					min='2020-01'
-					max='2100-12'
-					onChange={e => {
-						const [year, month] = e.target.value.split('-');
-						dispatch(fetchEmployeeMonthStatistics(`${year}-${month}`));
-					}}
+					type='number'
+					id='year'
+					placeholder='YYYY'
+					min='2020'
+					max='2100'
+					value={year}
+					className='block h-[30px] w-[90px] rounded-sm border p-2 pr-[32px]'
+					onChange={e => setYear(e.target.value)}
 				/>
+				<Button
+					className='h-[30px] w-[30px]'
+					onClick={() => {
+						dispatch(fetchEmployeeYearStatistics(year));
+					}}
+				>
+					<TextSearch />
+				</Button>
 			</div>
 			<div className='grid grid-cols-4 gap-2'>
 				<div className='rounded-md bg-white p-4'>

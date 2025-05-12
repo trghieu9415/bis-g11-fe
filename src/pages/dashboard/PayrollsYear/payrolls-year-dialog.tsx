@@ -552,8 +552,6 @@ export default function PayrollsYearDialog({
 		}
 	};
 
-	console.log(payrollYearByUser);
-
 	return (
 		<>
 			<Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>

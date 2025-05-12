@@ -81,7 +81,7 @@ export default function EmployeeSalaryCal() {
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
 	const { payrollYearByUser } = useSelector((state: RootState) => state.payrollYearByUser);
-	console.log(payrollYearByUser);
+	
 	const onChangeMonthYear = (year: string, month: string) => {
 		setMonthYear({ year, month });
 	};

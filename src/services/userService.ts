@@ -41,3 +41,13 @@ export const getUser = async (userId: number) => {
 		throw error;
 	}
 };
+
+export const getMe = async () => {
+	try {
+		const response = await axios.get(`/api/v1/users/me`);
+		return response.data;
+	} catch (error) {
+		console.error('Lỗi lấy thông tin người dùng:', error);
+		throw error;
+	}
+};
