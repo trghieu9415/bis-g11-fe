@@ -24,7 +24,9 @@ import authorReducer from './slices/authorSlice';
 import categoryReducer from './slices/categorySlice';
 import goodsReceiptReducer from './slices/goodReceiptsSlice';
 import salaryMonthStatisticsReducer from './slices/salaryMonthStatisticsSlice';
+import salaryYearStatisticsReducer from './slices/salaryYearStatisticsSlice';
 import employeeMonthStatisticsReducer from './slices/employeeMonthStatisticsSlice';
+import employeeYearStatisticsReducer from './slices/employeeYearStatisticsSlice';
 import authReducer, { authStorageListener, authLogoutListener } from './slices/authSlice';
 import profileReducer from './slices/profileSlice';
 
@@ -55,7 +57,9 @@ export const store = configureStore({
 		goodsReceipt: goodsReceiptReducer,
 		auth: authReducer,
 		salaryMonthStatistics: salaryMonthStatisticsReducer,
+		salaryYearStatistics: salaryYearStatisticsReducer,
 		employeeMonthStatistics: employeeMonthStatisticsReducer,
+		employeeYearStatistics: employeeYearStatisticsReducer,
 		profile: profileReducer
 	},
 	middleware: getDefaultMiddleware =>

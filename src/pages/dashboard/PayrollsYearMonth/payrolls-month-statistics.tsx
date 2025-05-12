@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { RootState, useAppDispatch } from '@/redux/store';
-import { fetchSalaryStatistics } from '@/redux/slices/salaryMonthStatisticsSlice';
+import { fetchSalaryMonthStatistics } from '@/redux/slices/salaryMonthStatisticsSlice';
 import { useSelector } from 'react-redux';
 import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#E91E63'];
@@ -10,10 +10,8 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 	const { statistics } = useSelector((state: RootState) => state.salaryMonthStatistics);
 	const { payrollsByYearMonth } = useSelector((state: RootState) => state.payrollsByYearMonth);
 
-	console.log(month, statistics);
-
 	useEffect(() => {
-		dispatch(fetchSalaryStatistics(`${year}-${month}`));
+		dispatch(fetchSalaryMonthStatistics(`${year}-${month}`));
 	}, [dispatch, month, year]);
 
 	if (!statistics) {
@@ -99,8 +97,6 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 	const formatNumber = (value: number) => {
 		return `${new Intl.NumberFormat('vi-VN').format(value)} `;
 	};
-
-	console.log(payrollsByYearMonth);
 
 	return (
 		<div className='mb-2'>

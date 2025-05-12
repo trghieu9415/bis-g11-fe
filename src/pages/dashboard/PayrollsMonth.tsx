@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import PayrollsYearMonthTable from './PayrollsYearMonth/payrolls-month-table';
-import PayrollsMonthStatistics from './PayrollsYearMonth/payrolls-month-statictisc';
+import PayrollsMonthStatistics from './PayrollsYearMonth/payrolls-month-statistics';
 
 export default function SalaryMonth() {
 	const [today, setToday] = useState(new Date());

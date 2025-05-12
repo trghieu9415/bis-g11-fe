@@ -1,6 +1,7 @@
 import EmployeeTable from './HREmployees/hremployee-table';
 import EmployeeCreateNew from './HREmployees/hremployee-create-new';
 import EmployeeMonthStatistics from './HREmployees/hremployee-statistics-month';
+import EmployeeYearStatistics from './HREmployees/hremployee-statistics-year';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function HREmployees() {
@@ -21,7 +22,9 @@ export default function HREmployees() {
 						<TabsContent value='month' id='employee-statistics-month'>
 							<EmployeeMonthStatistics />
 						</TabsContent>
-						<TabsContent value='year' id='employee-statistics-year'></TabsContent>
+						<TabsContent value='year' id='employee-statistics-year'>
+							<EmployeeYearStatistics />
+						</TabsContent>
 					</Tabs>
 				</div>
 				<EmployeeTable />

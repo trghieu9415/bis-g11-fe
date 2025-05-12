@@ -3,7 +3,7 @@ import axios from '@/services/customize-axios';
 
 interface ApiResponse {
 	id: number;
-	monthOfYear: string;
+	year: string;
 	activeEmployees: number;
 	newEmployees: number;
 	contractExpired: number;
@@ -26,35 +26,34 @@ const initialState: EmployeeStatisticsState = {
 	isError: false
 };
 
-export const fetchEmployeeMonthStatistics = createAsyncThunk(
-	'employee-month-statistics/fetchEmployeeMonthStatistics',
-	async (yearMonth: string) => {
-		const response = await axios.get<ApiResponse>(`/api/v1/staffStatistics/month?yearMonth=${yearMonth}`);
-		console.log(response);
+export const fetchEmployeeYearStatistics = createAsyncThunk(
+	'employee-year-statistics/fetchEmployeeYearStatistics',
+	async (year: string) => {
+		const response = await axios.get<ApiResponse>(`/api/v1/staffStatistics/year?year=${year}`);
 		return response.data;
 	}
 );
 
-const employeeMonthStatisticsSlice = createSlice({
-	name: 'employeeStatistics',
+const employeeYearStatisticsSlice = createSlice({
+	name: 'employeeYearStatistics',
 	initialState,
 	reducers: {},
 	extraReducers: builder => {
 		builder
-			.addCase(fetchEmployeeMonthStatistics.pending, state => {
+			.addCase(fetchEmployeeYearStatistics.pending, state => {
 				state.isLoading = true;
 				state.isError = false;
 			})
-			.addCase(fetchEmployeeMonthStatistics.fulfilled, (state, action) => {
+			.addCase(fetchEmployeeYearStatistics.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.isError = false;
 				state.statistics = action.payload;
 			})
-			.addCase(fetchEmployeeMonthStatistics.rejected, state => {
+			.addCase(fetchEmployeeYearStatistics.rejected, state => {
 				state.isLoading = false;
 				state.isError = true;
 			});
 	}
 });
 
-export default employeeMonthStatisticsSlice.reducer;
+export default employeeYearStatisticsSlice.reducer;

@@ -47,7 +47,6 @@ const initialState: ProfileState = {
 
 export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () => {
 	const response = await axios.get<ApiResponse>('/api/v1/users/me');
-	console.log(response);
 	return response.data;
 });
 
