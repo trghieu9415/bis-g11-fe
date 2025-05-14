@@ -46,42 +46,7 @@ interface ApiResponse {
 	userId: number;
 }
 
-type ResContractDTO = {
-	baseSalary: number;
-	endDate: string;
-	expiryDate: string;
-	fullName: string;
-	id: number;
-	idString: string;
-	levelName: string;
-	roleName: string;
-	salaryCoefficient: number;
-	seniorityId: number;
-	startDate: string;
-	status: number;
-	userId: number;
-};
-
-type UserInfo = {
-	id: number;
-	idString: string;
-	fullName: string;
-	email: string;
-	phoneNumber: string;
-	gender: 'MALE' | 'FEMALE' | string;
-	dateOfBirth: string;
-	address: string;
-	username: string;
-	createdAt: string;
-	status: number;
-	resContractDTO?: ResContractDTO;
-};
-
-interface userInformationLeaveRequestsHistoryProps {
-	userInfo: UserInfo;
-}
-
-export default function UserInformationLeaveRequestsHistory({ userInfo }: userInformationLeaveRequestsHistoryProps) {
+export default function UserInformationLeaveRequestsHistory() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [filteredLeaveRequests, setFilteredLeaveRequests] = useState<ApiResponse[]>([]);
 	const [openItem, setOpenItem] = useState('');
@@ -89,6 +54,7 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 	const dispatch = useAppDispatch();
 	// const { user } = useSelector((state: RootState) => state.user);
 	const { leaveRequests } = useSelector((state: RootState) => state.leaveRequestByUserID);
+	const { profile } = useSelector((state: RootState) => state.profile);
 
 	const {
 		register,
@@ -110,10 +76,10 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 	const formData = watch();
 
 	useEffect(() => {
-		if (leaveRequests?.length == 0 && userInfo?.id) {
-			dispatch(fetchAllLeaveRequestsByUserId(userInfo.id));
+		if (leaveRequests?.length == 0 && profile?.id) {
+			dispatch(fetchAllLeaveRequestsByUserId(profile.id));
 		}
-	}, [dispatch, userInfo]);
+	}, [dispatch, profile]);
 
 	useEffect(() => {
 		if (leaveRequests && leaveRequests.length > 0) {
@@ -152,10 +118,14 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 		setFilteredLeaveRequests(leaveRequests);
 	};
 
-	const handleDeleleClick = async (leaveRequestID: number) => {
+	const handleDeleteClick = async (leaveRequestID: number) => {
 		try {
+			if (!profile?.id) {
+				toast.error('Không tìm thấy thông tin người dùng.');
+				return;
+			}
 			await deleteLeaveRequest(leaveRequestID);
-			dispatch(fetchAllLeaveRequestsByUserId(userInfo.id));
+			dispatch(fetchAllLeaveRequestsByUserId(profile?.id));
 			toast.success('Hủy đơn xin nghỉ phép thành công!');
 			setIsDialogOpen(false);
 		} catch (error) {
@@ -219,7 +189,7 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 				value={openItem}
 				onValueChange={value => setOpenItem(value)}
 			>
-				{filteredLeaveRequests.length > 0 ? (
+				{filteredLeaveRequests.length > 0 && profile?.resContractDTO?.roleName !== 'ADMIN' ? (
 					filteredLeaveRequests.map((item, index) => {
 						return (
 							<AccordionItem value={`item-${item.id}`} key={index}>
@@ -369,10 +339,10 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 																	<strong className='italic underline'>Kính gửi:</strong> Trưởng phòng Nhân sự
 																</p>
 																<p className='text-gray-900'>
-																	<strong>Tên tôi là:</strong> {userInfo?.fullName}
+																	<strong>Tên tôi là:</strong> {profile?.fullName}
 																</p>
 																<p className='text-gray-900'>
-																	<strong>Chức vụ:</strong> {userInfo?.resContractDTO?.roleName}
+																	<strong>Chức vụ:</strong> {profile?.resContractDTO?.roleName}
 																</p>
 																<div className='flex items-center justify-start gap-2'>
 																	<strong className='text-base text-gray-900'>Loại nghỉ phép: </strong>
@@ -431,7 +401,7 @@ export default function UserInformationLeaveRequestsHistory({ userInfo }: userIn
 																	<AlertDialogCancel>Thoát</AlertDialogCancel>
 																	<AlertDialogAction
 																		onClick={() => {
-																			handleDeleleClick(item.id);
+																			handleDeleteClick(item.id);
 																		}}
 																	>
 																		Xác nhận

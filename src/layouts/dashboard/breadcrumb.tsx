@@ -20,7 +20,6 @@ export function DashboardBreadcrumb() {
 	useEffect(() => {
 		for (const [key, pattern] of Object.entries(routes)) {
 			if (matchPath({ path: pattern, end: true }, location.pathname)) {
-				// console.log('KEY: ', key);
 				switch (key) {
 					case 'userInformation':
 						setNav([

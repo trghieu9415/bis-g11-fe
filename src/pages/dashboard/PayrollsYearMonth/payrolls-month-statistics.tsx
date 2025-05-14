@@ -14,64 +14,60 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 		dispatch(fetchSalaryMonthStatistics(`${year}-${month}`));
 	}, [dispatch, month, year]);
 
-	if (!statistics) {
-		return null;
-	}
-
 	const leaveData = [
-		{ name: 'Nghỉ bệnh', value: statistics.totalSickLeaves },
-		{ name: 'Nghỉ phép', value: statistics.totalPaidLeaves },
-		{ name: 'Nghỉ không phép', value: statistics.totalUnpaidLeaves },
-		{ name: 'Nghỉ lễ', value: statistics.totalHolidayLeaves }
+		{ name: 'Nghỉ bệnh', value: statistics?.totalSickLeaves },
+		{ name: 'Nghỉ phép', value: statistics?.totalPaidLeaves },
+		{ name: 'Nghỉ không phép', value: statistics?.totalUnpaidLeaves },
+		{ name: 'Nghỉ lễ', value: statistics?.totalHolidayLeaves }
 	];
 
 	const totalCompanyCost = [
 		{
 			name: 'Tổng lương GROSS',
-			value: Number(statistics.totalGrossSalary.replace(/,/g, ''))
+			value: Number(statistics?.totalGrossSalary?.replace(/,/g, ''))
 		},
 		{
 			name: 'Tổng lương NET',
-			value: Number(statistics.totalNetSalary.replace(/,/g, ''))
+			value: Number(statistics?.totalNetSalary?.replace(/,/g, ''))
 		},
 		{
 			name: 'Tổng phụ cấp',
-			value: Number(statistics.totalAllowance.replace(/,/g, ''))
+			value: Number(statistics?.totalAllowance?.replace(/,/g, ''))
 		},
 		{
 			name: 'Tổng thuế',
-			value: Number(statistics.totalTax.replace(/,/g, ''))
+			value: Number(statistics?.totalTax?.replace(/,/g, ''))
 		},
 		{
 			name: 'Tổng phạt',
-			value: Number(statistics.totalPenalties.replace(/,/g, ''))
+			value: Number(statistics?.totalPenalties?.replace(/,/g, ''))
 		}
 	];
 
 	const averageSalaryData = [
 		{
 			name: 'GROSS',
-			value: Number(statistics.avgGrossSalary.replace(/,/g, '')),
+			value: Number(statistics?.avgGrossSalary?.replace(/,/g, '')),
 			fill: '#0088FE'
 		},
 		{
 			name: 'NET',
-			value: Number(statistics.avgNetSalary.replace(/,/g, '')),
+			value: Number(statistics?.avgNetSalary?.replace(/,/g, '')),
 			fill: '#00C49F'
 		},
 		{
 			name: 'Phụ cấp',
-			value: Number(statistics.avgAllowance.replace(/,/g, '')),
+			value: Number(statistics?.avgAllowance?.replace(/,/g, '')),
 			fill: '#FFBB28'
 		},
 		{
 			name: 'Phạt',
-			value: Number(statistics.avgPenalties.replace(/,/g, '')),
+			value: Number(statistics?.avgPenalties?.replace(/,/g, '')),
 			fill: '#FF8042'
 		},
 		{
 			name: 'Thuế',
-			value: Number(statistics.avgTax.replace(/,/g, '')),
+			value: Number(statistics?.avgTax?.replace(/,/g, '')),
 			fill: '#E91E63'
 		}
 	];
@@ -79,21 +75,25 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 	const insuranceData = [
 		{
 			name: 'BHXH',
-			value: Number(statistics.totalEmployeeBHXH.replace(/,/g, '')),
+			value: Number(statistics?.totalEmployeeBHXH?.replace(/,/g, '')),
 			fill: '#8884d8'
 		},
 		{
 			name: 'BHYT',
-			value: Number(statistics.totalEmployeeBHYT.replace(/,/g, '')),
+			value: Number(statistics?.totalEmployeeBHYT?.replace(/,/g, '')),
 			fill: '#82ca9d'
 		},
 		{
 			name: 'BHTN',
-			value: Number(statistics.totalEmployeeBHTN.replace(/,/g, '')),
+			value: Number(statistics?.totalEmployeeBHTN?.replace(/,/g, '')),
 			fill: '#ffc658'
 		}
 	];
 
+	const hasNonZeroLeaveData = leaveData.some(item => item && typeof item.value === 'number' && item.value > 0);
+	const hasNonZeroTotalCompanyCost = totalCompanyCost.some(
+		item => item && typeof item.value === 'number' && item.value > 0
+	);
 	const formatNumber = (value: number) => {
 		return `${new Intl.NumberFormat('vi-VN').format(value)} `;
 	};
@@ -105,7 +105,7 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 				<div className='rounded-md bg-white p-4 shadow'>
 					<h3 className='text-lg font-medium'>Phân loại ngày nghỉ</h3>
 					<div className='flex justify-center'>
-						{payrollsByYearMonth.length > 0 ? (
+						{payrollsByYearMonth.length > 0 && hasNonZeroLeaveData ? (
 							<PieChart width={450} height={350} className='m-auto'>
 								<Pie
 									data={leaveData}
@@ -132,7 +132,7 @@ export default function PayrollsMonthStatistics({ month, year }: { month: string
 				<div className='rounded-md bg-white p-4 shadow'>
 					<h3 className='text-lg font-medium'>Phân bổ chi phí công ty</h3>
 					<div className='flex justify-center'>
-						{payrollsByYearMonth.length > 0 ? (
+						{payrollsByYearMonth.length > 0 && hasNonZeroTotalCompanyCost ? (
 							<PieChart width={450} height={350}>
 								<Pie
 									data={totalCompanyCost}

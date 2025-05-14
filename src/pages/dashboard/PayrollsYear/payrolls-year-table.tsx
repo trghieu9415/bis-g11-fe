@@ -49,15 +49,13 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 		dispatch(fetchUsers());
 	}, [dispatch]);
 
-	console.log(selectedEmployee);
-
 	const columns: ColumnDef<Employee>[] = [
 		{
 			accessorKey: 'idString',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -70,7 +68,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Họ và tên <ArrowUpDown />
@@ -78,7 +76,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			),
 			cell: ({ row }) => (
 				<span className='flex items-center'>
-					<Button variant='ghost' className='text-black p-1 h-5 mr-2'>
+					<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
 						<UserRoundPen />
 					</Button>
 					{row.getValue('full_name')}
@@ -91,7 +89,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Giới tính <ArrowUpDown />
@@ -101,13 +99,13 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 				return (
 					<span className='flex justify-center'>
 						{row.getValue('gender') ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-blue-500 rounded-sm p-1'>
-								<Mars className='w-4 h-4 mr-1' stroke='white' />
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-blue-500 p-1 text-white'>
+								<Mars className='mr-1 h-4 w-4' stroke='white' />
 								Nam
 							</p>
 						) : (
-							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-pink-500 rounded-sm p-1'>
-								<Venus className='w-4 h-4 mr-1' stroke='white' /> Nữ
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-pink-500 p-1 text-white'>
+								<Venus className='mr-1 h-4 w-4' stroke='white' /> Nữ
 							</p>
 						)}
 					</span>
@@ -120,7 +118,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Chức vụ hiện tại <ArrowUpDown />
@@ -150,25 +148,24 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-30'
+					className='w-30 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
 				</Button>
 			),
 			cell: ({ row }) => {
-				// console.log(row.getValue('role') === '', 'Status: ', row.getValue('status'));
 				return (
 					<span className='flex justify-center'>
 						{row.getValue('status') && row.getValue('role') !== '' ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-								<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+								<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 								Đang làm việc
 							</p>
 						) : (
 							row.getValue('role') === '' && (
-								<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-yellow-500 rounded-sm p-1'>
-									<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Hết hợp đồng
+								<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+									<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Hết hợp đồng
 								</p>
 							)
 						)}
@@ -188,7 +185,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-52'
+					className='w-52 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Email <ArrowUpDown />
@@ -224,7 +221,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-72'
+					className='w-72 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Địa chỉ <ArrowUpDown />
@@ -238,7 +235,7 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
@@ -252,7 +249,6 @@ export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
 	];
 
 	const handleOpenDialog = (employee: Employee, mode: 'view' | 'edit' | 'delete') => {
-		console.log(employee);
 		setSelectedEmployee(employee);
 		setDialogMode(mode);
 		setIsDialogOpen(true);

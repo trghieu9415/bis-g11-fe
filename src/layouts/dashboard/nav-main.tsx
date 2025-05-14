@@ -264,8 +264,6 @@ export function NavMain() {
 
 	const data: MenuItem[] = trueDataForRenderMenu;
 
-	console.log(data);
-
 	return (
 		<>
 			{data?.length > 0 && (

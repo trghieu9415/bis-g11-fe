@@ -75,7 +75,7 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -88,7 +88,7 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-28'
+					className='w-28 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID nhân viên <ArrowUpDown />
@@ -102,7 +102,7 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Họ và tên <ArrowUpDown />
@@ -117,13 +117,13 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Nghỉ lễ <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalHolidayLeaves')}</span>,
+			cell: ({ row }) => <span className='float-end flex items-center'>{row.getValue('totalHolidayLeaves')}</span>,
 			enableHiding: true
 		},
 		{
@@ -131,13 +131,13 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Nghỉ bệnh <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalSickLeaves')}</span>,
+			cell: ({ row }) => <span className='float-end flex items-center'>{row.getValue('totalSickLeaves')}</span>,
 			enableHiding: true
 		},
 		{
@@ -145,13 +145,13 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Nghỉ phép <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalPaidLeaves')}</span>,
+			cell: ({ row }) => <span className='float-end flex items-center'>{row.getValue('totalPaidLeaves')}</span>,
 			enableHiding: true
 		},
 		{
@@ -159,13 +159,13 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-[84px]'
+					className='w-[84px] text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Nghỉ thai sản <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalMaternityLeaves')}</span>,
+			cell: ({ row }) => <span className='float-end flex items-center'>{row.getValue('totalMaternityLeaves')}</span>,
 			enableHiding: true
 		},
 		{
@@ -173,13 +173,13 @@ export default function TimeTrackingMonthTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Làm việc <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center float-end'>{row.getValue('totalWorkingDays')}</span>,
+			cell: ({ row }) => <span className='float-end flex items-center'>{row.getValue('totalWorkingDays')}</span>,
 			enableHiding: true
 		},
 		// {
@@ -253,7 +253,7 @@ export default function TimeTrackingMonthTable() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
@@ -319,7 +319,6 @@ export default function TimeTrackingMonthTable() {
 					};
 				});
 
-				// console.log(events);
 				setEvents(events);
 			}
 		} catch (error) {
@@ -340,10 +339,8 @@ export default function TimeTrackingMonthTable() {
 	};
 
 	const handleOpenDialog = async (timeTrackingMonth: TimeTrackingMonth, mode: 'view' | 'edit' | 'delete') => {
-		console.log(timeTrackingMonth);
 		setSelectedTimeTrackingMonth(timeTrackingMonth);
 		await fetchEvents(timeTrackingMonth.userId, timeTrackingMonth.monthOfYear);
-		console.log(events, timeTrackingMonth?.monthOfYear);
 
 		setDialogMode(mode);
 		setIsDialogOpen(true);
@@ -368,7 +365,7 @@ export default function TimeTrackingMonthTable() {
 			<CustomTable columns={columns} data={timeTrackingMonth} hiddenColumns={hiddenColumns} stickyClassIndex={0} />
 			{events.length > 0 && selectedTimeTrackingMonth?.monthOfYear && (
 				<Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-					<DialogContent className='max-w-[70vw] max-h-[100vh]'>
+					<DialogContent className='max-h-[100vh] max-w-[70vw]'>
 						<DialogHeader>
 							<DialogTitle>Lịch làm việc và nghỉ của nhân viên</DialogTitle>
 							<DialogDescription></DialogDescription>

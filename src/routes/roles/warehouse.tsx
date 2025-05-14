@@ -14,6 +14,6 @@ export const warehouseRoutes = [
 	{ path: config.routes.supplier, component: Supplier, layout: CommerceLayout },
 	{ path: config.routes.author, component: Author, layout: CommerceLayout },
 	{ path: config.routes.category, component: Category, layout: CommerceLayout },
-	{ path: config.routes.customers, component: Customer, layout: CommerceLayout },
+	// { path: config.routes.customers, component: Customer, layout: CommerceLayout },
 	{ path: config.routes.inventory, component: Inventory, layout: CommerceLayout }
 ];

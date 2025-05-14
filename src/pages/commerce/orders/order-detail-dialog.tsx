@@ -10,8 +10,6 @@ interface OrderDetailDialogProps {
 }
 
 export const OrderDetailDialog = ({ order }: OrderDetailDialogProps) => {
-	// console.log(order);
-
 	return (
 		<Dialog>
 			<DialogTrigger asChild>

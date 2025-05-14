@@ -37,42 +37,7 @@ interface ApiResponse {
 	salaryCoefficient: number;
 }
 
-type ResContractDTO = {
-	baseSalary: number;
-	endDate: string;
-	expiryDate: string;
-	fullName: string;
-	id: number;
-	idString: string;
-	levelName: string;
-	roleName: string;
-	salaryCoefficient: number;
-	seniorityId: number;
-	startDate: string;
-	status: number;
-	userId: number;
-};
-
-type UserInfo = {
-	id: number;
-	idString: string;
-	fullName: string;
-	email: string;
-	phoneNumber: string;
-	gender: 'MALE' | 'FEMALE' | string;
-	dateOfBirth: string;
-	address: string;
-	username: string;
-	createdAt: string;
-	status: number;
-	resContractDTO?: ResContractDTO;
-};
-
-interface userInformationDetailProps {
-	userInfo: UserInfo;
-}
-
-export default function UserInformationContractsHistory({ userInfo }: userInformationDetailProps) {
+export default function UserInformationContractsHistory() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [filteredContracts, setFilteredContracts] = useState<ApiResponse[]>([]);
 	const [openItem, setOpenItem] = useState('');
@@ -80,6 +45,7 @@ export default function UserInformationContractsHistory({ userInfo }: userInform
 	const dispatch = useAppDispatch();
 	// const { user } = useSelector((state: RootState) => state.user);
 	const { contracts } = useSelector((state: RootState) => state.contractsByUserID);
+	const { profile } = useSelector((state: RootState) => state.profile);
 
 	const {
 		register,
@@ -101,10 +67,10 @@ export default function UserInformationContractsHistory({ userInfo }: userInform
 	const formData = watch();
 
 	useEffect(() => {
-		if (contracts?.length == 0 && userInfo?.id) {
-			dispatch(fetchAllContractsByUserId(userInfo?.id));
+		if (contracts?.length == 0 && profile?.id) {
+			dispatch(fetchAllContractsByUserId(profile?.id));
 		}
-	}, [dispatch, userInfo]);
+	}, [dispatch, profile]);
 
 	useEffect(() => {
 		if (contracts && contracts.length > 0) {
@@ -190,7 +156,7 @@ export default function UserInformationContractsHistory({ userInfo }: userInform
 					value={openItem}
 					onValueChange={value => setOpenItem(value)}
 				>
-					{filteredContracts.length > 0 ? (
+					{filteredContracts.length > 0 && profile?.resContractDTO?.roleName !== 'ADMIN' ? (
 						filteredContracts.map((item, index) => {
 							return (
 								<AccordionItem value={`item-${item.id}`} key={index}>
@@ -325,19 +291,19 @@ export default function UserInformationContractsHistory({ userInfo }: userInform
 																	<h2 className='mb-2 mt-4 border-b-[1px] pb-1 text-base font-bold'>Bên lao động</h2>
 																	<p className='ml-2'>
 																		<strong>Họ và tên: </strong>
-																		{userInfo?.fullName}
+																		{profile?.fullName}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Ngày sinh: </strong>
-																		{userInfo?.dateOfBirth}
+																		{profile?.dateOfBirth}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Địa chỉ: </strong>
-																		{userInfo?.address}
+																		{profile?.address}
 																	</p>
 																	<p className='ml-2'>
 																		<strong>Số điện thoại: </strong>
-																		{userInfo?.phoneNumber}
+																		{profile?.phoneNumber}
 																	</p>
 																</TabsContent>
 																<TabsContent value='term-job' className='text-start'>

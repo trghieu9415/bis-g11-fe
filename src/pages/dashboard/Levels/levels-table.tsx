@@ -78,8 +78,6 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 		salaryCoefficient: 0.0
 	});
 
-	console.log(changeValueLevel);
-
 	const dispatch = useAppDispatch();
 	const {
 		register,
@@ -149,8 +147,6 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 		}
 	};
 
-	console.log(selectedLevel);
-
 	const handleUpdateLevel = async (levelID: number, level: Level) => {
 		try {
 			const levelData = {
@@ -167,7 +163,6 @@ export default function LevelsTable({ selectedRole, mode }: RolesDialogProps) {
 			// @ts-expect-error - exception success attr
 			if (res.success) {
 				toast.success('Cập nhật thông tin cấp bậc thành công!');
-				console.log('FK');
 				dispatch(fetchRoles());
 				setSelectedLevel({
 					id: -1,

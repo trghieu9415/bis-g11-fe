@@ -5,8 +5,6 @@ export default function AllLeaveRequests() {
 	const { type } = useParams();
 	const leaveTypeKey = type?.toLowerCase();
 
-	console.log(leaveTypeKey);
-
 	return (
 		<div className='flex flex-col w-full'>
 			<h1 className='text-lg font-bold py-4 uppercase'>

@@ -137,7 +137,6 @@ export default function RolesTable() {
 			),
 			cell: ({ row }) => {
 				const allowance = allowances.find(a => a.id === row.getValue('allowanceId'));
-				console.log(allowance);
 				if (allowance?.allowance != null) {
 					return <span className='flex items-center justify-end'>{allowance.allowance.toLocaleString()} VNĐ</span>;
 				} else {

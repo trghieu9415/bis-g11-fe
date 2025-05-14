@@ -25,8 +25,10 @@ import categoryReducer from './slices/categorySlice';
 import goodsReceiptReducer from './slices/goodReceiptsSlice';
 import salaryMonthStatisticsReducer from './slices/salaryMonthStatisticsSlice';
 import salaryYearStatisticsReducer from './slices/salaryYearStatisticsSlice';
+import salaryYearMonthStatisticsReducer from './slices/salaryYearMonthStatictiscSlice';
 import employeeMonthStatisticsReducer from './slices/employeeMonthStatisticsSlice';
 import employeeYearStatisticsReducer from './slices/employeeYearStatisticsSlice';
+import employeeYearMonthStatisticsReducer from './slices/employeeYearMonthStatisticsSlice';
 import authReducer, { authStorageListener, authLogoutListener } from './slices/authSlice';
 import profileReducer from './slices/profileSlice';
 
@@ -58,8 +60,10 @@ export const store = configureStore({
 		auth: authReducer,
 		salaryMonthStatistics: salaryMonthStatisticsReducer,
 		salaryYearStatistics: salaryYearStatisticsReducer,
+		salaryYearMonthStatistics: salaryYearMonthStatisticsReducer,
 		employeeMonthStatistics: employeeMonthStatisticsReducer,
 		employeeYearStatistics: employeeYearStatisticsReducer,
+		employeeYearMonthStatistics: employeeYearMonthStatisticsReducer,
 		profile: profileReducer
 	},
 	middleware: getDefaultMiddleware =>
