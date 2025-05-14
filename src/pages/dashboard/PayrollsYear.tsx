@@ -6,7 +6,7 @@ import { CalendarSearch } from 'lucide-react';
 
 import { fetchPayrollsByYear } from '@/redux/slices/payrollsByYearSlice';
 import { useAppDispatch } from '@/redux/store';
-import PayrollsYearStatistics from './PayrollsYearMonth/payrolls-year-statistics';
+import PayrollsYearStatistics from './PayrollsYear/payrolls-year-statistics';
 
 export default function SalaryMonth() {
 	const dispatch = useAppDispatch();
@@ -26,8 +26,6 @@ export default function SalaryMonth() {
 		setYear(prev => ({ ...prev, input: String(currentYear), search: String(currentYear) }));
 		dispatch(fetchPayrollsByYear(String(currentYear)));
 	}, []);
-
-	// console.log(year.input, year.search);
 
 	return (
 		<div className='flex w-full flex-col'>

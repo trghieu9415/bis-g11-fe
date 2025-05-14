@@ -29,7 +29,6 @@ const initialState: AuthorState = {
 
 export const fetchAuthor = createAsyncThunk('authors/fetchAuthor', async () => {
 	const response = await axios.get<ApiResponse[]>('api/v1/author/list');
-	console.log(response);
 	const formattedData: Author[] = response.data.map(author => ({
 		id: author.id,
 		name: author.name,

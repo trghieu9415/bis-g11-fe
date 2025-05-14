@@ -87,7 +87,7 @@ export default function TimeTrackingToday() {
 			// Use useRef to avoid the problem when scan API call 2 times (react strict mode)
 			if (!apiCalledRef.current) {
 				dispatch(scanAttendanceDetailRedux(localDateTime));
-				apiCalledRef.current = true; 
+				apiCalledRef.current = true;
 			}
 
 			const currentTime = new Date().toLocaleTimeString('vi-VN', {
@@ -117,9 +117,6 @@ export default function TimeTrackingToday() {
 			const prevDateData = await getAllAttendanceDetailByDate(`${year}-${month}-${day}`);
 			// @ts-expect-error - Response from getAllAttendanceDetailByDate includes success property
 			if (prevDateData?.success) {
-				// console.log(prevDateData.data);
-				// console.log(timeTrackingToday);
-
 				const { onTime, late, early } = timeTrackingToday.reduce(
 					(acc, item) => {
 						if (!item.checkIn) return acc;
@@ -161,9 +158,6 @@ export default function TimeTrackingToday() {
 					{ yesterdayOnTime: 0, yesterdayLate: 0, yesterdayEarly: 0 }
 				);
 
-				// console.log({ onTime, late, early });
-				// console.log({ yesterdayOnTime, yesterdayLate, yesterdayEarly });
-
 				const { unpaidLeave, notCheckIn, notCheckOut } = timeTrackingToday.reduce(
 					(acc, item) => {
 						if (item.checkIn === null) {
@@ -190,9 +184,6 @@ export default function TimeTrackingToday() {
 					{ yesterdayUnpaidLeave: 0, yesterdayNotCheckIn: 0, yesterdayNotCheckOut: 0 }
 				);
 
-				// console.log(unpaidLeave, notCheckIn, notCheckOut);
-				// console.log(yesterdayUnpaidLeave, yesterdayNotCheckIn, yesterdayNotCheckOut);
-
 				const { paidLeave, sickLeave, maternityLeave } = timeTrackingToday.reduce(
 					(acc, item) => {
 						if (item.attendanceStatus === 'ON_LEAVE') {
@@ -216,9 +207,6 @@ export default function TimeTrackingToday() {
 					},
 					{ paidLeaveGTEorLTE: 0, sickLeaveGTEorLTE: 0, maternityLeaveGTEorLTE: 0 }
 				);
-
-				// console.log(paidLeave, sickLeave, maternityLeave);
-				// console.log(paidLeaveGTEorLTE, sickLeaveGTEorLTE, maternityLeaveGTEorLTE);
 
 				setAttendanceSummary(prev => ({
 					...prev,
@@ -255,27 +243,27 @@ export default function TimeTrackingToday() {
 	};
 
 	return (
-		<div className='flex flex-col w-full'>
-			<h1 className='text-lg font-bold py-4 uppercase'>
+		<div className='flex w-full flex-col'>
+			<h1 className='py-4 text-lg font-bold uppercase'>
 				Danh sách chấm công ngày{' '}
-				<span className='text-lg pb-[2px] font-bold border-b-4 border-blue-300 '>{formattedDate}</span>{' '}
-				{isToday && <span className='bg-yellow-200 text-black px-2 py-1 rounded ml-2'>Hôm nay</span>}
+				<span className='border-b-4 border-blue-300 pb-[2px] text-lg font-bold'>{formattedDate}</span>{' '}
+				{isToday && <span className='ml-2 rounded bg-yellow-200 px-2 py-1 text-black'>Hôm nay</span>}
 			</h1>
 			<div>
-				<div className='inline-block float-end mr-1'>
+				<div className='float-end mr-1 inline-block'>
 					<Input
 						type='date'
-						className='border-gray-200 outline-none mb-2 !text-base'
+						className='mb-2 border-gray-200 !text-base outline-none'
 						value={`${year}-${month}-${day}`}
 						onChange={updateDate}
 					/>
 				</div>
 			</div>
 			{!isFuture && (
-				<div className='flex items-center gap-1 mb-2'>
+				<div className='mb-2 flex items-center gap-1'>
 					<div className='text-sm text-gray-600'>Thời gian quét: {scanTime}</div>
 					<button
-						className='p-1 hover:bg-gray-100 rounded-full text-gray-600'
+						className='rounded-full p-1 text-gray-600 hover:bg-gray-100'
 						onClick={() => {
 							const localDateTime = new Date(today).toISOString().slice(0, 19);
 							dispatch(scanAttendanceDetailRedux(localDateTime));
@@ -289,12 +277,12 @@ export default function TimeTrackingToday() {
 							}
 						}}
 					>
-						<Loader2 className='w-4 h-4 text-gray-600' />
+						<Loader2 className='h-4 w-4 text-gray-600' />
 					</button>
 				</div>
 			)}
 			{attendanceSummary.isSet && !isFuture && (
-				<div className='flex items-center justify-between gap-4 mb-4'>
+				<div className='mb-4 flex items-center justify-between gap-4'>
 					<PresentSummary {...attendanceSummary.present} />
 					<AbsentSummary {...attendanceSummary.absent} />
 					<AwaySummary {...attendanceSummary.away} />

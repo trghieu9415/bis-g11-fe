@@ -27,8 +27,8 @@ function App() {
 			// So we need to logout
 			const accessToken = localStorage.getItem('accessToken');
 			if (!accessToken) {
-				dispatch(logoutUser());
 				<Navigate to='/login' />;
+				dispatch(logoutUser());
 			}
 
 			const checkAccessTokenExpired = async () => {

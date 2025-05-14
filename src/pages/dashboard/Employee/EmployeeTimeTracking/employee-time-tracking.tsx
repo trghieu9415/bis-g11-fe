@@ -48,9 +48,7 @@ export default function EmployeeTimeTracking() {
 	const handleCheckIn = async () => {
 		try {
 			const now = new Date(); // Get the current date and time
-			console.log(now);
 			const nowUTC = toISOStringWithTimezone(now, 7);
-			console.log(nowUTC);
 			const checkInData = {
 				userId: user.id,
 				checkIn: nowUTC
@@ -71,7 +69,6 @@ export default function EmployeeTimeTracking() {
 					toast.success(`Check-in thành công lúc  ${formattedTime}`);
 					dispatch(fetchAttendanceDetailsByUserID(user.id));
 				} else if (res?.data == 'AttendanceDetail already exist') {
-					console.log(checkInData);
 					await updateAttendanceDetail({
 						...checkInData,
 						checkOut: null

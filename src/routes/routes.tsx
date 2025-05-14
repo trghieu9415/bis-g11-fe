@@ -15,8 +15,6 @@ export const getRoutesByRole = (role: string | undefined) => {
 		layout: DashboardLayout
 	};
 
-	console.log(role);
-
 	switch (role) {
 		case 'HR_MANAGER':
 			return [...hrRoutes, commonRoute, ...authRoutes];

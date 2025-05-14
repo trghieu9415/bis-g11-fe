@@ -45,7 +45,7 @@ export const fetchSalaryMonthStatistics = createAsyncThunk(
 	'salary-month-statistics/fetchSalaryMonthStatistics',
 	async (month: string) => {
 		const response = await axios.get<ApiResponse>(`/api/v1/salaryStatistics/month?month=${month}`);
-		return response as unknown as ApiResponse;
+		return response.data;
 	}
 );
 

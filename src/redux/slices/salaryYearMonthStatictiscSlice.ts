@@ -30,45 +30,45 @@ interface ApiResponse {
 }
 
 interface SalaryYearStatisticsState {
-	statistics: ApiResponse | null;
+	statisticsYearMonth: ApiResponse[] | null;
 	isLoading: boolean;
 	isError: boolean;
 }
 
 const initialState: SalaryYearStatisticsState = {
-	statistics: null,
+	statisticsYearMonth: null,
 	isLoading: false,
 	isError: false
 };
 
-export const fetchSalaryYearStatistics = createAsyncThunk(
-	'salary-year-statistics/fetchSalaryYearStatistics',
+export const fetchSalaryYearMonthStatistics = createAsyncThunk(
+	'salary-year-month-statistics/fetchSalaryYearMonthStatistics',
 	async (year: string) => {
-		const response = await axios.get<ApiResponse>(`/api/v1/salaryStatistics/year?year=${year}`);
+		const response = await axios.get<ApiResponse[]>(`/api/v1/salaryStatistics/year/month?year=${year}`);
 		return response.data;
 	}
 );
 
-const salaryYearStatisticsSlice = createSlice({
-	name: 'salaryYearStatistics',
+const salaryYearMonthStatisticsSlice = createSlice({
+	name: 'salaryYearMonthStatistics',
 	initialState,
 	reducers: {},
 	extraReducers: builder => {
 		builder
-			.addCase(fetchSalaryYearStatistics.pending, state => {
+			.addCase(fetchSalaryYearMonthStatistics.pending, state => {
 				state.isLoading = true;
 				state.isError = false;
 			})
-			.addCase(fetchSalaryYearStatistics.fulfilled, (state, action) => {
+			.addCase(fetchSalaryYearMonthStatistics.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.isError = false;
-				state.statistics = action.payload;
+				state.statisticsYearMonth = action.payload;
 			})
-			.addCase(fetchSalaryYearStatistics.rejected, state => {
+			.addCase(fetchSalaryYearMonthStatistics.rejected, state => {
 				state.isLoading = false;
 				state.isError = true;
 			});
 	}
 });
 
-export default salaryYearStatisticsSlice.reducer;
+export default salaryYearMonthStatisticsSlice.reducer;

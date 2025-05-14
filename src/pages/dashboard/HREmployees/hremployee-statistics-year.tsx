@@ -2,11 +2,26 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '@/redux/store';
 import { fetchEmployeeYearStatistics } from '@/redux/slices/employeeYearStatisticsSlice';
+import { fetchEmployeeYearMonthStatistics } from '@/redux/slices/employeeYearMonthStatisticsSlice';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TextSearch } from 'lucide-react';
-
-import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+	PieChart,
+	Pie,
+	Cell,
+	Tooltip,
+	Legend,
+	BarChart,
+	Bar,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	ResponsiveContainer,
+	LineChart,
+	Line
+} from 'recharts';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#E91E63'];
 
 interface Statistics {
@@ -26,11 +41,10 @@ export default function EmployeeYearStatistics() {
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
 	const { statistics } = useSelector((state: RootState) => state.employeeYearStatistics);
+	const { statisticsYearMonth } = useSelector((state: RootState) => state.employeeYearMonthStatistics);
 
 	const [hasValidData, setHasValidData] = useState<boolean>(false);
 	const [year, setYear] = useState('2025');
-
-	console.log(hasValidData);
 
 	const checkHasData = (stats: Statistics | null) => {
 		if (!stats) return false;
@@ -41,7 +55,10 @@ export default function EmployeeYearStatistics() {
 	};
 
 	useEffect(() => {
-		dispatch(fetchEmployeeYearStatistics(`${year}`));
+		if (year) {
+			dispatch(fetchEmployeeYearStatistics(`${year}`));
+			dispatch(fetchEmployeeYearMonthStatistics(`${year}`));
+		}
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -79,6 +96,30 @@ export default function EmployeeYearStatistics() {
 		}
 	];
 
+	const employeeStructureAllMonth = statisticsYearMonth?.map(item => ({
+		title: item.monthOfYear,
+		activeEmployee: item.activeEmployees,
+		newEmployee: item.newEmployees,
+		contractExpired: item.contractExpired
+	}));
+
+	const contractStatusAllMonth = statisticsYearMonth?.map(item => ({
+		title: item.monthOfYear,
+		permanentEmployees: item.permanentEmployees,
+		probationEmployees: item.probationEmployees
+	}));
+
+	const avgAgeAllMonth = statisticsYearMonth?.map(item => ({
+		title: item.monthOfYear,
+		avgAge: item.avgAge
+	}));
+
+	const genderRatioAllMonth = statisticsYearMonth?.map(item => ({
+		title: item.monthOfYear,
+		male: Number(item?.genderRatio?.replace('%', '')),
+		female: 100 - Number(item?.genderRatio?.replace('%', ''))
+	}));
+
 	return (
 		<div className='mb-2'>
 			<div className='mb-2 flex justify-center gap-2'>
@@ -96,12 +137,81 @@ export default function EmployeeYearStatistics() {
 					className='h-[30px] w-[30px]'
 					onClick={() => {
 						dispatch(fetchEmployeeYearStatistics(year));
+						dispatch(fetchEmployeeYearMonthStatistics(year));
 					}}
 				>
 					<TextSearch />
 				</Button>
 			</div>
-			<div className='grid grid-cols-4 gap-2'>
+
+			<div className='rounded-md bg-white p-4'>
+				<Tabs defaultValue='employeeStructure' className='w-full'>
+					<TabsList className='m-auto grid w-[60%] grid-cols-4'>
+						<TabsTrigger value='employeeStructure'>Cơ cấu nhân sự</TabsTrigger>
+						<TabsTrigger value='contractStatus'>Trạng thái hợp đồng</TabsTrigger>
+						<TabsTrigger value='avgAge'>Tuổi trung bình</TabsTrigger>
+						<TabsTrigger value='genderRatio'>Tỉ lệ giới tính</TabsTrigger>
+					</TabsList>
+					<TabsContent value='employeeStructure'>
+						<h3 className='my-2 text-center text-lg font-medium'>Thống kê cơ cấu nhân sự</h3>
+						<ResponsiveContainer width='100%' height={300}>
+							<LineChart data={employeeStructureAllMonth} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
+								<CartesianGrid strokeDasharray='3 3' />
+								<XAxis dataKey='title' />
+								<YAxis tickFormatter={value => formatNumber(value)} />
+								<Tooltip formatter={value => formatNumber(Number(value))} />
+								<Legend />
+								<Line type='monotone' dataKey='activeEmployee' name='Nhân viên hoạt động' stroke='#0088FE' />
+								<Line type='monotone' dataKey='newEmployee' name='Nhân viên mới' stroke='#00C49F' />
+								<Line type='monotone' dataKey='contractExpired' name='Hết hạn hợp đồng' stroke='#FFBB28' />
+							</LineChart>
+						</ResponsiveContainer>
+					</TabsContent>
+					<TabsContent value='contractStatus'>
+						<h3 className='my-2 text-center text-lg font-medium'>Thống kê trạng thái hợp đồng</h3>
+						<ResponsiveContainer width='100%' height={300}>
+							<LineChart data={contractStatusAllMonth} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
+								<CartesianGrid strokeDasharray='3 3' />
+								<XAxis dataKey='title' />
+								<YAxis tickFormatter={value => formatNumber(value)} />
+								<Tooltip formatter={value => formatNumber(Number(value))} />
+								<Legend />
+								<Line type='monotone' dataKey='permanentEmployees' name='Chính thức' stroke='#0088FE' />
+								<Line type='monotone' dataKey='probationEmployees' name='Thử việc' stroke='#00C49F' />
+							</LineChart>
+						</ResponsiveContainer>
+					</TabsContent>
+					<TabsContent value='avgAge'>
+						<h3 className='my-2 text-center text-lg font-medium'>Thống kê tuổi trung bình</h3>
+						<ResponsiveContainer width='100%' height={300}>
+							<LineChart data={avgAgeAllMonth} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
+								<CartesianGrid strokeDasharray='3 3' />
+								<XAxis dataKey='title' />
+								<YAxis tickFormatter={value => formatNumber(value)} />
+								<Tooltip formatter={value => formatNumber(Number(value))} />
+								<Legend />
+								<Line type='monotone' dataKey='avgAge' name='Tuổi trung bình' stroke='#0088FE' />
+							</LineChart>
+						</ResponsiveContainer>
+					</TabsContent>
+					<TabsContent value='genderRatio'>
+						<h3 className='my-2 text-center text-lg font-medium'>Thống kê tỉ lệ giới tính</h3>
+						<ResponsiveContainer width='100%' height={300}>
+							<BarChart data={genderRatioAllMonth} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
+								<CartesianGrid strokeDasharray='3 3' />
+								<XAxis dataKey='title' />
+								<YAxis />
+								<Tooltip formatter={value => `${Number(value).toFixed(1)}%`} />
+								<Legend />
+								<Bar dataKey='male' name='Nam' stackId='a' fill='#0088FE' />
+								<Bar dataKey='female' name='Nữ' stackId='a' fill='#00C49F' />
+							</BarChart>
+						</ResponsiveContainer>
+					</TabsContent>
+				</Tabs>
+			</div>
+
+			<div className='mt-2 grid grid-cols-4 gap-2'>
 				<div className='rounded-md bg-white p-4'>
 					<h3 className='text-lg font-medium'>Cơ cấu nhân sự</h3>
 					<div className='flex justify-center'>

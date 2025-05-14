@@ -13,6 +13,7 @@ import {
 	ColumnFiltersState,
 	getFilteredRowModel
 } from '@tanstack/react-table';
+
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Button } from './ui/button';
 import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';

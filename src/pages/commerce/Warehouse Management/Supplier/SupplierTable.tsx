@@ -38,7 +38,6 @@ export type Supplier = {
 
 const SupplierTable = () => {
 	const { suppliers } = useSelector((state: RootState) => state.supplier);
-	console.log(suppliers);
 
 	const dispatch = useDispatch<AppDispatch>();
 

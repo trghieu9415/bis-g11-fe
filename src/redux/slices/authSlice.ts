@@ -28,12 +28,10 @@ export const loginUser = createAsyncThunk(
 	'auth/loginUser',
 	async (credentials: { username: string; password: string; platform: string }, { rejectWithValue }) => {
 		try {
-			console.log('Logging in with credentials:', credentials);
 
 			// Step 1: Login to get tokens
 			const loginResponse = await axios.post('/api/v1/auth/access', credentials);
 
-			console.log('Login response:', loginResponse.data);
 
 			// Extract data
 			const { accessToken, refreshToken, userId } = loginResponse.data;
@@ -45,8 +43,6 @@ export const loginUser = createAsyncThunk(
 			// Return combined result
 			// return loginResponse.data;
 		} catch (error: any) {
-			console.error('Auth error:', error.response?.data || error);
-
 			// Clean up if login failed
 			localStorage.removeItem('accessToken');
 			localStorage.removeItem('refreshToken');

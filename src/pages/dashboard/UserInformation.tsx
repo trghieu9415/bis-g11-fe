@@ -44,14 +44,14 @@ export default function UserInformation() {
 		profile && (
 			<div className='mb-2 flex max-h-[calc(100vh-60px)] w-full items-start justify-between gap-4'>
 				{/* Thông tin User */}
-				<UserInformationDetail userInfo={profile} />
+				<UserInformationDetail />
 
 				{/* Khung chứa lịch sử */}
 				<div className='flex h-full flex-1 flex-col gap-4'>
 					<PanelGroup direction='vertical' className='h-full w-full rounded-sm'>
 						{/* Panel Contract */}
 						<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-							<UserInformationContractsHistory userInfo={profile} />
+							<UserInformationContractsHistory />
 						</Panel>
 
 						{/* Scroll */}
@@ -59,7 +59,7 @@ export default function UserInformation() {
 
 						{/* Panel Leave Request */}
 						<Panel defaultSize={50} minSize={20} maxSize={80} className='overflow-auto'>
-							<UserInformationLeaveRequestsHistory userInfo={profile} />
+							<UserInformationLeaveRequestsHistory />
 						</Panel>
 					</PanelGroup>
 				</div>

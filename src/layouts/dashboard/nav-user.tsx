@@ -108,16 +108,16 @@ export function NavUser({ user }: { user: UserInfo | null }) {
 								</DropdownMenuItem>
 							</NavLink>
 						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<EmployeeTimeTracking />
-							<EmployeeLeaveRequest />
-							<EmployeeSalaryCal />
-							{/* <DropdownMenuItem>
-								<ShieldQuestion />
-								Quyền lợi nhân viên
-							</DropdownMenuItem> */}
-						</DropdownMenuGroup>
+						{user?.resContractDTO?.roleName !== 'ADMIN' && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuGroup>
+									<EmployeeTimeTracking />
+									<EmployeeLeaveRequest />
+									<EmployeeSalaryCal />
+								</DropdownMenuGroup>
+							</>
+						)}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className='hover:cursor-pointer hover:bg-gray-100' onClick={handleLogout}>
 							<LogOut />

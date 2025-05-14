@@ -36,37 +36,6 @@ type Employee = {
 	password: string | null;
 };
 
-type ResContractDTO = {
-	baseSalary: number;
-	endDate: string;
-	expiryDate: string;
-	fullName: string;
-	id: number;
-	idString: string;
-	levelName: string;
-	roleName: string;
-	salaryCoefficient: number;
-	seniorityId: number;
-	startDate: string;
-	status: number;
-	userId: number;
-};
-
-type UserInfo = {
-	id: number;
-	idString: string;
-	fullName: string;
-	email: string;
-	phoneNumber: string;
-	gender: 'MALE' | 'FEMALE' | string;
-	dateOfBirth: string;
-	address: string;
-	username: string;
-	createdAt: string;
-	status: number;
-	resContractDTO?: ResContractDTO;
-};
-
 export default function UserInformationDetail() {
 	const dispatch = useAppDispatch();
 	// const { user } = useSelector((state: RootState) => state.user);
@@ -113,7 +82,6 @@ export default function UserInformationDetail() {
 	}, [profile, reset]);
 
 	const handleResetClick = () => {
-		console.log(profile);
 		reset({
 			fullName: profile?.fullName,
 			gender: profile?.gender,

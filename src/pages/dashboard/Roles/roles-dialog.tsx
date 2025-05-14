@@ -69,9 +69,6 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 	const dispatch = useAppDispatch();
 	const { allowances } = useSelector((state: RootState) => state.allowances);
 
-	console.log('current role: ', selectedRole);
-	console.log('dspc: ', allowances);
-
 	const {
 		register,
 		formState: { errors },
@@ -114,9 +111,7 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 					status: formData.status
 				};
 
-				console.log(roleId, roleData);
 				const res = await updateRole(roleId, roleData);
-				console.log(res);
 				// @ts-expect-error - exception success attr
 				if (res.success) {
 					toast.success('Cập nhật thông tin cấp bậc thành công!');
@@ -146,7 +141,6 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 			if (selectedRole) {
 				const roleId = selectedRole.id;
 				const res = await deleteRole(roleId);
-				console.log(res);
 				// @ts-expect-error - exception success attr
 				if (res.success) {
 					toast.success('Xóa cấp bậc thành công!');
@@ -174,14 +168,14 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 	return (
 		<>
 			<Dialog open={isOpen} onOpenChange={() => onClose()}>
-				<DialogContent className='min-w-[1000px] max-h-[98vh] ' onOpenAutoFocus={e => e.preventDefault()}>
+				<DialogContent className='max-h-[98vh] min-w-[1000px]' onOpenAutoFocus={e => e.preventDefault()}>
 					<DialogHeader>
 						<DialogTitle>{selectedRole ? selectedRole.name : 'Role Details'}</DialogTitle>
 						<DialogDescription>{selectedRole ? selectedRole.description : 'No role selected'}</DialogDescription>
 					</DialogHeader>
 					<div className='grid grid-cols-4 gap-4'>
 						<div>
-							<label htmlFor='role-id' className='w-full text-sm mb-1 text-start font-semibold'>
+							<label htmlFor='role-id' className='mb-1 w-full text-start text-sm font-semibold'>
 								ID
 							</label>
 							<Input
@@ -193,7 +187,7 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 							/>
 						</div>
 						<div>
-							<label htmlFor='role-name' className='w-full text-sm mb-1 text-start font-semibold'>
+							<label htmlFor='role-name' className='mb-1 w-full text-start text-sm font-semibold'>
 								Tên chức vụ
 							</label>
 							<Input
@@ -209,10 +203,10 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 									}
 								})}
 							/>
-							{errors.roleName && <p className='text-red-500 text-sm'>{errors.roleName.message}</p>}
+							{errors.roleName && <p className='text-sm text-red-500'>{errors.roleName.message}</p>}
 						</div>
 						<div>
-							<label htmlFor='allowance' className='w-full text-sm mb-1 text-start font-semibold'>
+							<label htmlFor='allowance' className='mb-1 w-full text-start text-sm font-semibold'>
 								Phụ cấp
 							</label>
 							<Select
@@ -241,10 +235,10 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 									</SelectGroup>
 								</SelectContent>
 							</Select>
-							{errors.allowanceId && <p className='text-red-500 text-sm'>{errors.allowanceId.message}</p>}
+							{errors.allowanceId && <p className='text-sm text-red-500'>{errors.allowanceId.message}</p>}
 						</div>
 						<div>
-							<label htmlFor='status' className='w-full text-sm mb-1 text-start font-semibold'>
+							<label htmlFor='status' className='mb-1 w-full text-start text-sm font-semibold'>
 								Trạng thái
 							</label>
 							<Select
@@ -264,12 +258,12 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 									</SelectGroup>
 								</SelectContent>
 							</Select>
-							{errors.status && <p className='text-red-500 text-sm'>{errors.status.message}</p>}
+							{errors.status && <p className='text-sm text-red-500'>{errors.status.message}</p>}
 						</div>
 					</div>
 					<div className='grid grid-cols-1'>
 						<div>
-							<label htmlFor='role-description' className='w-full text-sm mb-1 text-start font-semibold'>
+							<label htmlFor='role-description' className='mb-1 w-full text-start text-sm font-semibold'>
 								Mô tả
 							</label>
 							<Input
@@ -285,13 +279,13 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 									}
 								})}
 							/>
-							{errors.description && <p className='text-red-500 text-sm'>{errors.description.message}</p>}
+							{errors.description && <p className='text-sm text-red-500'>{errors.description.message}</p>}
 						</div>
 					</div>
 					{mode === 'edit' && selectedRole?.status === 2 && (
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<button className='px-4 py-2 border w-[80px] ml-auto float-end bg-black text-white rounded-md hover:bg-gray-600 transition '>
+								<button className='float-end ml-auto w-[80px] rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'>
 									Lưu
 								</button>
 							</AlertDialogTrigger>
@@ -314,7 +308,7 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 						<div className='flex items-center justify-between'>
 							<AlertDialog>
 								<AlertDialogTrigger asChild>
-									<button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'>
+									<button className='flex items-center justify-center gap-1 rounded-md border bg-red-500 px-4 py-2 text-white transition hover:bg-red-600'>
 										<Trash2 />
 										Xóa
 									</button>
@@ -332,7 +326,7 @@ export default function RolesDialog({ isOpen, selectedRole, onClose, mode }: Rol
 							</AlertDialog>
 							<div className='flex justify-end gap-2'>
 								<button
-									className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+									className='rounded-md border bg-white px-4 py-2 text-black transition hover:bg-gray-100'
 									onClick={() => onClose()}
 								>
 									Thoát
