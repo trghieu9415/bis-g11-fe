@@ -15,13 +15,13 @@ const WorkPolicyDialog: React.FC<WorkPolicyDialogProps> = ({ isOpen, onClose }) 
 				<DialogDescription></DialogDescription>
 				<div className='mx-auto bg-white rounded-lg px-4'>
 					<div className='text-center border-b pb-4 mb-4'>
-						<h1 className='text-lg font-bold'>CÔNG TY INVERSE</h1>
+						<h1 className='text-lg font-bold'>CÔNG TY INKVERSE</h1>
 						<h2 className='text-lg font-bold'>CHÍNH SÁCH LÀM VIỆC</h2>
-						<p className='text-sm'>Số: 99/TB-INVERSE</p>
+						<p className='text-sm'>Số: 99/TB-INKVERSE</p>
 					</div>
 					<div className='text-gray-700 space-y-4'>
 						<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-						<p className='!mt-1'>Giám đốc công ty Inverse thông báo về chính sách làm việc như sau:</p>
+						<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về chính sách làm việc như sau:</p>
 						<ul className='list-disc pl-6 space-y-2'>
 							<li>
 								<strong>Giờ làm việc</strong>: Từ 8h00 đến 17h30, từ thứ Hai đến thứ Sáu.

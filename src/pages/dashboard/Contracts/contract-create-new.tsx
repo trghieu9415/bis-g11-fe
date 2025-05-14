@@ -325,7 +325,7 @@ export default function ContractCreateNew() {
 									<Command>
 										<CommandInput placeholder='Tìm kiếm nhân viên ở đây...' />
 										<CommandList>
-											<CommandEmpty>No results found.</CommandEmpty>
+											<CommandEmpty>Không tìm thấy nhân viên cần thêm.</CommandEmpty>
 											<CommandGroup heading='Kết quả'>
 												<div className='max-h-[96px] overflow-y-auto'>
 													{users.map((item, index) => {
@@ -473,15 +473,19 @@ export default function ContractCreateNew() {
 													<SelectValue placeholder='Chọn vai trò' />
 												</SelectTrigger>
 												<SelectContent>
-													{roles?.map((item, index) => {
-														if (item.name.toLowerCase() === 'admin'.toLowerCase()) return;
+													{roles
+														?.filter(
+															item => item.status === 1 && item.resSeniority?.filter(s => s.status === 1).length > 0
+														)
+														?.map((item, index) => {
+															if (item.name.toLowerCase() === 'admin'.toLowerCase()) return;
 
-														return (
-															<SelectItem value={String(item.id)} key={index}>
-																{item.name}
-															</SelectItem>
-														);
-													})}
+															return (
+																<SelectItem value={String(item.id)} key={index}>
+																	{item.name}
+																</SelectItem>
+															);
+														})}
 												</SelectContent>
 											</Select>
 											{errors.role_id && <p className='text-red-500 text-sm'>{errors.role_id.message}</p>}
@@ -522,7 +526,11 @@ export default function ContractCreateNew() {
 												type='text'
 												className='mt-1'
 												{...register('base_salary', {
-													required: 'Vui lòng nhập lương cơ bản'
+													required: 'Vui lòng nhập lương cơ bản',
+													validate: value => {
+														const numericValue = Number(value.replace(/,/g, ''));
+														return numericValue > 0 || 'Lương cơ bản phải lớn hơn 0';
+													}
 												})}
 												onChange={e => formatSalary(e.target.value)}
 											/>

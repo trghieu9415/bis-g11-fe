@@ -1,7 +1,6 @@
 'use client';
-
+import { useNavigate } from 'react-router-dom';
 import { ChevronsUpDown, LogOut, ShieldQuestion, SquareUser } from 'lucide-react';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
 	DropdownMenu,
@@ -18,18 +17,49 @@ import EmployeeTimeTracking from '@/pages/dashboard/Employee/EmployeeTimeTrackin
 import EmployeeLeaveRequest from '@/pages/dashboard/Employee/employee-leave-request';
 import EmployeeSalaryCal from '@/pages/dashboard/Employee/employee-payroll';
 import { NavLink } from 'react-router-dom';
+import { useAppDispatch } from '@/redux/store';
+import { logoutUser } from '@/redux/slices/authSlice';
 
-export function NavUser({
-	user
-}: {
-	user: {
-		id: number;
-		name: string;
-		email: string;
-		avatar: string;
-	};
-}) {
+type ResContractDTO = {
+	baseSalary: number;
+	endDate: string;
+	expiryDate: string;
+	fullName: string;
+	id: number;
+	idString: string;
+	levelName: string;
+	roleName: string;
+	salaryCoefficient: number;
+	seniorityId: number;
+	startDate: string;
+	status: number;
+	userId: number;
+};
+
+type UserInfo = {
+	id: number;
+	idString: string;
+	fullName: string;
+	email: string;
+	phoneNumber: string;
+	gender: 'MALE' | 'FEMALE' | string;
+	dateOfBirth: string;
+	address: string;
+	username: string;
+	createdAt: string;
+	status: number;
+	resContractDTO?: ResContractDTO;
+};
+
+export function NavUser({ user }: { user: UserInfo | null }) {
+	const navigate = useNavigate();
 	const { isMobile } = useSidebar();
+	const dispatch = useAppDispatch();
+
+	const handleLogout = async () => {
+		await dispatch(logoutUser());
+		navigate('/login');
+	};
 
 	return (
 		<SidebarMenu>
@@ -41,12 +71,12 @@ export function NavUser({
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
 							<Avatar className='h-8 w-8 rounded-lg'>
-								<AvatarImage src={user.avatar} alt={user.name} />
+								<AvatarImage src={`./avatars/black_cat.jpg`} alt={user?.fullName || ''} />
 								<AvatarFallback className='rounded-lg'>CN</AvatarFallback>
 							</Avatar>
 							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate font-semibold'>{user.name}</span>
-								<span className='truncate text-xs'>{user.email}</span>
+								<span className='truncate font-semibold'>{user?.fullName || ''}</span>
+								<span className='truncate text-xs'>{user?.email || ''}</span>
 							</div>
 							<ChevronsUpDown className='ml-auto size-4' />
 						</SidebarMenuButton>
@@ -60,36 +90,36 @@ export function NavUser({
 						<DropdownMenuLabel className='p-0 font-normal'>
 							<div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
 								<Avatar className='h-8 w-8 rounded-lg'>
-									<AvatarImage src={user.avatar} alt={user.name} />
+									<AvatarImage src={`./avatars/black_cat.jpg`} alt={user?.fullName || ''} />
 									<AvatarFallback className='rounded-lg'>CN</AvatarFallback>
 								</Avatar>
 								<div className='grid flex-1 text-left text-sm leading-tight'>
-									<span className='truncate font-semibold'>{user.name}</span>
-									<span className='truncate text-xs'>{user.email}</span>
+									<span className='truncate font-semibold'>{user?.fullName || ''}</span>
+									<span className='truncate text-xs'>{user?.email || ''}</span>
 								</div>
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<NavLink to={`/user/${user.id}`}>
-								<DropdownMenuItem className='hover:bg-gray-100 hover:cursor-pointer'>
+							<NavLink to={`/user`}>
+								<DropdownMenuItem className='hover:cursor-pointer hover:bg-gray-100'>
 									<SquareUser />
 									Thông tin cá nhân
 								</DropdownMenuItem>
 							</NavLink>
 						</DropdownMenuGroup>
+						{user?.resContractDTO?.roleName !== 'ADMIN' && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuGroup>
+									<EmployeeTimeTracking />
+									<EmployeeLeaveRequest />
+									<EmployeeSalaryCal />
+								</DropdownMenuGroup>
+							</>
+						)}
 						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<EmployeeTimeTracking />
-							<EmployeeLeaveRequest />
-							<EmployeeSalaryCal />
-							{/* <DropdownMenuItem>
-								<ShieldQuestion />
-								Quyền lợi nhân viên
-							</DropdownMenuItem> */}
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem className='hover:cursor-pointer hover:bg-gray-100' onClick={handleLogout}>
 							<LogOut />
 							Đăng xuất
 						</DropdownMenuItem>

@@ -81,9 +81,14 @@ function EmployeeCalendar({ events, onCheckIn, onCheckOut }: EmployeeCalendarPro
 		const today = new Date();
 		const hours = today.getHours();
 		const minutes = today.getMinutes();
-		const isCheckOutTime = (hours === 17 && minutes >= 30) || (hours === 18 && minutes <= 30);
-		const isCheckInTime = hours >= 8 && hours < 2;
 
+		// const isCheckOutTime = (hours === 17 && minutes >= 30) || (hours === 18 && minutes <= 30);
+		// const isCheckInTime = hours >= 8 && hours < 14;
+
+		// FOR DEMO
+		const isCheckOutTime = true
+		const isCheckInTime = true
+		
 		const newestCheckInEvent = events
 			.filter(event => event.title === 'Check-in')
 			.sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())[0];
@@ -196,12 +201,14 @@ function EmployeeCalendar({ events, onCheckIn, onCheckOut }: EmployeeCalendarPro
 				)}
 			</div>
 
+
 			{calendar && (
 				<div>
 					<ScheduleXCalendar calendarApp={calendar} />
 				</div>
 			)}
 		</div>
+
 	);
 }
 

@@ -47,3 +47,5 @@ export const getSupplier = async (supplierId: number) => {
 		throw error;
 	}
 };
+
+export const getListSuppliers = async () => await axios.get(`/api/v1/supplier/list`);

@@ -97,7 +97,7 @@ const EmployeePayrollMonth = ({
 
 					<div className='grid grid-col grid-cols-2'>
 						<p className='mb-2 text-xs'>
-							<strong>Lương cơ bản:</strong> {payrollMonth?.baseSalary}
+							<strong>Ngày công chuẩn:</strong> {payrollMonth?.standardWorkingDays}
 						</p>
 						<p className='mb-2 text-xs'>
 							<strong>Ngày nghỉ bệnh:</strong> {payrollMonth?.totalSickLeaves}
@@ -106,7 +106,7 @@ const EmployeePayrollMonth = ({
 
 					<div className='grid grid-col grid-cols-2'>
 						<p className='mb-2 text-xs'>
-							<strong>Hệ số lương:</strong> {payrollMonth?.salaryCoefficient}
+							<strong></strong>
 						</p>
 						<p className='mb-2 text-xs'>
 							<strong>Nghỉ thai sản:</strong> {payrollMonth?.totalMaternityLeaves}
@@ -115,7 +115,7 @@ const EmployeePayrollMonth = ({
 
 					<div className='grid grid-col grid-cols-2'>
 						<p className='mb-2 text-xs'>
-							<strong>Ngày công chuẩn:</strong> {payrollMonth?.standardWorkingDays}
+							<strong></strong>
 						</p>
 						<p className='mb-2 text-xs'>
 							<strong>Nghỉ không phép:</strong> {payrollMonth?.totalUnpaidLeaves}
@@ -133,17 +133,27 @@ const EmployeePayrollMonth = ({
 						<tbody>
 							<tr>
 								<td className='border border-gray-300 p-2'>1</td>
-								<td className='border border-gray-300 p-2'>Lương chính thức</td>
-								<td className='border border-gray-300 p-2 text-right'>{payrollMonth?.mainSalary} VNĐ</td>
+								<td className='border border-gray-300 p-2'>Lương cơ bản</td>
+								<td className='border border-gray-300 p-2 text-right'>{payrollMonth?.baseSalary} VNĐ</td>
 							</tr>
 							<tr>
 								<td className='border border-gray-300 p-2'>2</td>
-								<td className='border border-gray-300 p-2'>Lương phụ cấp</td>
+								<td className='border border-gray-300 p-2'>Hệ số lương</td>
+								<td className='border border-gray-300 p-2 text-right'>{payrollMonth?.salaryCoefficient}</td>
+							</tr>
+							<tr>
+								<td className='border border-gray-300 p-2'>3</td>
+								<td className='border border-gray-300 p-2'>Lương Gross</td>
+								<td className='border border-gray-300 p-2 text-right'>{payrollMonth?.mainSalary} VNĐ</td>
+							</tr>
+							<tr>
+								<td className='border border-gray-300 p-2'>4</td>
+								<td className='border border-gray-300 p-2'>Phụ cấp</td>
 								<td className='border border-gray-300 p-2 text-right'>{payrollMonth?.allowance} VNĐ</td>
 							</tr>
 							<tr>
 								<td className='border border-gray-300 p-2 text-right font-bold' colSpan={2}>
-									Tổng cộng:
+									Tổng cộng (3) + (4):
 								</td>
 								<td className='border border-gray-300 p-2 font-bold text-right'>{payrollMonth?.grossSalary} VNĐ</td>
 							</tr>

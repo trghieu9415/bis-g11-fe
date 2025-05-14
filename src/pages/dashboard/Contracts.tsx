@@ -1,5 +1,5 @@
 import ContractTable from '@/pages/dashboard/Contracts/contract-table';
-import ContractCreateNew from './Contracts/contract-creat-new';
+import ContractCreateNew from './Contracts/contract-create-new';
 
 export default function Contracts() {
 	return (

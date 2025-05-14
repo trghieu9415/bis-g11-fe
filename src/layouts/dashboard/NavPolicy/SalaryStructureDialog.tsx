@@ -15,13 +15,13 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogOverlay />
-			<DialogContent className='min-w-[60vw]'>
+			<DialogContent className='min-w-[80vw]'>
 				<DialogTitle></DialogTitle>
 				<DialogDescription></DialogDescription>
 				<div className='text-center border-b pb-4 mb-4 text-black'>
-					<h1 className='text-lg font-bold'>CÔNG TY INVERSE</h1>
+					<h1 className='text-lg font-bold'>CÔNG TY INKVERSE</h1>
 					<h2 className='text-lg font-bold'>CƠ CẤU LƯƠNG</h2>
-					<p className='text-sm'>Số: 100/TB-INVERSE</p>
+					<p className='text-sm'>Số: 100/TB-INKVERSE</p>
 				</div>
 				<Tabs defaultValue='salary-formula'>
 					<div className='text-center mb-4'>
@@ -36,32 +36,33 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 					<TabsContent value='salary-formula' className='min-h-[430px] max-h-[430px] overflow-y-auto pr-1'>
 						<div className='text-gray-700 space-y-4'>
 							<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-							<p className='!mt-1'>Giám đốc công ty Inverse thông báo về cơ cấu lương như sau:</p>
+							<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về cơ cấu lương như sau:</p>
 							<ul className='list-disc pl-6 space-y-4'>
 								<li>
 									<strong>Công thức tính lương:</strong>
-									<div className='py-2 px-4 mt-2 bg-gray-100 rounded-lg text-base flex flex-col justify-center items-start'>
+									<div className='py-2 px-4 mt-2 bg-gray-100 rounded-lg text-base flex flex-col justify-center items-start '>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>A</strong> = (lương cơ bản - hệ số lương) / số ngày làm việc
-											tiêu chuẩn
+											<strong className='text-base'>Số ngày tính lương</strong> = Tổng số ngày làm việc tiêu chuẩn trong
+											tháng - Số ngày nghỉ thai sản - Số ngày nghỉ bệnh - Số ngày nghỉ không phép{' '}
+											<strong className=' text-md'>(1)</strong>
 										</p>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>B</strong> = số ngày làm việc thực tế - số ngày nghỉ thai sản -
-											số ngày nghỉ bệnh
+											<strong className='text-base'>Lương Gross</strong> = Lương cơ bản x hệ số lương
+											<strong className=' text-md'> (2)</strong>
 										</p>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>C</strong> = phụ cấp thai sản + phụ cấp nghỉ bệnh + phụ cấp từ
-											công ty
+											<strong className='text-base'>Lương ngày</strong> = <strong className=' text-md'>(2)</strong> /
+											(Tổng số ngày làm việc tiêu chuẩn trong tháng)
+											<strong className=' text-md'> (3)</strong>
 										</p>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>D</strong> = khoản phạt (bao gồm đi trễ, nghỉ không phép)
+											<strong className='text-base'>Lương chính</strong> = <strong className=' text-md'> (3)</strong> x{' '}
+											<strong className=' text-md'>(1)</strong>
 										</p>
 										<div>
 											<p className='text-sm'>
-												<strong className='text-base'>Lương thực nhận</strong> ={' '}
-												<strong className='italic text-lg'>A</strong> x <strong className='italic text-lg'>B</strong> +{' '}
-												<strong className='italic text-lg'>C</strong> - thuế -{' '}
-												<strong className='italic text-lg'>D</strong>
+												<strong className='text-base'>Lương thực nhận</strong> = Lương chính + Phụ cấp từ công ty + Phụ
+												cấp thai sản + Phụ cấp nghỉ bệnh
 											</p>
 										</div>
 										<p className='mt-2 mx-auto text-center text-sm italic'>
@@ -80,18 +81,18 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 					<TabsContent value='allowances' className='min-h-[430px] max-h-[430px] overflow-y-auto pr-1'>
 						<div className='text-gray-700 space-y-4'>
 							<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-							<p className='!mt-1'>Giám đốc công ty Inverse thông báo về cơ cấu lương như sau:</p>
+							<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về cơ cấu lương như sau:</p>
 							<ul className='list-disc pl-6 space-y-4'>
 								<li>
 									<strong>Công thức tính phụ cấp thai sản:</strong>
 									<div className='py-2 px-4 mt-2 bg-gray-100 rounded-lg text-base flex flex-col justify-center items-start'>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>A</strong> = (bình quân 6 tháng trước đóng BHXH) / số ngày làm
+											<strong className='italic text-lg'>A</strong> = (Bình quân 6 tháng trước đóng BHXH) / Số ngày làm
 											việc tiêu chuẩn
 										</p>
-										<p>
+										<p className='text-sm'>
 											<strong className='text-base'>Phụ cấp thai sản</strong> ={' '}
-											<strong className='italic text-lg'>A</strong> x số ngày nghỉ thai sản
+											<strong className='italic text-lg'>A</strong> x Số ngày nghỉ thai sản
 										</p>
 									</div>
 								</li>
@@ -99,12 +100,11 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 									<strong>Công thức tính phụ cấp nghỉ bệnh:</strong>
 									<div className='py-2 px-4 mt-2 bg-gray-100 rounded-lg text-base flex flex-col justify-center items-start'>
 										<p className='text-sm'>
-											<strong className='italic text-lg'>A</strong> = (lương cơ bản x hệ số lương x số ngày nghỉ) / số
-											ngày làm việc tiêu chuẩn
+											<strong className='italic text-lg'>A</strong> = Lương ngày x Số ngày nghỉ bệnh
 										</p>
-										<p>
+										<p className='text-sm'>
 											<strong className='text-base'>Phụ cấp nghỉ bệnh</strong> ={' '}
-											<strong className='italic text-lg'>A</strong> x ??%
+											<strong className='italic text-lg'>A</strong> x Tỷ lệ BHXH chi trả (75%)
 										</p>
 									</div>
 								</li>
@@ -114,7 +114,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 					<TabsContent value='allowancesFormCompany' className='min-h-[430px] max-h-[430px] overflow-y-auto pr-1'>
 						<div className='text-gray-700 space-y-4'>
 							<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-							<p className='!mt-1'>Giám đốc công ty Inverse thông báo về cơ cấu lương như sau:</p>
+							<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về cơ cấu lương như sau:</p>
 							<table className='min-w-full divide-y divide-gray-200 overflow-y-auto pr-1'>
 								<thead className='bg-gray-100 sticky top-0 z-10'>
 									<tr>
@@ -142,7 +142,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 					<TabsContent value='tax' className='min-h-[430px] max-h-[430px] overflow-y-auto pr-1'>
 						<div className='text-gray-700 space-y-4'>
 							<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-							<p className='!mt-1'>Giám đốc công ty Inverse thông báo về các khoản thuế như sau:</p>
+							<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về các khoản thuế như sau:</p>
 							<table className='min-w-full divide-y divide-gray-200 overflow-y-auto pr-1'>
 								<thead className='bg-gray-100 sticky top-0 z-10'>
 									<tr>
@@ -185,7 +185,7 @@ const SalaryStructureDialog: React.FC<SalaryStructureDialogProps> = ({ isOpen, o
 					<TabsContent value='penalty' className='min-h-[430px] max-h-[430px] overflow-y-auto pr-1'>
 						<div className='text-gray-700 space-y-4'>
 							<p className='!mt-1'>Căn cứ vào quy định của công ty và Bộ luật Lao động;</p>
-							<p className='!mt-1'>Giám đốc công ty Inverse thông báo về cơ cấu lương như sau:</p>
+							<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về cơ cấu lương như sau:</p>
 							<table className='min-w-full divide-y divide-gray-200 overflow-y-auto pr-1'>
 								<thead className='bg-gray-100 sticky top-0 z-10'>
 									<tr>

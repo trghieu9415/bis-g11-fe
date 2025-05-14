@@ -7,63 +7,55 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ellipsis } from 'lucide-react';
+import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, Mars, UserRoundPen, Venus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { fetchPayrollsByYear } from '@/redux/slices/payrollsByYearSlice';
+import { fetchUsers } from '@/redux/slices/usersSlice';
 import { RootState, useAppDispatch } from '@/redux/store';
+import PayrollsYearDialog from './payrolls-year-dialog';
 
-type Payroll = {
+type Employee = {
 	id: number;
 	idString: string;
-	standardWorkingDays: number;
-	maternityBenefit: string;
-	sickBenefit: string;
-	netSalary: string;
-	grossSalary: string;
-	tax: string;
-	employeeBHXH: string;
-	employeeBHYT: string;
-	employeeBHTN: string;
-	penalties: string;
-	allowance: string;
-	totalIncome: string;
-	attendanceId: number;
-	monthOfYear: string;
-	userIdStr: string;
-	fullName: string;
-	roleName: string;
-	salaryCoefficient: number;
-	totalWorkingDays: number;
-	totalSickLeaves: number;
-	totalPaidLeaves: number;
-	totalMaternityLeaves: number;
-	totalUnpaidLeaves: number;
-	totalHolidayLeaves: number;
-	baseSalary: string;
-	totalBaseSalary: string;
-	totalBenefit: string;
-	mainSalary: string;
-	deductions: string;
+	full_name: string;
+	role: string;
+	status: boolean;
+	base_salary: number;
+	level: string;
+	salary_coefficient: number;
+	gender: boolean;
+	email: string;
+	phone: string;
+	date_of_birth: string;
+	address: string;
+	username: string;
+	password: string;
 };
 
-export default function PayrollsYearTable() {
-	const [selectedPayroll, setSelectedPayroll] = useState<Payroll | null>(null);
+type PayrollYearsTableProps = {
+	year: string;
+};
+
+export default function PayrollsYearTable({ year }: PayrollYearsTableProps) {
+	const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'delete'>('view');
 
-	const { payrollsByYear } = useSelector((state: RootState) => state.payrollsByYear);
+	const dispatch = useAppDispatch();
+	const { users } = useSelector((state: RootState) => state.users);
 
-	console.log(payrollsByYear);
+	useEffect(() => {
+		dispatch(fetchUsers());
+	}, [dispatch]);
 
-	const columns: ColumnDef<Payroll>[] = [
+	const columns: ColumnDef<Employee>[] = [
 		{
 			accessorKey: 'idString',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -72,144 +64,169 @@ export default function PayrollsYearTable() {
 			enableHiding: false
 		},
 		{
-			accessorKey: 'userIdStr',
+			accessorKey: 'full_name',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-24'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					ID nhân viên <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ row }) => <span className='flex items-center'>{row.getValue('userIdStr')}</span>,
-			enableHiding: false
-		},
-		{
-			accessorKey: 'fullName',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Họ và tên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center'>{row.getValue('fullName')}</span>,
+			cell: ({ row }) => (
+				<span className='flex items-center'>
+					<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
+						<UserRoundPen />
+					</Button>
+					{row.getValue('full_name')}
+				</span>
+			),
 			enableHiding: false
 		},
 		{
-			accessorKey: 'roleName',
+			accessorKey: 'gender',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Vai trò <ArrowUpDown />
+					Giới tính <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('gender') ? (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-blue-500 p-1 text-white'>
+								<Mars className='mr-1 h-4 w-4' stroke='white' />
+								Nam
+							</p>
+						) : (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-pink-500 p-1 text-white'>
+								<Venus className='mr-1 h-4 w-4' stroke='white' /> Nữ
+							</p>
+						)}
+					</span>
+				);
+			}
+			// enableHiding: false
+		},
+		{
+			accessorKey: 'role',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='w-40 text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Chức vụ hiện tại <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-start'>{row.getValue('role') ? row.getValue('role') : '--'}</span>
+			)
+		},
+		{
+			accessorKey: 'level',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Cấp bậc hiện tại <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-start'>{row.getValue('level') ? row.getValue('level') : '--'}</span>
+			)
+		},
+		{
+			accessorKey: 'status',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='w-30 text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Trạng thái <ArrowUpDown />
+				</Button>
+			),
+			cell: ({ row }) => {
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('status') && row.getValue('role') !== '' ? (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+								<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
+								Đang làm việc
+							</p>
+						) : (
+							row.getValue('role') === '' && (
+								<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+									<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Hết hợp đồng
+								</p>
+							)
+						)}
+					</span>
+				);
+			},
+			sortingFn: (rowA, rowB) => {
+				const statusA = rowA.original.status ? 1 : 0;
+				const statusB = rowB.original.status ? 1 : 0;
+				return statusA - statusB;
+			},
+			enableHiding: false
+		},
+
+		{
+			accessorKey: 'email',
+			header: ({ column }) => (
+				<Button
+					variant='link'
+					className='w-52 text-white'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+				>
+					Email <ArrowUpDown />
 				</Button>
 			)
 		},
 		{
-			accessorKey: 'totalWorkingDays',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white w-26'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Ngày làm việc <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()}`}</div>,
-			enableHiding: false
-		},
-		{
-			accessorKey: 'allowance',
+			accessorKey: 'phone',
 			header: ({ column }) => (
 				<Button
 					variant='link'
 					className='text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Phụ cấp <ArrowUpDown />
+					Số điện thoại <ArrowUpDown />
 				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()} VNĐ`}</div>
+			)
 		},
 		{
-			accessorKey: 'deductions',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white w-26'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Khấu trừ BH <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()} VNĐ`}</div>
-		},
-		{
-			accessorKey: 'tax',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white w-24'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Thuế <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()} VNĐ`}</div>
-		},
-		{
-			accessorKey: 'baseSalary',
+			accessorKey: 'date_of_birth',
 			header: ({ column }) => (
 				<Button
 					variant='link'
 					className='text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Lương cơ bản <ArrowUpDown />
+					Ngày sinh <ArrowUpDown />
 				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()} VNĐ`}</div>
+			)
 		},
 		{
-			accessorKey: 'grossSalary',
+			accessorKey: 'address',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white'
+					className='w-72 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
-					Lương Gross <ArrowUpDown />
+					Địa chỉ <ArrowUpDown />
 				</Button>
-			),
-			cell: ({ getValue }) => <div style={{ textAlign: 'right' }}>{`${getValue()} VNĐ`}</div>
-		},
-		{
-			accessorKey: 'netSalary',
-			header: ({ column }) => (
-				<Button
-					variant='link'
-					className='text-white'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-				>
-					Lương Net <ArrowUpDown />
-				</Button>
-			),
-			cell: ({ getValue }) => {
-				const value = getValue() as string;
-				const numericValue = Math.floor(parseFloat(value));
-				const formattedValue = numericValue.toLocaleString('en-US', {
-					minimumFractionDigits: 0,
-					maximumFractionDigits: 0
-				});
-				return <div style={{ textAlign: 'right' }}>{`${formattedValue} VNĐ`}</div>;
-			}
+			)
 		},
 		{
 			id: 'actions',
@@ -218,39 +235,52 @@ export default function PayrollsYearTable() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem> */}
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
 		}
 	];
 
-	const handleOpenDialog = (payroll: Payroll, mode: 'view' | 'edit' | 'delete') => {
-		setSelectedPayroll(payroll);
+	const handleOpenDialog = (employee: Employee, mode: 'view' | 'edit' | 'delete') => {
+		setSelectedEmployee(employee);
 		setDialogMode(mode);
 		setIsDialogOpen(true);
 	};
 
 	const handleCloseDialog = () => {
 		setIsDialogOpen(false);
-		setSelectedPayroll(null);
+		setSelectedEmployee(null);
 	};
 
 	const hiddenColumns = {
-		totalWorkingDays: false,
-		roleName: false
+		gender: false,
+		date_of_birth: false,
+		address: false,
+		base_salary: false,
+		salary_coefficient: false,
+		email: false,
+		phone: false
 	};
 
 	return (
 		<div>
-			<CustomTable columns={columns} data={payrollsByYear} hiddenColumns={hiddenColumns} />
-			{/* <PayrollsMonthDialog isOpen={isDialogOpen} selectedPayroll={selectedPayroll} onClose={handleCloseDialog} /> */}
+			<CustomTable columns={columns} data={users} hiddenColumns={hiddenColumns} />
+			{selectedEmployee && year && (
+				<PayrollsYearDialog
+					year={year}
+					isDialogOpen={isDialogOpen}
+					selectedId={selectedEmployee.id}
+					handleCloseDialog={handleCloseDialog}
+				/>
+			)}
+			{/* <PayrollsYearDialog isDialogOpen={true} selectedId={1} handleCloseDialog={handleCloseDialog} year={year} /> */}
 		</div>
 	);
 }

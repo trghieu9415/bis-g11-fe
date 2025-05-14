@@ -6,6 +6,7 @@ import { CalendarSearch } from 'lucide-react';
 
 import { fetchPayrollsByYear } from '@/redux/slices/payrollsByYearSlice';
 import { useAppDispatch } from '@/redux/store';
+import PayrollsYearStatistics from './PayrollsYear/payrolls-year-statistics';
 
 export default function SalaryMonth() {
 	const dispatch = useAppDispatch();
@@ -26,20 +27,18 @@ export default function SalaryMonth() {
 		dispatch(fetchPayrollsByYear(String(currentYear)));
 	}, []);
 
-	console.log(year.input, year.input.length);
-
 	return (
-		<div className='flex flex-col w-full'>
-			<h1 className='text-lg font-bold py-4 uppercase'>
+		<div className='flex w-full flex-col'>
+			<h1 className='py-4 text-lg font-bold uppercase'>
 				Danh sách lương năm{' '}
-				<span className='text-lg pb-[2px] font-bold border-b-4 border-blue-300 '>năm {year.search}</span>
-				{isThisYear && <span className='bg-yellow-200 text-black px-2 py-1 rounded ml-2'>Năm nay</span>}
+				<span className='border-b-4 border-blue-300 pb-[2px] text-lg font-bold'>năm {year.search}</span>
+				{isThisYear && <span className='ml-2 rounded bg-yellow-200 px-2 py-1 text-black'>Năm nay</span>}
 			</h1>
 			<div>
-				<div className='flex items-center justify-center gap-2 float-end mr-1 mb-2'>
+				<div className='float-end mb-2 mr-1 flex items-center justify-center gap-2'>
 					<Input
 						type='number'
-						className={`border-gray-200 outline-none w-[68px] !text-base ${year.input && (parseInt(year.input) < 2020 || parseInt(year.input) > new Date().getFullYear()) ? 'border-red-500' : ''}`}
+						className={`w-[68px] border-gray-200 !text-base outline-none ${year.input && (parseInt(year.input) < 2020 || parseInt(year.input) > new Date().getFullYear()) ? 'border-red-500' : ''}`}
 						value={year?.input || ''}
 						min={2020}
 						max={new Date().getFullYear()}
@@ -79,8 +78,9 @@ export default function SalaryMonth() {
 					</Button>
 				</div>
 			</div>
+			<PayrollsYearStatistics year={year.search} />
 			<div className='mb-2'>
-				<PayrollsYearTable />
+				<PayrollsYearTable year={year.search} />
 			</div>
 		</div>
 	);

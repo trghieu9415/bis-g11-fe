@@ -1,6 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { BadgeCheck } from 'lucide-react';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -10,25 +18,15 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog';
-import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction
-} from '@/components/ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { RootState, useAppDispatch } from '@/redux/store';
-import { useSelector } from 'react-redux';
-import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
 import { fetchAllLeaveRequestsByUserId } from '@/redux/slices/leaveRequestByUserIDSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/store';
 import { addLeaveRequest } from '@/services/leaveRequestService';
 import { AxiosError } from 'axios';
+import { BadgeCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 export default function EmployeeLeaveRequest() {
@@ -39,7 +37,7 @@ export default function EmployeeLeaveRequest() {
 	const year = today.getFullYear();
 
 	const dispatch = useAppDispatch();
-	const { user } = useSelector((state: RootState) => state.user);
+	const { profile } = useAppSelector(state => state.profile);
 	const {
 		register,
 		watch,
@@ -67,9 +65,9 @@ export default function EmployeeLeaveRequest() {
 	}, [isDialogOpen]);
 
 	useEffect(() => {
-		if (!user.id) {
-			dispatch(fetchUserDetail(2));
-		}
+		// if (!user.id) {
+		// 	dispatch(fetchUserDetail(2));
+		// }
 
 		if (!formData.startDate) {
 			setValue('endDate', '');
@@ -79,9 +77,9 @@ export default function EmployeeLeaveRequest() {
 	const getMaxLeaveDays = () => {
 		switch (formData.typeLeave) {
 			case 'PAID_LEAVE':
-				return 1;
+				return 5;
 			case 'MATERNITY_LEAVE':
-				if (user.gender === 'MALE') {
+				if (profile?.gender === 'MALE') {
 					return 7;
 				}
 				return 180;
@@ -96,7 +94,7 @@ export default function EmployeeLeaveRequest() {
 		const fieldsToValidate = ['title', 'description', 'startDate', 'endDate', 'typeLeave'] as const;
 
 		const isValid = await trigger(fieldsToValidate);
-		if (isValid) {
+		if (isValid && profile?.id) {
 			try {
 				const leaveReqObject = {
 					title: formData.title,
@@ -104,11 +102,11 @@ export default function EmployeeLeaveRequest() {
 					endDate: formData.endDate,
 					description: formData.description,
 					leaveReason: formData.typeLeave,
-					userId: user.id
+					userId: profile?.id
 				};
 				const res = await addLeaveRequest(leaveReqObject);
 				if (res?.data) {
-					dispatch(fetchAllLeaveRequestsByUserId(user.id));
+					dispatch(fetchAllLeaveRequestsByUserId(profile?.id));
 					toast.success('Thêm đơn xin nghỉ phép thành công!');
 					setIsDialogOpen(false);
 				}
@@ -134,12 +132,12 @@ export default function EmployeeLeaveRequest() {
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'>
+				<Button variant='outline' className='h-[32px] w-full items-center justify-start border-none px-[8px] py-[6px]'>
 					<BadgeCheck />
 					Xin nghỉ phép
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='!w-[50vw] !max-w-none !h-[90vh]' onOpenAutoFocus={e => e.preventDefault()}>
+			<DialogContent className='!h-[90vh] !w-[50vw] !max-w-none' onOpenAutoFocus={e => e.preventDefault()}>
 				<DialogHeader>
 					<DialogTitle>Đơn xin nghỉ phép</DialogTitle>
 					<DialogDescription>
@@ -152,50 +150,50 @@ export default function EmployeeLeaveRequest() {
 						<strong>Nội dung đơn</strong>
 					</span>
 					<div>
-						<div className='p-4 max-h-[500px] overflow-x-auto border border-solid border-gray-200 rounded-sm'>
+						<div className='max-h-[500px] overflow-x-auto rounded-sm border border-solid border-gray-200 p-4'>
 							<input
 								type='text'
-								className='outline-none border-none font-bold w-full text-center mx-auto my-3 block'
+								className='mx-auto my-3 block w-full border-none text-center font-bold outline-none'
 								placeholder='Nhập tiêu đề ở đây...'
 								{...register('title', {
 									required: 'Vui lòng nhập tiêu đề'
 								})}
 							/>
-							{errors.title && <p className='text-red-500 text-sm text-center mb-2'>{errors.title.message}</p>}
+							{errors.title && <p className='mb-2 text-center text-sm text-red-500'>{errors.title.message}</p>}
 							<p className='text-gray-900'>
 								<strong className='italic underline'>Kính gửi:</strong> Trưởng phòng Nhân sự
 							</p>
 							<p className='text-gray-900'>
-								<strong>Tên tôi là:</strong> {user.fullName}
+								<strong>Tên tôi là:</strong> {profile?.fullName}
 							</p>
 							<p className='text-gray-900'>
-								<strong>Chức vụ:</strong> {user.resContractDTO?.roleName}
+								<strong>Chức vụ:</strong> {profile?.resContractDTO?.roleName}
 							</p>
 							<div className='flex items-center justify-start gap-2'>
-								<strong className='text-gray-900 text-base'>Loại nghỉ phép: </strong>
+								<strong className='text-base text-gray-900'>Loại nghỉ phép: </strong>
 								<Select
 									{...register('typeLeave', { required: 'Vui lòng chọn loại nghỉ' })}
 									onValueChange={value => setValue('typeLeave', value)}
 								>
-									<SelectTrigger id='typeLeave' className='max-w-[250px] h-[24px] text-base'>
+									<SelectTrigger id='typeLeave' className='h-[24px] max-w-[250px] text-base'>
 										<SelectValue placeholder='Chọn loại nghỉ phép' />
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value='PAID_LEAVE'>Nghỉ phép</SelectItem>
-										<SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>
+										{profile?.gender === 'FEMALE' && <SelectItem value='MATERNITY_LEAVE'>Nghỉ thai sản</SelectItem>}
 										<SelectItem value='SICK_LEAVE'>Nghỉ bệnh</SelectItem>
 									</SelectContent>
 								</Select>
-								{errors.typeLeave && <p className='text-red-500 text-sm'>({errors.typeLeave.message})</p>}
+								{errors.typeLeave && <p className='text-sm text-red-500'>({errors.typeLeave.message})</p>}
 							</div>
-							<div className='text-black mt-4'>
+							<div className='mt-4 text-black'>
 								<div>
 									{date} tháng {month}, {year}. Nay tôi làm đơn này, kính xin Trường phòng Nhân sự cho tôi xin nghỉ phép
 									từ ngày{' '}
 									<input
 										type='date'
 										id='startDate'
-										className='w-[140px] border border-gray-200 rounded-sm p-1 mr-1 h-[24px]'
+										className='mr-1 h-[24px] w-[140px] rounded-sm border border-gray-200 p-1'
 										disabled={!formData.typeLeave}
 										{...register('startDate', {
 											required: 'Vui lòng chọn ngày bắt đầu',
@@ -205,17 +203,17 @@ export default function EmployeeLeaveRequest() {
 												const selectedDate = new Date(value);
 												selectedDate.setHours(0, 0, 0, 0);
 
-												return selectedDate > today || 'Ngày bắt đầu phải sau hôm nay';
+												return selectedDate >= today || 'Ngày bắt đầu phải là ngày hôm nay hoặc sau hôm nay';
 											}
 										})}
 									/>
 									{errors.startDate && (
-										<p className='text-red-500 text-sm inline-block mr-1'>({errors.startDate.message})</p>
+										<p className='mr-1 inline-block text-sm text-red-500'>({errors.startDate.message})</p>
 									)}
 									đến ngày{' '}
 									<input
 										type='date'
-										className='w-[140px] border border-gray-200 rounded-sm p-1 mr-1 h-[24px]'
+										className='mr-1 h-[24px] w-[140px] rounded-sm border border-gray-200 p-1'
 										id='endDate'
 										disabled={!formData.startDate}
 										{...register('endDate', {
@@ -238,7 +236,7 @@ export default function EmployeeLeaveRequest() {
 										})}
 									/>
 									{errors.endDate && (
-										<p className='text-red-500 text-sm inline-block mr-1'>({errors.endDate.message})</p>
+										<p className='mr-1 inline-block text-sm text-red-500'>({errors.endDate.message})</p>
 									)}
 								</div>
 								<div className='mt-3'>
@@ -249,7 +247,7 @@ export default function EmployeeLeaveRequest() {
 											required: 'Vui lòng nhập mô tả chi tiết nội dung'
 										})}
 									/>
-									{errors.description && <p className='text-red-500 text-sm'>{errors.description.message}</p>}
+									{errors.description && <p className='text-sm text-red-500'>{errors.description.message}</p>}
 								</div>
 							</div>
 						</div>
@@ -258,14 +256,14 @@ export default function EmployeeLeaveRequest() {
 				<div className='flex items-center justify-end gap-2'>
 					<Button
 						onClick={() => setIsDialogOpen(false)}
-						className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+						className='rounded-md border bg-white px-4 py-2 text-black transition hover:bg-gray-100'
 					>
 						Cancel
 					</Button>
 
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
-							<Button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
+							<Button className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'>
 								Submit
 							</Button>
 						</AlertDialogTrigger>

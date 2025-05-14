@@ -16,9 +16,9 @@ const LeavePolicyDialog: React.FC<LeavePolicyDialogProps> = ({ isOpen, onClose }
 				<div className='mx-auto bg-white rounded-lg p-6'>
 					{/* Increased max-width */}
 					<div className='text-center border-b pb-4 mb-4'>
-						<h1 className='text-lg font-bold'>CÔNG TY INVERSE</h1>
+						<h1 className='text-lg font-bold'>CÔNG TY INKVERSE</h1>
 						<h2 className='text-lg font-bold'>CHÍNH SÁCH NGHỈ PHÉP</h2>
-						<p className='text-sm'>Số: 98/TB-INVERSE</p>
+						<p className='text-sm'>Số: 98/TB-INKVERSE</p>
 					</div>
 					{/* <div className='text-center border-b pb-4 mb-4'>
 						<h1 className='text-xl font-bold uppercase'>THÔNG BÁO</h1>
@@ -26,11 +26,11 @@ const LeavePolicyDialog: React.FC<LeavePolicyDialogProps> = ({ isOpen, onClose }
 					</div> */}
 					<div className='text-gray-700 space-y-4'>
 						<p>Căn cứ Bộ luật Lao động nước Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam;</p>
-						<p className='!mt-1'>Căn cứ vào chính sách phát triển nguồn nhân lực của Công ty Inverse;</p>
-						<p className='!mt-1'>Giám đốc công ty Inverse thông báo về chính sách nghỉ phép như sau:</p>
+						<p className='!mt-1'>Căn cứ vào chính sách phát triển nguồn nhân lực của Công ty INKVERSE;</p>
+						<p className='!mt-1'>Giám đốc công ty INKVERSE thông báo về chính sách nghỉ phép như sau:</p>
 						<ul className='list-disc pl-6 space-y-2'>
 							<li>
-								<strong>Nghỉ phép</strong>: 12 ngày / 1 năm.
+								<strong>Nghỉ phép</strong>: 12 ngày / 1 năm (tối đa 5 ngày / 1 đơn).
 							</li>
 							<li>
 								<strong>Nghỉ thai sản</strong>: 6 tháng đối với nữ, 7 ngày đối với nam.
