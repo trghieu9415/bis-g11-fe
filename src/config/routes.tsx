@@ -29,7 +29,9 @@ const routes = {
 	newOrderBusiness: `/business/new-order`,
 	ordersBusiness: `/business/orders`,
 	customersBusiness: `/business/customers`,
-	// statistics: ???
+
+	statistics: 'business/statistics',
+
 
 	// For warehouse employee
 	warehouse: '/warehouse',
@@ -38,7 +40,6 @@ const routes = {
 	author: '/warehouse/author',
 	category: '/warehouse/category',
 	inventory: '/warehouse/inventory',
-	// statistics: ???
 
 	// For login
 	eLogin: '/login',
