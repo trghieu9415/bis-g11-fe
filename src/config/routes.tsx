@@ -1,27 +1,48 @@
 const routes = {
 	home: '/',
-	userInformation: '/user/:id',
-	hremployee: '/hremployee',
-	contracts: '/contracts',
-	leaveRequests: '/leave-requests',
-	leaveRequestsByType: '/leave-requests/:type',
-	timeTrackingToday: '/time-tracking/today',
-	timeTrackingMonth: '/time-tracking/month',
-	products: '/products',
-	supplier: '/supplier',
-	holiday: '/holiday',
-	newOrder: '/new-order',
-	orders: '/orders',
-	customers: '/customers',
+	userInformation: '/user',
+
+	// For HR
+	hr: '/hr',
+	hremployee: '/hr/hremployee',
+	contracts: '/hr/contracts',
+	leaveRequests: '/hr/leave-requests',
+	leaveRequestsByType: '/hr/leave-requests/:type',
+	timeTrackingToday: '/hr/time-tracking/today',
+	timeTrackingMonth: '/hr/time-tracking/month',
+	holiday: '/hr/holiday',
+	salaryMonth: '/hr/salary/month',
+	salaryYear: '/hr/salary/year',
+	roles: '/hr/roles',
+
+	// For sales
+	// sales: '/sales',
+	// newOrder: `/sales/new-order`,
+	// orders: `/sales/orders`,
+	// customers: `/sales/customers`,
+
+	// For normal employee
+	employee: '/employee',
+
+	// For business
+	business: '/business',
+	newOrderBusiness: `/business/new-order`,
+	ordersBusiness: `/business/orders`,
+	customersBusiness: `/business/customers`,
+	statistics: 'business/statistics',
+
+	// For warehouse employee
+	warehouse: '/warehouse',
+	products: '/warehouse/products',
+	supplier: '/warehouse/suppliers',
+	author: '/warehouse/author',
+	category: '/warehouse/category',
+	inventory: '/warehouse/inventory',
+
+	// For login
 	eLogin: '/login',
-	author: '/author',
-	category: '/category',
 	eForgot: '/forgot-password',
-	hrLogin: '/hr-login',
-	salaryMonth: '/salary/month',
-	salaryYear: '/salary/year',
-	roles: '/roles',
-	inventory: '/inventory'
+	hrLogin: '/hr-login'
 };
 
 export default routes;
