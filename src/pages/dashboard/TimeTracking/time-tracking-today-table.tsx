@@ -12,7 +12,7 @@ import classNames from 'classnames';
 
 import CustomDialog from '@/components/custom-dialog';
 import { fetchAllTimeTrackingToday } from '@/redux/slices/timeTrackingTodaySlice';
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import { checkIn, updateAttendanceDetail } from '@/services/attendanceDetailService';
 import { ColumnDef } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
@@ -68,6 +68,8 @@ export default function TimeTrackingTodayTable() {
 
 	const dispatch = useAppDispatch();
 	const { timeTrackingToday } = useSelector((state: RootState) => state.timeTrackingToday);
+	const { profile } = useAppSelector((state: RootState) => state.profile);
+
 	const formattedDate = format(new Date(), 'yyyy-MM-dd');
 
 	const columns: ColumnDef<TimeTrackingToday>[] = [
@@ -325,7 +327,7 @@ export default function TimeTrackingTodayTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{row.original.attendanceStatus === 'ABSENT' && (
+						{row.original.attendanceStatus === 'ABSENT' || profile?.id !== row?.original?.id && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}

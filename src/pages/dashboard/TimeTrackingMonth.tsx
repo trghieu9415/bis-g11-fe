@@ -11,7 +11,7 @@ import { scanAttendanceDetailRedux } from '@/redux/slices/scanAttendanceDetailSl
 export default function TimeTrackingMonth() {
 	const dispatch = useAppDispatch();
 	const { scanAttendanceDetail } = useSelector((state: RootState) => state.scanAttendanceDetail);
-
+	
 	const [today, setToday] = useState(new Date());
 	const [isScan, setIsScan] = useState(false);
 	const [scanTime, setScanTime] = useState('');
@@ -56,33 +56,33 @@ export default function TimeTrackingMonth() {
 	}, [scanAttendanceDetail]);
 
 	return (
-		<div className='flex flex-col w-full'>
-			<h1 className='text-lg font-bold py-4 uppercase'>
+		<div className='flex w-full flex-col'>
+			<h1 className='py-4 text-lg font-bold uppercase'>
 				Danh sách chấm công theo tháng{' '}
-				<span className='text-lg pb-[2px] font-bold border-b-4 border-blue-300 '>{formattedDate}</span>{' '}
+				<span className='border-b-4 border-blue-300 pb-[2px] text-lg font-bold'>{formattedDate}</span>{' '}
 			</h1>
 			<div>
-				<div className='inline-block float-end mr-1'>
+				<div className='float-end mr-1 inline-block'>
 					<Input
 						type='date'
-						className='border-gray-200 outline-none mb-2 !text-base'
+						className='mb-2 border-gray-200 !text-base outline-none'
 						value={`${year}-${month}-${day}`}
 						onChange={updateDate}
 					/>
 				</div>
 			</div>
-			<div className='flex items-center gap-1 mb-2'>
+			<div className='mb-2 flex items-center gap-1'>
 				{isScan && (
 					<>
 						<div className='text-sm text-gray-600'>Thời gian quét: {scanTime}</div>
 						<button
-							className='p-1 hover:bg-gray-100 rounded-full text-gray-600'
+							className='rounded-full p-1 text-gray-600 hover:bg-gray-100'
 							onClick={() => {
 								const localDateTime = new Date().toISOString();
 								dispatch(scanAttendanceDetailRedux(localDateTime));
 							}}
 						>
-							<Loader2 className='w-4 h-4 text-gray-600' />
+							<Loader2 className='h-4 w-4 text-gray-600' />
 						</button>
 					</>
 				)}

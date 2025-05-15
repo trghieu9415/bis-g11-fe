@@ -14,7 +14,7 @@ import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions, UseFormSetError, FieldValues } from 'react-hook-form';
 // import data from '@/pages/dashboard/HREmployees/data.json';
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
 import { updateUser, deleteUser } from '@/services/userService';
 import { toast } from 'react-toastify';
@@ -58,6 +58,7 @@ export default function EmployeeTable() {
 
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
+	const { profile } = useAppSelector(state => state.profile);
 
 	useEffect(() => {
 		dispatch(fetchUsers());
@@ -276,7 +277,9 @@ export default function EmployeeTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						{profile?.id !== row?.original?.id && (
+							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -335,6 +338,7 @@ export default function EmployeeTable() {
 						{ value: 'true', label: 'Hoạt động', isBoolean: true },
 						{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
 					],
+					disabled: true,
 					validation: { required: 'Vui lòng chọn trạng thái' }
 				}
 			]
@@ -462,25 +466,6 @@ export default function EmployeeTable() {
 			]
 		]
 	];
-
-	const checkUserExistence = (email: string, phone: string, setError: UseFormSetError<Employee>) => {
-		const existingEmail = users.find(user => user.email === email && user.id !== selectedEmployee?.id);
-		const existingPhone = users.find(user => user.phone === phone && user.id !== selectedEmployee?.id);
-
-		if (existingEmail || email === 'an.nguyen@example.com') {
-			setError('email', { type: 'manual', message: 'Email đã tồn tại' });
-		}
-
-		if (existingPhone || phone === '0987654321') {
-			setError('phone', { type: 'manual', message: 'Số điện thoại đã tồn tại' });
-		}
-
-		if (existingEmail || email === 'an.nguyen@example.com' || existingPhone || phone === '0987654321') {
-			return true;
-		}
-
-		return false;
-	};
 
 	const handleSave = async (data: Employee) => {
 		const userId = data.id;
