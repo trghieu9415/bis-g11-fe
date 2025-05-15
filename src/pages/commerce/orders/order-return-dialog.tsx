@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeftRight } from 'lucide-react';
-import { Order } from '@/types/order';
+import { Bill } from '@/types/order';
 
 interface OrderReturnDialogProps {
-	order: Order;
-	onReturn: (orderId: string, reason: string) => void;
+	order: Bill;
+	onReturn: (orderId: string | number, reason: string) => void;
 }
 
 export const OrderReturnDialog = ({ order, onReturn }: OrderReturnDialogProps) => {
@@ -31,7 +30,7 @@ export const OrderReturnDialog = ({ order, onReturn }: OrderReturnDialogProps) =
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Trả hàng - Đơn hàng {order.orderNumber}</DialogTitle>
+					<DialogTitle>Trả hàng - Đơn hàng {order.idString}</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className='space-y-4'>
 					<div className='space-y-2'>

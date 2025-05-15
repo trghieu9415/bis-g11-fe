@@ -1,25 +1,14 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { NavMain } from './nav-main';
 import { NavPolicies } from './nav-policy';
 import { NavUser } from './nav-user';
 import { NavCompany } from './nav-company';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
-
-const data = {
-	user: {
-		id: 2,
-		name: 'Quản trị viên',
-		email: 'admin@company.com',
-		avatar: './avatars/black_cat.jpg'
-	},
-	team: {
-		name: 'Công ty Inverse',
-		logo: './logo/square.png',
-		plan: 'Enterprise'
-	}
-};
+import { useAppSelector } from '@/redux/store';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { profile } = useAppSelector(state => state.profile);
+
 	return (
 		<Sidebar collapsible='icon' {...props}>
 			<SidebarHeader className='shadow-sm'>
@@ -29,9 +18,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavMain />
 				<NavPolicies />
 			</SidebarContent>
-			<SidebarFooter>
-				<NavUser user={data.user} />
-			</SidebarFooter>
+			<SidebarFooter>{<NavUser user={profile} />}</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
 	);

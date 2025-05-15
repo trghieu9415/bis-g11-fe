@@ -4,7 +4,7 @@ export function NavCompany() {
 	const { state } = useSidebar();
 
 	const data = {
-		name: 'Công ty Inverse',
+		name: 'Công ty INKVERSE',
 		logo: '/logo/square.png',
 		plan: 'Enterprise'
 	};

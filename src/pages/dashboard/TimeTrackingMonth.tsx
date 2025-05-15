@@ -55,8 +55,6 @@ export default function TimeTrackingMonth() {
 		}
 	}, [scanAttendanceDetail]);
 
-	console.log(formattedDate);
-
 	return (
 		<div className='flex flex-col w-full'>
 			<h1 className='text-lg font-bold py-4 uppercase'>

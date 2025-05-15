@@ -29,7 +29,9 @@ const routes = {
 	newOrderBusiness: `/business/new-order`,
 	ordersBusiness: `/business/orders`,
 	customersBusiness: `/business/customers`,
+
 	statistics: 'business/statistics',
+
 
 	// For warehouse employee
 	warehouse: '/warehouse',

@@ -9,7 +9,7 @@ import {
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen } from 'lucide-react';
+import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions } from 'react-hook-form';
@@ -67,7 +67,7 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -80,7 +80,7 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tên <ArrowUpDown />
@@ -88,7 +88,7 @@ export default function EmployeeTable() {
 			),
 			cell: ({ row }) => (
 				<span className='flex items-center'>
-					<Button variant='ghost' className='text-black p-1 h-5 mr-2'>
+					<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
 						<UserRoundPen />
 					</Button>
 					{row.getValue('full_name')}
@@ -101,11 +101,14 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Vai trò <ArrowUpDown />
 				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-start'>{row.getValue('role') ? row.getValue('role') : '--'}</span>
 			)
 		},
 		{
@@ -113,26 +116,30 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-30'
+					className='w-30 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => (
-				<span className='flex justify-center'>
-					{row.getValue('status') ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
-							Đang làm việc
-						</p>
-					) : (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Tạm nghỉ
-						</p>
-					)}
-				</span>
-			),
+			cell: ({ row }) => {
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('status') && row.getValue('role') !== '' ? (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+								<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
+								Đang làm việc
+							</p>
+						) : (
+							row.getValue('role') === '' && (
+								<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+									<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Hết hợp đồng
+								</p>
+							)
+						)}
+					</span>
+				);
+			},
 			sortingFn: (rowA, rowB) => {
 				const statusA = rowA.original.status ? 1 : 0;
 				const statusB = rowB.original.status ? 1 : 0;
@@ -162,6 +169,9 @@ export default function EmployeeTable() {
 				>
 					Kinh nghiệm <ArrowUpDown />
 				</Button>
+			),
+			cell: ({ row }) => (
+				<span className='flex justify-start'>{row.getValue('level') ? row.getValue('level') : '--'}</span>
 			)
 		},
 		{
@@ -181,19 +191,35 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Giới tính <ArrowUpDown />
 				</Button>
-			)
+			),
+			cell: ({ row }) => {
+				return (
+					<span className='flex justify-center'>
+						{row.getValue('gender') ? (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-blue-500 p-1 text-white'>
+								<Mars className='mr-1 h-4 w-4' stroke='white' />
+								Nam
+							</p>
+						) : (
+							<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-pink-500 p-1 text-white'>
+								<Venus className='mr-1 h-4 w-4' stroke='white' /> Nữ
+							</p>
+						)}
+					</span>
+				);
+			}
 		},
 		{
 			accessorKey: 'email',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-52'
+					className='w-52 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Email <ArrowUpDown />
@@ -229,7 +255,7 @@ export default function EmployeeTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-72'
+					className='w-72 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Địa chỉ <ArrowUpDown />
@@ -243,13 +269,13 @@ export default function EmployeeTable() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem>
+						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
@@ -314,7 +340,7 @@ export default function EmployeeTable() {
 
 		[
 			[
-				{ label: 'ID', key: 'id', type: 'input', disabled: true },
+				{ label: 'ID', key: 'idString', type: 'input', disabled: true },
 				{
 					label: 'Ngày sinh',
 					key: 'date_of_birth',

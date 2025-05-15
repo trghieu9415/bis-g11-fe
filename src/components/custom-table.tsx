@@ -13,6 +13,7 @@ import {
 	ColumnFiltersState,
 	getFilteredRowModel
 } from '@tanstack/react-table';
+
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Button } from './ui/button';
 import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -27,12 +28,12 @@ function Header<DType>({
 	setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	return (
-		<div className='flex w-full justify-between p-2 bg-white'>
+		<div className='flex w-full justify-between bg-white p-2'>
 			<div className='flex w-full items-center'>
-				<span className='text-[14px] text-gray-800 mr-4'>Tìm kiếm:</span>
+				<span className='mr-4 text-[14px] text-gray-800'>Tìm kiếm:</span>
 				<Input
 					type='text'
-					className='w-[30%] rounded-none px-2 focus:ring-0 focus:outline-none h-8'
+					className='h-8 w-[30%] rounded-none px-2 focus:outline-none focus:ring-0'
 					placeholder='ID...'
 					onChange={e => setGlobalFilter(e.target.value)}
 				/>
@@ -54,7 +55,7 @@ function CTableHeader<DType>({ table, stickyClassIndex = 1 }: { table: ReactTabl
 						return (
 							<TableHead
 								key={header.id}
-								className={`whitespace-nowrap border border-gray-500 bg-gray-400 text-white text-center  ${stickyClass}`}
+								className={`whitespace-nowrap bg-blue-50 text-center font-bold text-blue-800 ${stickyClass} [&_button]:font-bold [&_button]:text-blue-800 [&_span]:text-blue-800`}
 							>
 								{header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
 							</TableHead>
@@ -75,7 +76,7 @@ function CTableBody<DType>({ table, stickyClassIndex = 1 }: { table: ReactTable<
 						{row.getVisibleCells().map((cell, index) => {
 							const stickyClass = index === stickyClassIndex ? 'sticky left-0 bg-white z-10' : '';
 							return (
-								<TableCell key={cell.id} className={`whitespace-nowrap border border-gray-200 py-2 ${stickyClass}`}>
+								<TableCell key={cell.id} className={`whitespace-nowrap py-2 ${stickyClass}`}>
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
 								</TableCell>
 							);
@@ -95,7 +96,7 @@ function CTableBody<DType>({ table, stickyClassIndex = 1 }: { table: ReactTable<
 
 function Body<DType>({ table, stickyClassIndex }: { table: ReactTable<DType>; stickyClassIndex: number }) {
 	return (
-		<div className='flex w-full overflow-x-auto border-l-2 border-r-2 border-gray-100 bg-white'>
+		<div className='flex w-full overflow-x-auto rounded-md border-l-2 border-r-2 border-gray-100 bg-white'>
 			<Table>
 				<CTableHeader table={table} stickyClassIndex={stickyClassIndex} />
 				<CTableBody table={table} stickyClassIndex={stickyClassIndex} />
@@ -128,7 +129,7 @@ function Footer<DType>({ table }: { table: ReactTable<DType> }) {
 	}, [table.getState().pagination.pageIndex]);
 
 	return (
-		<div className='flex items-center justify-between space-x-2 py-4 bg-white'>
+		<div className='flex items-center justify-between space-x-2 bg-white py-4'>
 			<div className='flex items-center text-sm'>
 				<span className='mr-2'>Hiển thị</span>
 				<Select
@@ -150,11 +151,11 @@ function Footer<DType>({ table }: { table: ReactTable<DType> }) {
 				</Select>
 				<span className='ml-2'>trong tổng số {table.getRowCount()}</span>
 			</div>
-			<div className='space-x-2 flex items-center'>
-				<div className='flex items-center mr-4'>
+			<div className='flex items-center space-x-2'>
+				<div className='mr-4 flex items-center'>
 					<span className='text-md mr-2'>Trang:</span>
 					<Input
-						className='w-12 h-9 text-center'
+						className='h-9 w-12 text-center'
 						type='number'
 						value={page}
 						onClick={() => setPage('')}
@@ -229,7 +230,7 @@ export default function CustomTable<DType>({
 		}
 	});
 	return (
-		<div className='text-xs border-2 px-4 border-[#e4e4e4] bg-white rounded-sm overflow-hidden'>
+		<div className='overflow-hidden border-2 border-[#e4e4e4] bg-white px-4 text-xs'>
 			<Header table={table} setGlobalFilter={setGlobalFilter} />
 			<Body table={table} stickyClassIndex={stickyClassIndex} />
 			<Footer table={table} />
