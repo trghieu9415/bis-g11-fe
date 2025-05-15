@@ -42,7 +42,7 @@ interface ProfileState {
 const initialState: ProfileState = {
 	profile: null,
 	isLoading: false,
-	isError: false
+	isError: false,
 };
 
 export const fetchProfile = createAsyncThunk('profile/fetchProfile', async () => {

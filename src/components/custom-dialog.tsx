@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useForm, DefaultValues, Path, RegisterOptions, FieldError, PathValue } from 'react-hook-form';
+import { useForm, DefaultValues, Path, RegisterOptions, FieldError, PathValue, UseFormSetError } from 'react-hook-form';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -101,7 +101,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 								: 'Chỉnh sửa thông tin.'}
 					</DialogDescription>
 				</DialogHeader>
-				<div className='overflow-x-auto max-h-[65vh]'>
+				<div className='max-h-[65vh] overflow-x-auto'>
 					{/* Dynamically creating grid columns based on array length */}
 					<div className='p-4'>
 						{fields.map((fieldGroup, fieldGroupIndex) => (
@@ -110,11 +110,11 @@ export default function CustomDialog<T extends Record<string, string | number | 
 									<div key={childIndex} className={`grid gap-4 grid-cols-${childFieldGroup.length} mb-4`}>
 										{childFieldGroup.map(
 											({ label, key, type, options, disabled, validation, showOnly, isShow = true }, fieldIndex) => (
-												<div key={key} className='flex items-center flex-col'>
-													<div className='flex items-start flex-col space-x-2 flex-1 w-full'>
+												<div key={key} className='flex flex-col items-center'>
+													<div className='flex w-full flex-1 flex-col items-start space-x-2'>
 														{isShow && (!showOnly || showOnly === mode) && (
 															<>
-																<label className='w-full text-sm mb-1 text-start font-semibold'>{label}</label>
+																<label className='mb-1 w-full text-start text-sm font-semibold'>{label}</label>
 																{type === 'input' || type === 'number' ? (
 																	<div className='!ml-0 w-full'>
 																		<Input
@@ -125,12 +125,13 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																			{...register(key as Path<T>, {
 																				required: validation?.required || false,
 																				minLength: validation?.minLength,
-																				pattern: validation?.pattern
+																				pattern: validation?.pattern,
+																				validate: validation?.validate
 																			})}
 																		/>
 																		{errors[key as Path<T>] && (
-																			<div className='flex justify-start w-full'>
-																				<p className='text-red-500 text-sm'>
+																			<div className='flex w-full justify-start'>
+																				<p className='text-sm text-red-500'>
 																					{(errors[key as keyof T] as FieldError)?.message || ''}
 																				</p>
 																			</div>
@@ -151,10 +152,10 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																			}}
 																			disabled={disabled || isReadOnly || isDelete}
 																		>
-																			<SelectTrigger className='w-full border p-2 rounded-md'>
+																			<SelectTrigger className='w-full rounded-md border p-2'>
 																				<SelectValue />
 																			</SelectTrigger>
-																			<SelectContent className='bg-white border border-gray-300 shadow-lg rounded-md z-10 w-full'>
+																			<SelectContent className='z-10 w-full rounded-md border border-gray-300 bg-white shadow-lg'>
 																				{options.map(({ value, label }) => (
 																					<SelectItem key={value} value={value} className='w-full flex-1'>
 																						{label}
@@ -167,7 +168,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																	<div className='!ml-0 w-full'>
 																		<Input
 																			type='date'
-																			className='w-full block'
+																			className='block w-full'
 																			disabled={disabled || isReadOnly || isDelete}
 																			{...register(key as Path<T>, {
 																				required: validation?.required || false,
@@ -177,8 +178,8 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																			})}
 																		/>
 																		{errors[key as Path<T>] && (
-																			<div className='flex justify-start w-full'>
-																				<p className='text-red-500 text-sm'>
+																			<div className='flex w-full justify-start'>
+																				<p className='text-sm text-red-500'>
 																					{(errors[key as keyof T] as FieldError)?.message || ''}
 																				</p>
 																			</div>
@@ -198,8 +199,8 @@ export default function CustomDialog<T extends Record<string, string | number | 
 																			})}
 																		/>
 																		{errors[key as Path<T>] && (
-																			<div className='flex justify-start w-full'>
-																				<p className='text-red-500 text-sm'>
+																			<div className='flex w-full justify-start'>
+																				<p className='text-sm text-red-500'>
 																					{(errors[key as keyof T] as FieldError)?.message || ''}
 																				</p>
 																			</div>
@@ -220,11 +221,11 @@ export default function CustomDialog<T extends Record<string, string | number | 
 				</div>
 
 				{/* Start: Actions btn */}
-				<div className={`flex mt-4 ${isDelete ? 'justify-between' : 'justify-end'}`}>
+				<div className={`mt-4 flex ${isDelete ? 'justify-between' : 'justify-end'}`}>
 					{isDelete && (
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<button className='px-4 py-2 border bg-red-500 text-white rounded-md hover:bg-red-600 transition flex justify-center items-center gap-1'>
+								<button className='flex items-center justify-center gap-1 rounded-md border bg-red-500 px-4 py-2 text-white transition hover:bg-red-600'>
 									<Trash2 />
 									Xóa
 								</button>
@@ -251,7 +252,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 					)}
 					<div className='flex justify-end gap-2'>
 						<button
-							className='px-4 py-2 border bg-white text-black rounded-md hover:bg-gray-100 transition'
+							className='rounded-md border bg-white px-4 py-2 text-black transition hover:bg-gray-100'
 							onClick={onClose}
 						>
 							Thoát
@@ -259,7 +260,7 @@ export default function CustomDialog<T extends Record<string, string | number | 
 						{isSave && (
 							<AlertDialog>
 								<AlertDialogTrigger asChild>
-									<button className='px-4 py-2 border bg-black text-white rounded-md hover:bg-gray-600 transition'>
+									<button className='rounded-md border bg-black px-4 py-2 text-white transition hover:bg-gray-600'>
 										Lưu
 									</button>
 								</AlertDialogTrigger>

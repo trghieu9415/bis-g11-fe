@@ -12,10 +12,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, CalendarCheck, CheckCircle, Ellipsis, UserRoundPen, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
 import CustomDialog from '@/components/custom-dialog';
-import { RegisterOptions } from 'react-hook-form';
-
+import { RegisterOptions, UseFormSetError, FieldValues } from 'react-hook-form';
 // import data from '@/pages/dashboard/HREmployees/data.json';
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
 import { updateUser, deleteUser } from '@/services/userService';
 import { toast } from 'react-toastify';
@@ -39,6 +38,8 @@ type Employee = {
 	password: string;
 };
 
+type ValidationFunction<T extends FieldValues> = (data: T, setError: UseFormSetError<T>, id?: number) => boolean;
+
 type FieldConfig = {
 	label: string;
 	key: keyof Employee | 'password';
@@ -47,6 +48,7 @@ type FieldConfig = {
 	disabled?: boolean;
 	validation?: RegisterOptions;
 	showOnly?: 'view' | 'edit' | 'delete';
+	validateFn?: ValidationFunction<FieldValues>;
 };
 
 export default function EmployeeTable() {
@@ -56,6 +58,7 @@ export default function EmployeeTable() {
 
 	const dispatch = useAppDispatch();
 	const { users } = useSelector((state: RootState) => state.users);
+	const { profile } = useAppSelector(state => state.profile);
 
 	useEffect(() => {
 		dispatch(fetchUsers());
@@ -274,7 +277,9 @@ export default function EmployeeTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						{profile?.id !== row?.original?.id && (
+							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -333,6 +338,7 @@ export default function EmployeeTable() {
 						{ value: 'true', label: 'Hoạt động', isBoolean: true },
 						{ value: 'false', label: 'Không Hoạt động', isBoolean: true }
 					],
+					disabled: true,
 					validation: { required: 'Vui lòng chọn trạng thái' }
 				}
 			]
@@ -385,10 +391,9 @@ export default function EmployeeTable() {
 					type: 'input',
 					validation: {
 						required: 'Vui lòng nhập địa chỉ',
-						pattern: {
-							value:
-								/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-							message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+						minLength: {
+							value: 3,
+							message: 'Địa chỉ phải có ít nhất 10 ký tự'
 						}
 					}
 				}
@@ -402,7 +407,16 @@ export default function EmployeeTable() {
 					type: 'input',
 					validation: {
 						required: 'Vui lòng nhập email',
-						pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Email không hợp lệ' }
+						pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Email không hợp lệ' },
+						validate: value => {
+							const existingEmail = users.find(user => user.email === value && user.id !== selectedEmployee?.id);
+
+							if (existingEmail || value === 'an.nguyen@example.com') {
+								return 'Email đã tồn tại';
+							}
+
+							return true;
+						}
 					}
 				}
 			],
@@ -413,7 +427,16 @@ export default function EmployeeTable() {
 					type: 'input',
 					validation: {
 						required: 'Vui lòng nhập số điện thoại',
-						pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' }
+						pattern: { value: /^0\d{9}$/, message: 'Số điện thoại phải có đúng 10 chữ số và bắt đầu bằng 0' },
+						validate: value => {
+							const existingPhone = users.find(user => user.phone === value && user.id !== selectedEmployee?.id);
+
+							if (existingPhone || value === '0987654321') {
+								return 'Số điện thoại đã tồn tại';
+							}
+
+							return true;
+						}
 					}
 				}
 			]

@@ -103,7 +103,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -116,7 +116,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tên khách hàng <ArrowUpDown />
@@ -129,7 +129,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
@@ -140,19 +140,19 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 				return (
 					<span className='flex justify-center'>
 						{status === 1 ? (
-							<p className='text-white flex items-center gap-1 justify-center w-full bg-green-500 rounded-sm p-1'>
-								<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							<p className='flex w-full items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+								<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 								Hoạt động
 							</p>
 						) : (
-							<p className='text-white flex items-center gap-1 justify-center w-full bg-red-500 rounded-sm p-1'>
+							<p className='flex w-full items-center justify-center gap-1 rounded-sm bg-red-500 p-1 text-white'>
 								<svg
 									xmlns='http://www.w3.org/2000/svg'
 									fill='none'
 									viewBox='0 0 24 24'
 									strokeWidth={1.5}
 									stroke='currentColor'
-									className='size-4 mr-1'
+									className='mr-1 size-4'
 								>
 									<path strokeLinecap='round' strokeLinejoin='round' d='M6 18 18 6M6 6l12 12' />
 								</svg>
@@ -168,7 +168,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-52'
+					className='w-52 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Email <ArrowUpDown />
@@ -192,7 +192,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-72'
+					className='w-72 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Địa chỉ <ArrowUpDown />
@@ -211,7 +211,7 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
@@ -249,10 +249,9 @@ const CustomerTable = ({ customers, fetchCustomers }: CustomerTableProps) => {
 					type: 'input',
 					validation: {
 						required: 'Vui lòng nhập địa chỉ',
-						pattern: {
-							value:
-								/^\d+\s[\p{L}0-9\s]+,\s(?:Phường|Xã)\s[\p{L}0-9\s]+,\s(?:Quận|Huyện)\s[\p{L}0-9\s]+,\s[\p{L}\s.]+$/u,
-							message: 'Địa chỉ không hợp lệ. Ví dụ: 273 An Dương Vương, Phường 3, Quận 5, TP.HCM'
+						minLength: {
+							value: 3,
+							message: 'Địa chỉ phải có ít nhất 10 ký tự'
 						}
 					}
 				}

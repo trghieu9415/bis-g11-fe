@@ -35,24 +35,6 @@ const LoginForm = () => {
 		if (hasAttemptedLogin && isAuthenticated) {
 			// Get user role from localStorage to determine where to redirect
 			const redirectPath = '/';
-
-			// if (profile) {
-			// 	const role = profile?.resContractDTO?.roleName;
-
-			// Redirect based on role
-			// 	if (role === 'HR_MANAGER') {
-			// 		redirectPath = '/hr';
-			// 	} else if (role === 'BUSINESS_MANAGER') {
-			// 		redirectPath = '/business';
-			// 	} else if (role === 'WAREHOUSE_MANAGER') {
-			// 		redirectPath = '/warehouse';
-			// 	} else if (role === 'EMPLOYEE') {
-			// 		redirectPath = '/employee';
-			// 	} else if (role === 'ADMIN') {
-			// 		redirectPath = '/hr';
-			// 	}
-			// }
-
 			toast.success('Đăng nhập thành công!');
 			navigate(redirectPath);
 		}
