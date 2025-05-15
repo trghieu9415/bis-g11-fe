@@ -14,7 +14,8 @@ import { useState, useEffect } from 'react';
 // import { createGoodReceipt } from '@/services/goodReceiptService';
 import { fetchProducts } from '@/redux/slices/productSlice';
 import { addGoodsReceipt } from '@/services/goodReceiptService';
-
+import { getMe } from '@/services/userService';
+import { fetchProfile } from '@/redux/slices/profileSlice';
 // Định nghĩa kiểu dữ liệu
 interface Product {
 	id: number;
@@ -32,14 +33,9 @@ type FormField = {
 
 export default function CreateGoodReceipt() {
 	const [isOpen, setIsOpen] = useState(false);
+	const { profile } = useSelector((state: RootState) => state.profile);
 	const { products } = useSelector((state: RootState) => state.products);
 	const dispatch = useDispatch<AppDispatch>();
-
-	// Fix cứng thông tin user
-	const currentUser = {
-		userId: 2,
-		fullName: 'Clone'
-	};
 
 	const {
 		register,
@@ -101,7 +97,7 @@ export default function CreateGoodReceipt() {
 
 		// Format dữ liệu để gửi lên API
 		const formattedData = {
-			userId: currentUser.userId, // Sử dụng userId đã fix cứng
+			userId: profile?.id, // Sử dụng userId đã fix cứng
 			goodReceiptDetails: data.items.map(item => ({
 				productId: Number(item.productId),
 				quantity: Number(item.quantity)
@@ -138,14 +134,14 @@ export default function CreateGoodReceipt() {
 	};
 
 	return (
-		<div className='text-end mb-4'>
+		<div className='mb-4 text-end'>
 			<Button className='bg-slate-800 hover:bg-slate-900' onClick={openDialog}>
 				<PackagePlus className='mr-2' />
 				Tạo phiếu nhập
 			</Button>
 
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogContent className='w-full max-w-4xl mx-auto p-6 space-y-4'>
+				<DialogContent className='mx-auto w-full max-w-4xl space-y-4 p-6'>
 					<DialogHeader>
 						<DialogTitle>Tạo phiếu nhập hàng mới</DialogTitle>
 					</DialogHeader>
@@ -153,13 +149,13 @@ export default function CreateGoodReceipt() {
 						<div className='space-y-4 py-4'>
 							{/* Hiển thị thông tin người tạo phiếu (đã fix cứng) */}
 							<div className='mb-4'>
-								<Label className='font-bold mb-2 block'>Người tạo phiếu</Label>
-								<div className='p-2 border rounded-md bg-slate-50'>
-									{currentUser.fullName} (ID: {currentUser.userId})
+								<Label className='mb-2 block font-bold'>Người tạo phiếu</Label>
+								<div className='rounded-md border bg-slate-50 p-2'>
+									{profile?.fullName} (ID: {profile?.idString})
 								</div>
 							</div>
 
-							<div className='flex justify-end mb-2'>
+							<div className='mb-2 flex justify-end'>
 								<Button
 									type='button'
 									variant='outline'
@@ -170,7 +166,7 @@ export default function CreateGoodReceipt() {
 							</div>
 
 							{/* Header của bảng */}
-							<div className='grid grid-cols-12 gap-2 font-medium text-sm mb-2 px-2'>
+							<div className='mb-2 grid grid-cols-12 gap-2 px-2 text-sm font-medium'>
 								<div className='col-span-5'>Sản phẩm</div>
 								<div className='col-span-2'>Số lượng</div>
 								<div className='col-span-3'>Đơn giá (Tham khảo)</div>
@@ -179,7 +175,7 @@ export default function CreateGoodReceipt() {
 
 							{/* Danh sách sản phẩm */}
 							{fields.map((field, index) => (
-								<div key={field.id} className='grid grid-cols-12 gap-2 items-center'>
+								<div key={field.id} className='grid grid-cols-12 items-center gap-2'>
 									<div className='col-span-5'>
 										<Select
 											value={watchItems[index].productId}
@@ -208,7 +204,7 @@ export default function CreateGoodReceipt() {
 											})}
 										/>
 										{errors.items?.[index]?.productId && (
-											<p className='text-red-500 text-xs mt-1'>{errors.items?.[index]?.productId?.message}</p>
+											<p className='mt-1 text-xs text-red-500'>{errors.items?.[index]?.productId?.message}</p>
 										)}
 									</div>
 
@@ -222,13 +218,13 @@ export default function CreateGoodReceipt() {
 											})}
 										/>
 										{errors.items?.[index]?.quantity && (
-											<p className='text-red-500 text-xs mt-1'>{errors.items?.[index]?.quantity?.message}</p>
+											<p className='mt-1 text-xs text-red-500'>{errors.items?.[index]?.quantity?.message}</p>
 										)}
 									</div>
 
 									<div className='col-span-3'>
 										<Input type='number' disabled {...register(`items.${index}.inputPrice`)} />
-										<p className='text-xs text-muted-foreground mt-1'>Chỉ hiển thị, không gửi lên</p>
+										<p className='mt-1 text-xs text-muted-foreground'>Chỉ hiển thị, không gửi lên</p>
 									</div>
 
 									<div className='col-span-2 flex justify-center'>
@@ -237,7 +233,7 @@ export default function CreateGoodReceipt() {
 											variant='destructive'
 											onClick={() => remove(index)}
 											disabled={fields.length === 1}
-											className='p-2 h-8 w-8'
+											className='h-8 w-8 p-2'
 										>
 											<Trash className='h-4 w-4' />
 										</Button>
@@ -246,7 +242,7 @@ export default function CreateGoodReceipt() {
 							))}
 
 							{/* Tổng tiền */}
-							<div className='flex justify-end mt-6 pt-4 border-t'>
+							<div className='mt-6 flex justify-end border-t pt-4'>
 								<div className='text-lg font-medium'>Tổng tiền (Tham khảo): {formatCurrency(calculateTotal())}</div>
 							</div>
 						</div>
