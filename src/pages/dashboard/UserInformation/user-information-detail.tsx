@@ -1,28 +1,26 @@
-import { useEffect, useState } from 'react';
-import { RootState, useAppDispatch } from '@/redux/store';
-import { useSelector } from 'react-redux';
-import { fetchUserDetail } from '@/redux/slices/userDetailSlice';
-import { fetchUsers } from '@/redux/slices/usersSlice';
 import { fetchProfile } from '@/redux/slices/profileSlice';
+import { RootState, useAppDispatch } from '@/redux/store';
+import { useEffect } from 'react';
 import { useForm, UseFormSetError } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
-import { Input } from '@/components/ui/input';
-import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { updateUser } from '@/services/userService';
-import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 import {
 	AlertDialog,
-	AlertDialogTrigger,
+	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
 	AlertDialogDescription,
 	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 
 type Employee = {
@@ -39,9 +37,8 @@ type Employee = {
 export default function UserInformationDetail() {
 	const dispatch = useAppDispatch();
 	// const { user } = useSelector((state: RootState) => state.user);
-	// const { users } = useSelector((state: RootState) => state.users);
+	const { users } = useSelector((state: RootState) => state.users);
 	const { profile } = useSelector((state: RootState) => state.profile);
-
 	const {
 		register,
 		reset,
@@ -94,6 +91,26 @@ export default function UserInformationDetail() {
 		});
 	};
 
+	const checkUserExistence = (email: string, phone: string, setError: UseFormSetError<Employee>) => {
+		const existingEmail = users.find(user => user.email === email && user.id !== profile?.id);
+		const existingPhone = users.find(user => user.phone === phone && user.id !== profile?.id);
+
+		if (existingEmail !== profile?.email)
+
+		if (existingEmail || email === 'an.nguyen@example.com') {
+			setError('email', { type: 'manual', message: 'Email đã tồn tại' });
+		}
+		if (existingPhone || phone === '0987654321') {
+			setError('phoneNumber', { type: 'manual', message: 'Số điện thoại đã tồn tại' });
+		}
+
+		if (existingEmail || email === 'an.nguyen@example.com' || existingPhone || phone === '0987654321') {
+			return true;
+		}
+
+		return false;
+	};
+
 	const handleSubmitClick = async () => {
 		const fieldsToValidate = [
 			'fullName',
@@ -108,15 +125,17 @@ export default function UserInformationDetail() {
 
 		const isValid = await trigger(fieldsToValidate);
 
-		// const email = getValues('email');
-		// const phone = getValues('phoneNumber');
-		// let isExist = true;
+		const email = getValues('email');
+		const phone = getValues('phoneNumber');
+		let isExist = true;
 
-		// if (userInfo?.id) {
-		// 	isExist = checkUserExistence(userInfo?.id, email, phone, setError);
-		// }
+		if (profile?.id) {
+			isExist = checkUserExistence(email, phone, setError);
+		}
 
-		if (isValid && profile?.id) {
+		console.log(isExist);
+
+		if (isValid && !isExist && profile?.id) {
 			try {
 				const updatedUserData = {
 					fullName: formData.fullName,
@@ -126,7 +145,7 @@ export default function UserInformationDetail() {
 					address: formData.address,
 					gender: formData.gender,
 					username: formData.username,
-					password: ''
+					password: formData.password || ''
 				};
 
 				await updateUser(profile?.id, updatedUserData);

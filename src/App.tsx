@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { Bounce, ToastContainer } from 'react-toastify';
 import './index.css';
@@ -11,43 +11,57 @@ import { logoutUser } from './redux/slices/authSlice';
 import { getMe } from './services/userService';
 
 function App() {
-	// const [profile, setProfile] = useState<UserInfo | null>(null);
-	// const [loading, setLoading] = useState(true);
 	const dispatch = useAppDispatch();
 	const { isAuthenticated } = useAppSelector(state => state.auth);
-	const { profile, isLoading } = useAppSelector(state => state.profile);
-	useEffect(() => {
-		dispatch(fetchProfile());
-	}, [dispatch, isAuthenticated]);
+	const { profile } = useAppSelector(state => state.profile);
+	const [isRedirecting, setIsRedirecting] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		if (!profile) {
-			// Refresh token
-			// But we don't have a refresh token
-			// So we need to logout
+		if (isAuthenticated && !isRedirecting) {
+			setIsLoading(true);
+			dispatch(fetchProfile()).then(() => {
+				setIsLoading(false);
+			});
+		}
+	}, [dispatch, isAuthenticated, isRedirecting]);
+
+	useEffect(() => {
+		if (isAuthenticated && !profile && !isLoading && !isRedirecting) {
+			setIsLoading(true);
 			const accessToken = localStorage.getItem('accessToken');
+
 			if (!accessToken) {
-				<Navigate to='/login' />;
-				dispatch(logoutUser());
+				console.log('No access token found, redirecting to login');
+				setIsRedirecting(true);
+				dispatch(logoutUser()).then(() => {
+					window.location.href = '/login';
+				});
+				return;
 			}
 
 			const checkAccessTokenExpired = async () => {
 				try {
 					const response = await getMe();
-					if (!response.id) {
-						dispatch(logoutUser());
-						<Navigate to='/login' />;
+					if (!response || !response.id) {
+						setIsRedirecting(true);
+						dispatch(logoutUser()).then(() => {
+							window.location.href = '/login';
+						});
 					}
 				} catch (error) {
 					console.error('Error fetching profile:', error);
-					dispatch(logoutUser());
-					<Navigate to='/login' />;
+					setIsRedirecting(true);
+					dispatch(logoutUser()).then(() => {
+						window.location.href = '/login';
+					});
 				}
 			};
 
 			checkAccessTokenExpired();
+			setIsLoading(false);
 		}
-	}, [profile, dispatch]);
+	}, [profile, dispatch, isAuthenticated, isLoading, isRedirecting]);
 
 	if (isLoading) {
 		return <div className='flex h-screen items-center justify-center'>Loading...</div>;

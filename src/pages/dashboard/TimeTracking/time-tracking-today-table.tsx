@@ -76,7 +76,7 @@ export default function TimeTrackingTodayTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -89,7 +89,7 @@ export default function TimeTrackingTodayTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-28'
+					className='w-28 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID nhân viên <ArrowUpDown />
@@ -103,7 +103,7 @@ export default function TimeTrackingTodayTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Họ và tên <ArrowUpDown />
@@ -128,7 +128,7 @@ export default function TimeTrackingTodayTable() {
 						column.setFilterValue(newValue);
 					}}
 				>
-					<SelectTrigger className='w-full text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+					<SelectTrigger className='bg-bg-green-800 w-full border-0 text-white ring-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
 						<SelectValue placeholder='Giờ làm việc' />
 					</SelectTrigger>
 					<SelectContent>
@@ -202,7 +202,7 @@ export default function TimeTrackingTodayTable() {
 					<div className='grid grid-cols-3 items-center text-sm font-semibold text-gray-700'>
 						<span className={classNames('text-center', getCheckInColorCheckIn(checkIn))}>{formatTime(checkIn)}</span>
 						<div className='flex justify-center'>
-							<Minus className='text-gray-300 w-6' stroke='currentColor' />
+							<Minus className='w-6 text-gray-300' stroke='currentColor' />
 						</div>
 						<span className={classNames('text-center', getCheckOutColorCheckOut(checkOut))}>
 							{formatTime(checkOut)}
@@ -220,7 +220,7 @@ export default function TimeTrackingTodayTable() {
 						column.setFilterValue(newValue);
 					}}
 				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+					<SelectTrigger className='bg-bg-green-800 w-40 border-0 text-white ring-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
 						<SelectValue placeholder='Trạng thái' />
 					</SelectTrigger>
 					<SelectContent>
@@ -236,17 +236,17 @@ export default function TimeTrackingTodayTable() {
 				return (
 					<span className='flex justify-center'>
 						{row.getValue('attendanceStatus') === 'PRESENT' ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-green-500 rounded-sm p-1'>
-								<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+							<p className='flex w-[84%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+								<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 								Có mặt
 							</p>
 						) : row.getValue('attendanceStatus') === 'ON_LEAVE' ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-								<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Vắng có phép
+							<p className='flex w-[84%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+								<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Vắng có phép
 							</p>
 						) : row.getValue('attendanceStatus') === 'ABSENT' && !checkIn ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-red-500 rounded-sm p-1'>
-								<XCircle className='w-4 h-4 mr-1' stroke='white' /> Vắng mặt
+							<p className='flex w-[84%] items-center justify-center gap-1 rounded-sm bg-red-500 p-1 text-white'>
+								<XCircle className='mr-1 h-4 w-4' stroke='white' /> Vắng mặt
 							</p>
 						) : (
 							<span className='flex justify-center text-gray-400'>Chưa cập nhật</span>
@@ -264,7 +264,7 @@ export default function TimeTrackingTodayTable() {
 						column.setFilterValue(newValue);
 					}}
 				>
-					<SelectTrigger className='w-40 text-white bg-bg-green-800 ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0'>
+					<SelectTrigger className='bg-bg-green-800 w-40 border-0 text-white ring-0 focus-visible:ring-0 focus-visible:ring-offset-0'>
 						<SelectValue placeholder='Loại nghỉ' />
 					</SelectTrigger>
 					<SelectContent>
@@ -282,25 +282,25 @@ export default function TimeTrackingTodayTable() {
 				return (
 					<span className='flex justify-center'>
 						{row.getValue('leaveTypeEnum') === 0 ? (
-							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-blue-500 rounded-sm p-1'>
-								<Hospital className='w-4 h-4 mr-1' stroke='white' />
+							<p className='flex w-[95%] items-center justify-center gap-1 rounded-sm bg-blue-500 p-1 text-white'>
+								<Hospital className='mr-1 h-4 w-4' stroke='white' />
 								Nghỉ bệnh
 							</p>
 						) : row.getValue('leaveTypeEnum') === 1 ? (
-							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-orange-500 rounded-sm p-1'>
-								<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Nghỉ phép
+							<p className='flex w-[95%] items-center justify-center gap-1 rounded-sm bg-orange-500 p-1 text-white'>
+								<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Nghỉ phép
 							</p>
 						) : row.getValue('leaveTypeEnum') === 2 ? (
-							<p className='text-white flex items-center gap-1 justify-center  w-[95%] bg-pink-500 rounded-sm p-1'>
-								<Baby className='w-6 h-4' stroke='white' /> Nghỉ thai sản
+							<p className='flex w-[95%] items-center justify-center gap-1 rounded-sm bg-pink-500 p-1 text-white'>
+								<Baby className='h-4 w-6' stroke='white' /> Nghỉ thai sản
 							</p>
 						) : row.getValue('leaveTypeEnum') === 3 ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-yellow-500 rounded-sm p-1'>
-								<PartyPopper className='w-4 h-4 mr-1' stroke='white' /> Nghỉ lễ
+							<p className='flex w-[95%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+								<PartyPopper className='mr-1 h-4 w-4' stroke='white' /> Nghỉ lễ
 							</p>
 						) : row.getValue('attendanceStatus') === 'ABSENT' && !checkIn ? (
-							<p className='text-white flex items-center gap-1 justify-center w-[95%] bg-red-500 rounded-sm p-1'>
-								<AlertTriangle className='w-4 h-4 mr-1' stroke='white' /> Không phép
+							<p className='flex w-[95%] items-center justify-center gap-1 rounded-sm bg-red-500 p-1 text-white'>
+								<AlertTriangle className='mr-1 h-4 w-4' stroke='white' /> Không phép
 							</p>
 						) : (
 							<span className='flex justify-center text-gray-400'>--</span>
@@ -320,7 +320,7 @@ export default function TimeTrackingTodayTable() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
