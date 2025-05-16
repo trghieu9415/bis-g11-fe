@@ -54,7 +54,7 @@ const CreateCustomerForm = ({ fetchCustomers }: CreateCustomerFormProps) => {
 			await addCustomer({ ...data, status: 1 });
 			toast.success('Thêm khách hàng thành công!');
 			if (fetchCustomers) {
-				await fetchCustomers(); // Gọi lại hàm fetchCustomers
+				await fetchCustomers();
 			}
 			setIsOpen(false);
 			form.reset();
