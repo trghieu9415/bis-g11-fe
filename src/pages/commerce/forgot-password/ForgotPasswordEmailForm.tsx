@@ -21,7 +21,7 @@ export default function ForgotPasswordEmailForm() {
 
 	async function onSubmit(values: { email: string }) {
 		try {
-			const response = await forgotPassword(values.email);
+			const response = await forgotPassword({ email: values.email });
 			toast.success('Link đặt lại mật khẩu đã được gửi đến email của bạn!');
 		} catch (error: any) {
 			console.log(error);
