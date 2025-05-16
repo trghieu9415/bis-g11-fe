@@ -184,12 +184,12 @@ export function NavMain() {
 						<SidebarMenuItem key={item.title}>
 							<SidebarMenuButton tooltip={item.title} asChild>
 								<div className='flex items-center justify-between'>
-									<NavLink to={item.url} className='flex  items-center gap-2 w-full'>
+									<NavLink to={item.url} className='flex w-full items-center gap-2'>
 										{item.icon && <item.icon size={16} />}
 										<span>{item.title}</span>
 									</NavLink>
 									{typeof item.total === 'number' && item.total > 0 && (
-										<Badge className='w-1 flex justify-center bg-red-800'>{item.total}</Badge>
+										<Badge className='flex w-1 justify-center bg-red-800'>{item.total}</Badge>
 									)}
 								</div>
 							</SidebarMenuButton>
