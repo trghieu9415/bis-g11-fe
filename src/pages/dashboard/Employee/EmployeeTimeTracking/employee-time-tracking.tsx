@@ -107,9 +107,11 @@ export default function EmployeeTimeTracking() {
 	const handleCheckOut = async () => {
 		try {
 			const now = new Date();
+			const nowUTC = toISOStringWithTimezone(now, 7);
+
 			const checkOutData = {
 				userId: profile?.id,
-				checkOut: now
+				checkOut: nowUTC
 			};
 			if (profile) {
 				const res = await checkOut(checkOutData);

@@ -247,7 +247,7 @@ export default function PayrollsYearStatistics({ year }: { year: string }) {
 										type='monotone'
 										dataKey='costPerEmployee'
 										stroke='#673AB7'
-										name='Lương trung bình'
+										name='Lương CTY chi trả trung bình'
 										strokeWidth={2}
 										dot={{ r: 4 }}
 									/>
