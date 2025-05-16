@@ -89,7 +89,7 @@ function App() {
 							) : role === 'ADMIN' ? (
 								<Navigate to='/hr' />
 							) : (
-								<Navigate to='/employee' />
+								<Navigate to='/' />
 							)
 						) : (
 							<Navigate to='/login' />

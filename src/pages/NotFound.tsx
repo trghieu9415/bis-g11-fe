@@ -1,8 +1,15 @@
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '@/redux/store';
 
 const NotFound = () => {
+	const { profile } = useAppSelector(state => state.profile);
+
+	if (!profile) {
+		return <div className='flex h-screen items-center justify-center'>Loading...</div>;
+	}
+
 	return (
 		<div className='flex h-screen items-center justify-center p-8'>
 			<Alert variant='destructive' className='max-w-2xl'>
