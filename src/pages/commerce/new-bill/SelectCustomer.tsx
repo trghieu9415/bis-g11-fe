@@ -9,8 +9,9 @@ import { getListCustomers } from '@/services/customerService';
 
 type SelectCustomerProps = {
 	onChange: (customer: Customer) => void;
+	refreshKey?: number
 };
-export function SelectCustomer({ onChange }: SelectCustomerProps) {
+export function SelectCustomer({ onChange, refreshKey }: SelectCustomerProps) {
 	const [open, setOpen] = useState(false);
 
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
@@ -24,7 +25,7 @@ export function SelectCustomer({ onChange }: SelectCustomerProps) {
 			}
 		};
 		fetchCustomer();
-	}, []);
+	}, [refreshKey]);
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild className='flex-grow w-[300px]'>
