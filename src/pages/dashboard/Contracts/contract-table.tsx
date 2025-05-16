@@ -229,7 +229,7 @@ export default function ContractTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{profile?.id !== row?.original?.id && row?.original?.status === 1 && (
+						{profile?.id !== row?.original?.userId && row?.original?.status === 1 && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
