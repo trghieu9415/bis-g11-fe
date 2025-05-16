@@ -29,7 +29,7 @@ type Contract = {
 	userIdString: string;
 	fullName: string;
 	baseSalary: string;
-	status: boolean;
+	status: number;
 	statusLabel: string;
 	startDate: string;
 	endDate: string;
@@ -58,6 +58,8 @@ export default function ContractTable() {
 	const dispatch = useAppDispatch();
 	const { contracts } = useSelector((state: RootState) => state.contracts);
 	const { profile } = useAppSelector(state => state.profile);
+
+	console.log(contracts);
 
 	useEffect(() => {
 		dispatch(fetchContracts());
@@ -123,7 +125,7 @@ export default function ContractTable() {
 			)
 		},
 		{
-			accessorKey: 'statusLabel',
+			accessorKey: 'status',
 			header: ({ column }) => (
 				<Button
 					variant='link'
@@ -135,7 +137,7 @@ export default function ContractTable() {
 			),
 			cell: ({ row }) => (
 				<span className='flex justify-center'>
-					{row.getValue('statusLabel') === 'Hiệu lực' ? (
+					{row.getValue('status') == 1 ? (
 						<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
 							<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 							Hiệu lực
@@ -148,8 +150,8 @@ export default function ContractTable() {
 				</span>
 			),
 			sortingFn: (rowA, rowB) => {
-				const statusA = rowA.original.statusLabel === 'Hiệu lực' ? 1 : 0;
-				const statusB = rowB.original.statusLabel === 'Hiệu lực' ? 1 : 0;
+				const statusA = rowA.original.status ? 1 : 0;
+				const statusB = rowB.original.status ? 1 : 0;
 				return statusA - statusB;
 			},
 			enableHiding: false
@@ -227,7 +229,7 @@ export default function ContractTable() {
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						{profile?.id !== row?.original?.id && (
+						{profile?.id !== row?.original?.id && row?.original?.status === 1 && (
 							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
 						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
@@ -354,6 +356,7 @@ export default function ContractTable() {
 			await updateContract(idContract, contractData);
 			toast.success('Cập nhật hợp đồng thành công!');
 			dispatch(fetchUsers());
+			dispatch(fetchContracts());
 			setIsDialogOpen(false);
 		} catch (error: unknown) {
 			const err = error as AxiosError;
