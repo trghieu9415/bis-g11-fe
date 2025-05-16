@@ -11,9 +11,10 @@ type Props = {
 
 export default function OrderCustomer({ onCustomerChange }: Props) {
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-
+	const [refreshKey, setRefreshKey] = useState(0);
 	const fetchCustomers = async () => {
 		await getListCustomers();
+		setRefreshKey(prev => prev + 1);
 	};
 
 	useEffect(() => {
@@ -32,7 +33,7 @@ export default function OrderCustomer({ onCustomerChange }: Props) {
 					<span>Thông tin người mua</span>
 					<div className='flex gap-2'>
 						<CreateCustomerForm fetchCustomers={fetchCustomers} />
-						<SelectCustomer onChange={handleCustomerChange} />
+						<SelectCustomer onChange={handleCustomerChange} refreshKey={ refreshKey} />
 					</div>
 				</div>
 				<CustomerZone customer={selectedCustomer} />

@@ -4,6 +4,7 @@ import { RotateCcw, Plus } from 'lucide-react';
 import ProductsTable from './ProductsTable';
 import { SelectProduct } from './SelectProduct';
 import { Product, SelectedProduct } from '@/types/product';
+import { toast } from 'react-toastify';
 
 type Props = {
 	products: SelectedProduct[];
@@ -16,7 +17,12 @@ export default function OrderProduct({ products, setProducts }: Props) {
 	const handleAddProductToBill = () => {
 		if (!selectedProduct) return;
 
-		setProducts(prev => {
+		if (selectedProduct.quantity <= 0) {
+			toast.warning('Sản phẩm này đã hết hàng!');
+			return;
+		}
+
+		setProducts(prev 	=> {
 			const existingProduct = prev.find(product => product.id === selectedProduct.id);
 			if (existingProduct) {
 				return prev.map(product =>
