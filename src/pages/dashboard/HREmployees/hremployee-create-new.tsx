@@ -639,12 +639,16 @@ export default function EmployeeCreateNew() {
 												</SelectTrigger>
 												<SelectContent>
 													{roles
-														?.find(role => role.id === formData.role_id)
-														?.resSeniority.map(item => (
-															<SelectItem value={String(item.id)} key={item.id}>
-																{item.levelName}
-															</SelectItem>
-														))}
+														?.find(role => role.id === formData.role_id && role.status === 1)
+														?.resSeniority.map(item => {
+															if (item.status === 1) {
+																return (
+																	<SelectItem value={String(item.id)} key={item.id}>
+																		{item.levelName}
+																	</SelectItem>
+																);
+															}
+														})}
 												</SelectContent>
 											</Select>
 											{errors.level_id && <p className='text-sm text-red-500'>{errors.level_id.message}</p>}{' '}
