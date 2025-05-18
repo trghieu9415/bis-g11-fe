@@ -60,7 +60,7 @@ const ProductsTable = () => {
 			header: ({}) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Hình ảnh
@@ -68,7 +68,7 @@ const ProductsTable = () => {
 			),
 			cell: ({ row }) => (
 				<span className='flex items-center justify-center'>
-					<img src={row.getValue('image')} className='min-w-[90px] h-[120px] object-fill overflow-auto rounded' />
+					<img src={row.getValue('image')} className='h-[120px] min-w-[90px] overflow-auto rounded object-fill' />
 				</span>
 			),
 			enableHiding: false
@@ -79,7 +79,7 @@ const ProductsTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -93,13 +93,13 @@ const ProductsTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tên <ArrowUpDown />
 				</Button>
 			),
-			cell: ({ row }) => <span className='flex items-center flex-wrap'>{row.getValue('name')}</span>,
+			cell: ({ row }) => <span className='flex flex-wrap items-center'>{row.getValue('name')}</span>,
 			enableHiding: false
 		},
 		{
@@ -107,7 +107,7 @@ const ProductsTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-30'
+					className='w-30 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
@@ -116,13 +116,13 @@ const ProductsTable = () => {
 			cell: ({ row }) => (
 				<span className='flex justify-center'>
 					{row.getValue('status') ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+						<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+							<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 							Đang kinh doanh
 						</p>
 					) : (
-						<p className='text-white flex items-center gap-1 justify-center w-[84%] bg-yellow-500 rounded-sm p-1'>
-							<CalendarCheck className='w-4 h-4 mr-1' stroke='white' /> Ngừng kinh doanh
+						<p className='flex w-[84%] items-center justify-center gap-1 rounded-sm bg-yellow-500 p-1 text-white'>
+							<CalendarCheck className='mr-1 h-4 w-4' stroke='white' /> Ngừng kinh doanh
 						</p>
 					)}
 				</span>
@@ -173,7 +173,7 @@ const ProductsTable = () => {
 			header: ({}) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Nhà xuất bản
@@ -190,7 +190,7 @@ const ProductsTable = () => {
 			header: ({}) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tác giả
@@ -207,7 +207,7 @@ const ProductsTable = () => {
 			header: ({}) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					// onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Thể loại
@@ -226,7 +226,7 @@ const ProductsTable = () => {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
@@ -391,8 +391,18 @@ const ProductsTable = () => {
 			dispatch(fetchProducts());
 			// Reset the product image after successful update
 			setProductImage(null);
-		} catch (error: unknown) {
-			// Error handling remains the same
+		} catch (error) {
+			const err = error as AxiosError;
+
+			if (err.response?.status === 400) {
+				toast.error((err.response?.data as any).message);
+			} else if (err.response?.status === 404) {
+				toast.error((err.response?.data as any).message);
+			} else if (err.response?.status === 500) {
+				toast.error((err.response?.data as any).message);
+			} else {
+				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
+			}
 		}
 	};
 
@@ -409,11 +419,11 @@ const ProductsTable = () => {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy sản phẩm.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}

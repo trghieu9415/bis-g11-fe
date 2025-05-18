@@ -5,7 +5,7 @@ import { fetchGoodreceipt } from '@/redux/slices/goodReceiptsSlice';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import CustomTable from '@/components/custom-table';
-import { ArrowUpDown, Eye, Calendar, User, DollarSign } from 'lucide-react';
+import { ArrowUpDown, Eye, Calendar, User, DollarSign, Coins, CoinsIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { getUser } from '@/services/userService';
@@ -106,7 +106,7 @@ const InventoryTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-primary w-16'
+					className='w-16 text-primary'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown className='ml-1 h-4 w-4' />
@@ -163,7 +163,7 @@ const InventoryTable = () => {
 			),
 			cell: ({ row }) => (
 				<div className='flex items-center'>
-					<DollarSign className='mr-2 h-4 w-4' />
+					<CoinsIcon className='mr-2 h-4 w-4' />
 					{formatCurrency(row.original.totalPrice)}
 				</div>
 			)
@@ -196,7 +196,7 @@ const InventoryTable = () => {
 						<DialogTitle>Chi tiết phiếu nhập #{selectedReceipt?.id}</DialogTitle>
 					</DialogHeader>
 
-					<div className='grid grid-cols-2 gap-4 mb-4'>
+					<div className='mb-4 grid grid-cols-2 gap-4'>
 						<div>
 							<p className='text-sm text-muted-foreground'>Ngày tạo:</p>
 							<p className='font-medium'>{selectedReceipt && formatDate(selectedReceipt.createdAt)}</p>
@@ -215,39 +215,39 @@ const InventoryTable = () => {
 						</div>
 					</div>
 
-					<div className='border rounded-md overflow-hidden'>
+					<div className='overflow-hidden rounded-md border'>
 						<table className='min-w-full divide-y divide-gray-200'>
 							<thead className='bg-gray-50'>
 								<tr>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										STT
 									</th>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										Mã SP
 									</th>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										Tên SP
 									</th>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										Số lượng
 									</th>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										Giá nhập
 									</th>
-									<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+									<th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
 										Thành tiền
 									</th>
 								</tr>
 							</thead>
-							<tbody className='bg-white divide-y divide-gray-200'>
+							<tbody className='divide-y divide-gray-200 bg-white'>
 								{selectedReceipt?.goodReceiptDetails.map((detail, index) => (
 									<tr key={index}>
-										<td className='px-6 py-4 whitespace-nowrap text-sm'>{index + 1}</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm'>{detail.productId}</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm'>{detail.productName || '—'}</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm'>{detail.quantity}</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm'>{formatCurrency(detail.inputPrice)}</td>
-										<td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
+										<td className='whitespace-nowrap px-6 py-4 text-sm'>{index + 1}</td>
+										<td className='whitespace-nowrap px-6 py-4 text-sm'>{detail.productId}</td>
+										<td className='whitespace-nowrap px-6 py-4 text-sm'>{detail.productName || '—'}</td>
+										<td className='whitespace-nowrap px-6 py-4 text-sm'>{detail.quantity}</td>
+										<td className='whitespace-nowrap px-6 py-4 text-sm'>{formatCurrency(detail.inputPrice)}</td>
+										<td className='whitespace-nowrap px-6 py-4 text-sm font-medium'>
 											{formatCurrency(detail.quantity * detail.inputPrice)}
 										</td>
 									</tr>
@@ -256,7 +256,7 @@ const InventoryTable = () => {
 						</table>
 					</div>
 
-					<div className='flex justify-end mt-4'>
+					<div className='mt-4 flex justify-end'>
 						<DialogClose asChild>
 							<Button variant='outline'>Đóng</Button>
 						</DialogClose>

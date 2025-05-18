@@ -54,7 +54,7 @@ const CategoryTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -67,7 +67,7 @@ const CategoryTable = () => {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tên <ArrowUpDown />
@@ -75,7 +75,7 @@ const CategoryTable = () => {
 			),
 			cell: ({ row }) => (
 				<span className='flex items-center'>
-					<Button variant='ghost' className='text-black p-1 h-5 mr-2'>
+					<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
 						<BookText />
 					</Button>
 					{row.getValue('name')}
@@ -109,7 +109,7 @@ const CategoryTable = () => {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
@@ -149,15 +149,15 @@ const CategoryTable = () => {
 			toast.success('Cập nhật thông tin danh mục thành công!');
 			dispatch(fetchCategory());
 			setIsDialogOpen(false);
-		} catch (error: unknown) {
+		} catch (error) {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}
@@ -177,11 +177,11 @@ const CategoryTable = () => {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}

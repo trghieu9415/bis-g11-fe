@@ -56,9 +56,11 @@ export default function CategoryNew() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
+			} else if (err.response?.status === 404) {
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}
@@ -66,7 +68,7 @@ export default function CategoryNew() {
 	};
 
 	return (
-		<div className='text-end mb-4'>
+		<div className='mb-4 text-end'>
 			<Button className='bg-slate-800 hover:bg-slate-900' onClick={openDialog}>
 				<Plus />
 				Thêm
@@ -74,7 +76,7 @@ export default function CategoryNew() {
 
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogTrigger asChild></DialogTrigger>
-				<DialogContent className='w-full max-w-2xl mx-auto p-6 space-y-4'>
+				<DialogContent className='mx-auto w-full max-w-2xl space-y-4 p-6'>
 					<DialogHeader>
 						<DialogTitle>Tạo danh mục mới</DialogTitle>
 					</DialogHeader>
@@ -91,7 +93,7 @@ export default function CategoryNew() {
 										className='col-span-3 mt-1'
 										{...register('name', { required: 'Vui lòng nhập tên danh mục' })}
 									/>
-									{errors.name && <p className='text-red-500 text-sm'>{errors.name.message}</p>}
+									{errors.name && <p className='text-sm text-red-500'>{errors.name.message}</p>}
 								</div>
 							</div>
 						</div>
