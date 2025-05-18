@@ -1,5 +1,4 @@
 import html2pdf from 'html2pdf.js';
-import removeAccents from 'remove-accents';
 import './index.css';
 export type YearReportData = {
 	monthlySales: { [month: string]: number }; // Doanh thu theo tháng
@@ -27,6 +26,7 @@ export type YearReportData = {
 
 // Function to generate report HTML
 export const generateReportHTML = (data: YearReportData, year: string) => {
+	console.log(data.monthlySales['2025-05']);
 	// Tạo tiêu đề báo cáo
 	const headerHTML = `
     <div class='text-center my-2'>
@@ -78,15 +78,11 @@ export const generateReportHTML = (data: YearReportData, year: string) => {
             <td class='border px-1  pb-5'>Số lượng<br>bán</td>
             ${monthsArray
 							.map(month => {
-								const monthKey = `Tháng ${month}`;
+								const monthKey = `${year}-${month < 10 ? '0' + month : month}`;
+								console.log(`LINE 83 ${monthKey}`);
 								const monthlySales = data.monthlySales[monthKey] || 0;
-								const monthlySold =
-									monthlySales > 0
-										? Object.keys(data.monthlySales).includes(monthKey)
-											? Math.round(monthlySales / 100000)
-											: 0
-										: 0;
-								return `<td class='border px-1 py-1 text-center'>${monthlySold}</td>`;
+								console.log(`LINE 85 ${monthlySales}`);
+								return `<td class='border px-1 py-1 text-center'>${monthlySales}</td>`;
 							})
 							.join('')}
           </tr>
@@ -102,22 +98,22 @@ export const generateReportHTML = (data: YearReportData, year: string) => {
 	//       <table class='w-full border border-collapse text-sm table-fixed'>
 	//         <thead>
 	//           <tr>
-	//             <th class='border px-2 py-1' style="width: 20%;">Chỉ tiêu</th>
-	//             <th class='border px-2 py-1' style="width: 20%;">Quý 1</th>
-	//             <th class='border px-2 py-1' style="width: 20%;">Quý 2</th>
-	//             <th class='border px-2 py-1' style="width: 20%;">Quý 3</th>
-	//             <th class='border px-2 py-1' style="width: 20%;">Quý 4</th>
+	//             <th class='border px-2 pb-5' style="width: 20%;">Chỉ tiêu</th>
+	//             <th class='border px-2 pb-5' style="width: 20%;">Quý 1</th>
+	//             <th class='border px-2 pb-5' style="width: 20%;">Quý 2</th>
+	//             <th class='border px-2 pb-5' style="width: 20%;">Quý 3</th>
+	//             <th class='border px-2 pb-5' style="width: 20%;">Quý 4</th>
 	//           </tr>
 	//         </thead>
 	//         <tbody>
 	//           <tr>
-	//             <td class='border px-2 py-1'>Số lượng bán</td>
+	//             <td class='border px-2 pb-5'>Số lượng bán</td>
 	//             ${[1, 2, 3, 4]
 	// 							.map(quarter => {
 	// 								const quarterlySold = data.quarterlySales[quarter]
 	// 									? Math.round(data.quarterlySales[quarter] / 100000)
 	// 									: 0;
-	// 								return `<td class='border px-2 py-1 text-center'>${quarterlySold}</td>`;
+	// 								return `<td class='border px-2 pb-5 text-center'>${quarterlySold}</td>`;
 	// 							})
 	// 							.join('')}
 	//           </tr>
@@ -127,7 +123,8 @@ export const generateReportHTML = (data: YearReportData, year: string) => {
 	//   `;
 	const quarterlySoldCells = [1, 2, 3, 4]
 		.map(quarter => {
-			const quarterlySold = data.quarterlySales[quarter] ? Math.round(data.quarterlySales[quarter] / 100000) : 0;
+			console.log(`LINE 127 ${data.quarterlySales[quarter]}`);
+			const quarterlySold = data.quarterlySales[quarter];
 			return `<td class='border px-2  pb-5 text-center align-middle '>${quarterlySold}</td>`;
 		})
 		.join('');

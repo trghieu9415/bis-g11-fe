@@ -63,11 +63,11 @@ export default function CreateSupplier() {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}
@@ -75,7 +75,7 @@ export default function CreateSupplier() {
 	};
 
 	return (
-		<div className='text-end mb-4'>
+		<div className='mb-4 text-end'>
 			<Button className='bg-slate-800 hover:bg-slate-900' onClick={openDialog}>
 				<Plus />
 				Thêm
@@ -83,7 +83,7 @@ export default function CreateSupplier() {
 
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogTrigger asChild></DialogTrigger>
-				<DialogContent className='w-full max-w-2xl mx-auto p-6 space-y-4'>
+				<DialogContent className='mx-auto w-full max-w-2xl space-y-4 p-6'>
 					<DialogHeader>
 						<DialogTitle>Tạo nhà cung cấp mới</DialogTitle>
 					</DialogHeader>
@@ -100,7 +100,7 @@ export default function CreateSupplier() {
 										className='col-span-3 mt-1'
 										{...register('name', { required: 'Vui lòng nhập tên nhà cung cấp' })}
 									/>
-									{errors.name && <p className='text-red-500 text-sm'>{errors.name.message}</p>}
+									{errors.name && <p className='text-sm text-red-500'>{errors.name.message}</p>}
 								</div>
 
 								<div>
@@ -116,7 +116,7 @@ export default function CreateSupplier() {
 											pattern: { value: /^[0-9]{10,11}$/, message: 'Số điện thoại không hợp lệ (10-11 chữ số)' }
 										})}
 									/>
-									{errors.phone && <p className='text-red-500 text-sm'>{errors.phone.message}</p>}
+									{errors.phone && <p className='text-sm text-red-500'>{errors.phone.message}</p>}
 								</div>
 							</div>
 
@@ -128,10 +128,10 @@ export default function CreateSupplier() {
 									<Input
 										id='address'
 										type='text'
-										className='w-full col-span-3 mt-1'
+										className='col-span-3 mt-1 w-full'
 										{...register('address', { required: 'Vui lòng nhập địa chỉ' })}
 									/>
-									{errors.address && <p className='text-red-500 text-sm'>{errors.address.message}</p>}
+									{errors.address && <p className='text-sm text-red-500'>{errors.address.message}</p>}
 								</div>
 							</div>
 
@@ -149,7 +149,7 @@ export default function CreateSupplier() {
 											pattern: { value: /^\S+@\S+\.\S+$/, message: 'Email không hợp lệ' }
 										})}
 									/>
-									{errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}
+									{errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
 								</div>
 
 								<div>
@@ -162,11 +162,11 @@ export default function CreateSupplier() {
 										className='col-span-3 mt-1'
 										{...register('percentage', {
 											required: 'Vui lòng nhập chiết khấu',
-											min: { value: 0, message: 'Chiết khấu không hợp lệ' },
-											max: { value: 100, message: 'Chiết khấu không hợp lệ' }
+											min: { value: 1, message: 'Chiết khấu không hợp lệ' },
+											max: { value: 99, message: 'Chiết khấu không hợp lệ' }
 										})}
 									/>
-									{errors.percentage && <p className='text-red-500 text-sm'>{errors.percentage.message}</p>}
+									{errors.percentage && <p className='text-sm text-red-500'>{errors.percentage.message}</p>}
 								</div>
 							</div>
 						</div>

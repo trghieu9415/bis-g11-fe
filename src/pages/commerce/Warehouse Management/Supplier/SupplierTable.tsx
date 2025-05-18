@@ -18,6 +18,7 @@ import { fetchSuppliers } from '@/redux/slices/supplierSlice';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { deleteSupllier, updateSupplier } from '@/services/supplierService';
+import { da } from 'date-fns/locale';
 
 type FieldConfig = {
 	label: string;
@@ -228,6 +229,27 @@ const SupplierTable = () => {
 
 	const handleSave = async (data: Supplier) => {
 		const supplierId = data.id;
+		const emailRegex = /^\S+@\S+\.\S+$/;
+
+		if (data.name === '') {
+			toast.error('Vui lòng nhập tên NCC');
+			return;
+		} else if (data.phone === '') {
+			toast.error('Vui lòng nhập tên SĐT');
+			return;
+		} else if (data.email === '') {
+			toast.error('Vui lòng nhập email');
+			return;
+		} else if (!emailRegex.test(data.email)) {
+			toast.error('Vui lòng nhập đúng định dạng email');
+			return;
+		} else if (data.percentage === undefined || data.percentage === null || data.percentage === '') {
+			toast.error('Vui lòng nhập chiết khấu NCC');
+			return;
+		} else if (data.percentage <= 0 || data.percentage > 20) {
+			toast.error('Chiết khấu không hợp lệ');
+			return;
+		}
 
 		const updatedData = {
 			name: data.name,
@@ -243,15 +265,15 @@ const SupplierTable = () => {
 			toast.success('Cập nhật thông tin nhà cung cấp thành công!');
 			dispatch(fetchSuppliers());
 			setIsDialogOpen(false);
-		} catch (error: unknown) {
+		} catch (error) {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}
@@ -271,11 +293,11 @@ const SupplierTable = () => {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
-				toast.error('Lỗi 500: Lỗi máy chủ, vui lòng thử lại sau.');
+				toast.error((err.response?.data as any).message);
 			} else {
 				toast.error(`Lỗi từ server: ${err.response?.status} - ${err.message}`);
 			}

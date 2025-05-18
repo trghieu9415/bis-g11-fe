@@ -4,48 +4,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, BookText } from 'lucide-react';
+import { ArrowUpDown, BookText, FileText } from 'lucide-react';
 import { Bar, Pie } from 'recharts';
 import { BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Cell } from 'recharts';
 import CustomTable from '@/components/custom-table';
 import axios from '@/services/customize-axios';
-import { handleExportSalesReport, YearReportData } from './Warehouse Management/Products/utils/pdfExplore';
-import { stat } from 'fs';
+import { handleExportImportReport, YearImportData } from './Warehouse Management/Inventory/utils/pdfExplore';
 
 // Types
-type ProductStatistics = {
+type ImportStatistics = {
 	year?: number;
 	quarter?: number;
 	monthOfYear?: string;
-	totalProductsSold: number;
-	totalRevenue: number;
-	totalProfit: number;
+	totalProductsImported: number;
 	totalCost: number;
-	monthlySales?: Record<string, number>;
-	quarterlySales?: Record<string, number>;
-	topSellingProducts: TopSellingProduct[];
-	categorySales: CategorySale[];
+	monthlyImports?: Record<string, number>;
+	quarterlyImports?: Record<string, number>;
+	topImportedProducts: ImportedProduct[];
+	allImportedProducts: ImportedProduct[];
+	supplierImports: SupplierImport[];
 };
 
-type TopSellingProduct = {
+type ImportedProduct = {
 	id: number;
 	name: string;
-	quantitySold: number;
-	revenue: number;
-	profit: number;
+	quantityImported: number;
+	totalCost: number;
 };
 
-type CategorySale = {
+type SupplierImport = {
 	id: number;
 	name: string;
-	quantitySold: number;
-	revenue: number;
-	profit: number;
+	quantityImported: number;
+	totalCost: number;
 	percentageOfTotal: number;
 };
 
 // Table column definitions
-const productColumns: ColumnDef<TopSellingProduct>[] = [
+const productColumns: ColumnDef<ImportedProduct>[] = [
 	{
 		accessorKey: 'id',
 		header: ({ column }) => (
@@ -81,7 +77,7 @@ const productColumns: ColumnDef<TopSellingProduct>[] = [
 		enableHiding: false
 	},
 	{
-		accessorKey: 'quantitySold',
+		accessorKey: 'quantityImported',
 		header: ({ column }) => (
 			<Button
 				variant='link'
@@ -91,37 +87,24 @@ const productColumns: ColumnDef<TopSellingProduct>[] = [
 				Số lượng <ArrowUpDown />
 			</Button>
 		),
-		cell: ({ row }) => <span className='flex justify-center'>{row.getValue('quantitySold')}</span>
+		cell: ({ row }) => <span className='flex justify-center'>{row.getValue('quantityImported')}</span>
 	},
 	{
-		accessorKey: 'revenue',
+		accessorKey: 'totalCost',
 		header: ({ column }) => (
 			<Button
 				variant='link'
 				className='text-white'
 				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			>
-				Doanh thu <ArrowUpDown />
+				Chi phí <ArrowUpDown />
 			</Button>
 		),
-		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('revenue'))}</span>
-	},
-	{
-		accessorKey: 'profit',
-		header: ({ column }) => (
-			<Button
-				variant='link'
-				className='text-white'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			>
-				Lợi nhuận <ArrowUpDown />
-			</Button>
-		),
-		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('profit'))}</span>
+		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('totalCost'))}</span>
 	}
 ];
 
-const categoryColumns: ColumnDef<CategorySale>[] = [
+const supplierColumns: ColumnDef<SupplierImport>[] = [
 	{
 		accessorKey: 'id',
 		header: ({ column }) => (
@@ -143,13 +126,21 @@ const categoryColumns: ColumnDef<CategorySale>[] = [
 				className='w-40 text-white'
 				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			>
-				Danh mục <ArrowUpDown />
+				Nhà cung cấp <ArrowUpDown />
 			</Button>
+		),
+		cell: ({ row }) => (
+			<span className='flex items-center'>
+				<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
+					<FileText />
+				</Button>
+				{row.getValue('name')}
+			</span>
 		),
 		enableHiding: false
 	},
 	{
-		accessorKey: 'quantitySold',
+		accessorKey: 'quantityImported',
 		header: ({ column }) => (
 			<Button
 				variant='link'
@@ -159,33 +150,20 @@ const categoryColumns: ColumnDef<CategorySale>[] = [
 				Số lượng <ArrowUpDown />
 			</Button>
 		),
-		cell: ({ row }) => <span className='flex justify-center'>{row.getValue('quantitySold')}</span>
+		cell: ({ row }) => <span className='flex justify-center'>{row.getValue('quantityImported')}</span>
 	},
 	{
-		accessorKey: 'revenue',
+		accessorKey: 'totalCost',
 		header: ({ column }) => (
 			<Button
 				variant='link'
 				className='text-white'
 				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 			>
-				Doanh thu <ArrowUpDown />
+				Chi phí <ArrowUpDown />
 			</Button>
 		),
-		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('revenue'))}</span>
-	},
-	{
-		accessorKey: 'profit',
-		header: ({ column }) => (
-			<Button
-				variant='link'
-				className='text-white'
-				onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-			>
-				Lợi nhuận <ArrowUpDown />
-			</Button>
-		),
-		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('profit'))}</span>
+		cell: ({ row }) => <span className='flex justify-center'>{formatCurrency(row.getValue('totalCost'))}</span>
 	},
 	{
 		accessorKey: 'percentageOfTotal',
@@ -213,14 +191,14 @@ const getCurrentYear = () => {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
-export default function ProductStatistics() {
+export default function ImportStatistics() {
 	const [activeTab, setActiveTab] = useState('year');
 	const [year, setYear] = useState(getCurrentYear());
 	const [quarter, setQuarter] = useState(1);
 	const [month, setMonth] = useState(1);
 	const [loading, setLoading] = useState(false);
-	const [stats, setStats] = useState<ProductStatistics | null>(null);
-	const [yearStats, setYearStats] = useState<YearReportData | null>(null);
+	const [stats, setStats] = useState<ImportStatistics | null>(null);
+	const [yearStats, setYearStats] = useState<YearImportData | null>(null);
 
 	// Fetch data based on active tab
 	useEffect(() => {
@@ -238,52 +216,53 @@ export default function ProductStatistics() {
 
 			switch (activeTab) {
 				case 'year':
-					url = `/api/v1/statistics/products/year/${year}`;
-					break;
-				case 'quarter':
-					url = `/api/v1/statistics/products/quarter/${year}/${quarter}`;
+					url = `/api/v1/statistics/products/imports/year/${year}`;
 					break;
 				case 'month':
-					url = `/api/v1/statistics/products/month/${year}/${month}`;
+					url = `/api/v1/statistics/products/imports/month/${year}/${month}`;
 					break;
 				default:
-					url = `/api/v1/statistics/products/year/${year}`;
+					url = `/api/v1/statistics/products/imports/year/${year}`;
 			}
 
 			const response = await axios.get(url);
 			console.log(response);
 			if (response) {
 				setStats(response.data);
-				console.log('line 257', response.data);
+				console.log('Import statistics data:', response.data);
 
-				const transformed: YearReportData = {
-					totalRevenue: response.data.totalRevenue,
+				const transformed: YearImportData = {
+					// Dữ liệu tổng hợp
+					totalProductsImported: response.data.totalProductsImported,
 					totalCost: response.data.totalCost,
-					totalProductsSold: response.data.totalProductsSold,
-					totalProfit: response.data.totalProfit,
-					monthlySales: response.data.monthlySales,
-					quarterlySales: response.data.quarterlySales,
-					topSellingProducts: response.data.topSellingProducts.map(product => ({
+					year: response.data.year,
+
+					// Dữ liệu theo thời gian
+					monthlyImports: response.data.monthlyImports,
+					quarterlyImports: response.data.quarterlyImports,
+
+					// Dữ liệu sản phẩm
+					topImportedProducts: response.data.topImportedProducts.map(product => ({
 						id: product.id,
 						name: product.name,
-						quantitySold: product.quantitySold,
-						revenue: product.revenue,
-						profit: product.profit
+						quantityImported: product.quantityImported,
+						totalCost: product.totalCost
 					})),
-					categorySales: response.data.categorySales.map(category => ({
-						id: category.id,
-						name: category.name,
-						quantitySold: category.quantitySold,
-						revenue: category.revenue,
-						profit: category.profit,
-						percentageOfTotal: category.percentageOfTotal
+
+					// Dữ liệu nhà cung cấp
+					supplierImports: response.data.supplierImports.map(supplier => ({
+						id: supplier.id,
+						name: supplier.name,
+						quantityImported: supplier.quantityImported,
+						totalCost: supplier.totalCost,
+						percentageOfTotal: supplier.percentageOfTotal
 					}))
 				};
 				setYearStats(transformed);
-				console.log(transformed);
+				console.log('Transformed data:', transformed);
 			}
 		} catch (error) {
-			console.error('Error fetching statistics:', error);
+			console.error('Error fetching import statistics:', error);
 		} finally {
 			setLoading(false);
 		}
@@ -291,7 +270,7 @@ export default function ProductStatistics() {
 
 	// Transform data for charts
 	const prepareMonthlyData = () => {
-		if (!stats?.monthlySales) return [];
+		if (!stats?.monthlyImports) return [];
 
 		const monthNames = {
 			'01': 'Tháng 1',
@@ -308,7 +287,7 @@ export default function ProductStatistics() {
 			'12': 'Tháng 12'
 		};
 
-		return Object.entries(stats.monthlySales)
+		return Object.entries(stats.monthlyImports)
 			.sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
 			.map(([key, value]) => {
 				const monthKey = key.split('-')[1];
@@ -320,16 +299,16 @@ export default function ProductStatistics() {
 	};
 
 	const prepareQuarterlyData = () => {
-		if (!stats?.quarterlySales) return [];
+		if (!stats?.quarterlyImports) return [];
 
-		return Object.entries(stats.quarterlySales).map(([key, value]) => ({
+		return Object.entries(stats.quarterlyImports).map(([key, value]) => ({
 			name: `Q${key}`,
 			value: value
 		}));
 	};
 
-	const prepareCategoryData = () => {
-		return stats?.categorySales || [];
+	const prepareSupplierData = () => {
+		return stats?.supplierImports || [];
 	};
 
 	// Generate years for select
@@ -341,19 +320,19 @@ export default function ProductStatistics() {
 		}
 		return years;
 	};
+
 	const handleExportPDF = () => {
 		console.log(yearStats);
-		handleExportSalesReport(yearStats, year.toString());
+		handleExportImportReport(yearStats, year);
 	};
 
 	return (
 		<div className='w-full p-4'>
-			<h1 className='mb-4 text-2xl font-bold'>Thống kê sản phẩm</h1>
+			<h1 className='mb-4 text-2xl font-bold'>Thống kê nhập hàng</h1>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
 				<TabsList className='mb-4 grid grid-cols-3'>
 					<TabsTrigger value='year'>Theo năm</TabsTrigger>
-					<TabsTrigger value='quarter'>Theo quý</TabsTrigger>
 					<TabsTrigger value='month'>Theo tháng</TabsTrigger>
 				</TabsList>
 
@@ -381,42 +360,6 @@ export default function ProductStatistics() {
 					</div>
 
 					{stats && renderStatisticsContent(stats, 'year', prepareMonthlyData(), prepareQuarterlyData())}
-				</TabsContent>
-
-				{/* Quarter Tab */}
-				<TabsContent value='quarter' className='space-y-4'>
-					<div className='mb-4 flex items-center'>
-						<Select value={year.toString()} onValueChange={value => setYear(parseInt(value))}>
-							<SelectTrigger className='w-[180px]'>
-								<SelectValue placeholder='Chọn năm' />
-							</SelectTrigger>
-							<SelectContent>
-								{getYearOptions().map(year => (
-									<SelectItem key={year} value={year.toString()}>
-										{year}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-
-						<Select value={quarter.toString()} onValueChange={value => setQuarter(parseInt(value))}>
-							<SelectTrigger className='w-[180px]'>
-								<SelectValue placeholder='Chọn quý' />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value='1'>Quý 1</SelectItem>
-								<SelectItem value='2'>Quý 2</SelectItem>
-								<SelectItem value='3'>Quý 3</SelectItem>
-								<SelectItem value='4'>Quý 4</SelectItem>
-							</SelectContent>
-						</Select>
-
-						<Button className='ml-2' onClick={fetchStatistics}>
-							Xem thống kê
-						</Button>
-					</div>
-
-					{stats && renderStatisticsContent(stats, 'quarter', prepareMonthlyData())}
 				</TabsContent>
 
 				{/* Month Tab */}
@@ -460,7 +403,7 @@ export default function ProductStatistics() {
 	);
 
 	function renderStatisticsContent(
-		stats: ProductStatistics,
+		stats: ImportStatistics,
 		mode: 'year' | 'quarter' | 'month',
 		monthlyData?: any[],
 		quarterlyData?: any[]
@@ -468,34 +411,18 @@ export default function ProductStatistics() {
 		return (
 			<>
 				{/* Overview Cards */}
-				<div className='mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+				<div className='mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2'>
 					<Card>
 						<CardHeader className='pb-2'>
-							<CardTitle className='text-md font-medium'>Tổng số sản phẩm đã bán</CardTitle>
+							<CardTitle className='text-md font-medium'>Tổng số sản phẩm đã nhập</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<p className='text-2xl font-bold'>{stats.totalProductsSold}</p>
+							<p className='text-2xl font-bold'>{stats.totalProductsImported}</p>
 						</CardContent>
 					</Card>
 					<Card>
 						<CardHeader className='pb-2'>
-							<CardTitle className='text-md font-medium'>Tổng doanh thu</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className='text-2xl font-bold'>{formatCurrency(stats.totalRevenue)}</p>
-						</CardContent>
-					</Card>
-					<Card>
-						<CardHeader className='pb-2'>
-							<CardTitle className='text-md font-medium'>Tổng lợi nhuận</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className='text-2xl font-bold'>{formatCurrency(stats.totalProfit)}</p>
-						</CardContent>
-					</Card>
-					<Card>
-						<CardHeader className='pb-2'>
-							<CardTitle className='text-md font-medium'>Tổng chi phí</CardTitle>
+							<CardTitle className='text-md font-medium'>Tổng chi phí nhập hàng</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<p className='text-2xl font-bold'>{formatCurrency(stats.totalCost)}</p>
@@ -509,7 +436,7 @@ export default function ProductStatistics() {
 					{mode === 'year' && quarterlyData && quarterlyData.length > 0 && (
 						<Card className='col-span-1'>
 							<CardHeader>
-								<CardTitle>Phân bố theo quý</CardTitle>
+								<CardTitle>Phân bố nhập hàng theo quý</CardTitle>
 							</CardHeader>
 							<CardContent className='h-[300px]'>
 								<ResponsiveContainer width='100%' height='100%'>
@@ -519,7 +446,7 @@ export default function ProductStatistics() {
 										<YAxis />
 										<Tooltip formatter={value => [value, 'Số lượng']} />
 										<Legend />
-										<Bar dataKey='value' fill='#8884d8' name='Số lượng bán' />
+										<Bar dataKey='value' fill='#8884d8' name='Số lượng nhập' />
 									</BarChart>
 								</ResponsiveContainer>
 							</CardContent>
@@ -532,10 +459,10 @@ export default function ProductStatistics() {
 							<CardHeader>
 								<CardTitle>
 									{mode === 'year'
-										? 'Phân bố theo tháng'
+										? 'Phân bố nhập hàng theo tháng'
 										: mode === 'quarter'
-											? `Phân bố các tháng trong Quý ${stats.quarter}`
-											: 'Chi tiết tháng'}
+											? `Phân bố nhập hàng các tháng trong Quý ${stats.quarter}`
+											: 'Chi tiết nhập hàng trong tháng'}
 								</CardTitle>
 							</CardHeader>
 							<CardContent className='h-[300px]'>
@@ -546,32 +473,32 @@ export default function ProductStatistics() {
 										<YAxis />
 										<Tooltip formatter={value => [value, 'Số lượng']} />
 										<Legend />
-										<Bar dataKey='value' fill='#82ca9d' name='Số lượng bán' />
+										<Bar dataKey='value' fill='#82ca9d' name='Số lượng nhập' />
 									</BarChart>
 								</ResponsiveContainer>
 							</CardContent>
 						</Card>
 					)}
 
-					{/* Category Distribution */}
+					{/* Supplier Distribution */}
 					<Card className='col-span-1'>
 						<CardHeader>
-							<CardTitle>Phân bố theo danh mục</CardTitle>
+							<CardTitle>Phân bố theo nhà cung cấp</CardTitle>
 						</CardHeader>
 						<CardContent className='h-[380px]'>
 							<ResponsiveContainer width='100%' height='100%'>
 								<PieChart>
 									<Pie
-										data={prepareCategoryData()}
-										dataKey='quantitySold'
+										data={prepareSupplierData()}
+										dataKey='quantityImported'
 										nameKey='name'
 										cx='50%'
 										cy='50%'
-										outerRadius={100}
+										outerRadius={80}
 										fill='#8884d8'
 										label={({ name, percentageOfTotal }) => `${name}: ${percentageOfTotal}%`}
 									>
-										{prepareCategoryData().map((entry, index) => (
+										{prepareSupplierData().map((entry, index) => (
 											<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
 										))}
 									</Pie>
@@ -585,25 +512,36 @@ export default function ProductStatistics() {
 
 				{/* Tables Section */}
 				<div className='grid grid-cols-1 gap-4'>
-					{/* Top Selling Products Table */}
+					{/* Top Imported Products Table */}
 					<Card>
 						<CardHeader>
-							<CardTitle>Sản phẩm bán chạy</CardTitle>
-							<CardDescription>Danh sách các sản phẩm bán chạy nhất</CardDescription>
+							<CardTitle>Sản phẩm nhập nhiều nhất</CardTitle>
+							<CardDescription>Danh sách các sản phẩm nhập với số lượng lớn nhất</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<CustomTable columns={productColumns} data={stats.topSellingProducts} />
+							<CustomTable columns={productColumns} data={stats.topImportedProducts} />
 						</CardContent>
 					</Card>
 
-					{/* Category Sales Table */}
+					{/* All Imported Products Table */}
 					<Card>
 						<CardHeader>
-							<CardTitle>Thống kê theo danh mục</CardTitle>
-							<CardDescription>Doanh số bán hàng theo từng danh mục</CardDescription>
+							<CardTitle>Tất cả sản phẩm đã nhập</CardTitle>
+							<CardDescription>Danh sách đầy đủ các sản phẩm đã nhập trong kỳ</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<CustomTable columns={categoryColumns} data={stats.categorySales} />
+							<CustomTable columns={productColumns} data={stats.allImportedProducts} />
+						</CardContent>
+					</Card>
+
+					{/* Supplier Imports Table */}
+					<Card>
+						<CardHeader>
+							<CardTitle>Thống kê theo nhà cung cấp</CardTitle>
+							<CardDescription>Chi tiết nhập hàng theo từng nhà cung cấp</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<CustomTable columns={supplierColumns} data={stats.supplierImports} />
 						</CardContent>
 					</Card>
 				</div>

@@ -1,0 +1,67 @@
+{
+    "statusCode": 200,
+    "success": true,
+    "message": "Thống kê thành công!",
+    "data": {
+        "year": 2025,
+        "totalProductsImported": 25,
+        "totalCost": 2342250.0000,
+        "monthlyImports": {
+            "2025-10": 0,
+            "2025-01": 0,
+            "2025-12": 0,
+            "2025-11": 0,
+            "2025-03": 25,
+            "2025-02": 0,
+            "2025-05": 0,
+            "2025-04": 0,
+            "2025-07": 0,
+            "2025-06": 0,
+            "2025-09": 0,
+            "2025-08": 0
+        },
+        "quarterlyImports": {
+            "1": 25,
+            "2": 0,
+            "3": 0,
+            "4": 0
+        },
+        "topImportedProducts": [
+            {
+                "id": 2,
+                "name": "Nhà Giả Kim",
+                "quantityImported": 15,
+                "totalCost": 1262250.0000
+            },
+            {
+                "id": 1,
+                "name": "Đắc Nhân Tâm",
+                "quantityImported": 10,
+                "totalCost": 1080000.0000
+            }
+        ],
+        "allImportedProducts": [
+            {
+                "id": 2,
+                "name": "Nhà Giả Kim",
+                "quantityImported": 15,
+                "totalCost": 1262250.0000
+            },
+            {
+                "id": 1,
+                "name": "Đắc Nhân Tâm",
+                "quantityImported": 10,
+                "totalCost": 1080000.0000
+            }
+        ],
+        "supplierImports": [
+            {
+                "id": 1,
+                "name": "Nhà Xuất Bản Kim Đồng",
+                "quantityImported": 25,
+                "totalCost": 2342250.0000,
+                "percentageOfTotal": 100.0
+            }
+        ]
+    }
+}
