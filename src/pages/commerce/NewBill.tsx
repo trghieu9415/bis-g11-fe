@@ -13,16 +13,15 @@ export default function NewBill() {
 	const [products, setProducts] = useState<SelectedProduct[]>([]);
 	const [customer, setCustomer] = useState<Customer | null>(null);
 	const [loading, setLoading] = useState(false);
+	const { profile } = useAppSelector(state => state.profile);
+	const userId = profile ? profile?.id : null;
 
 	const handleSubmitOrder = async () => {
 		if (!customer) {
 			toast.warning('Vui lòng chọn khách hàng trước khi lưu hóa đơn!');
 			return;
 		}
-
-		const { profile } = useAppSelector(state => state.profile);
-
-		const userId = profile ? profile?.id : null;
+		
 		if (!userId) {
 			toast.warning('Không tìm thấy userId, vui lòng đăng nhập lại!');
 			return;

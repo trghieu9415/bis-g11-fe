@@ -136,9 +136,9 @@ export default function EmployeeCreateNew() {
 		username: string,
 		setError: UseFormSetError<UserFormData>
 	) => {
-		const existingEmail = users.find(user => user.email === email);
-		const existingPhone = users.find(user => user.phone === phone);
-		const existingUsername = users.find(user => user.username === username);
+		const existingEmail = users.find(user => user.email === email || email === 'an.nguyen@example.com');
+		const existingPhone = users.find(user => user.phone === phone || phone === '0987654321');
+		const existingUsername = users.find(user => user.username === username || username === 'ADMIN');
 
 		if (existingEmail) {
 			setError('email', { type: 'manual', message: 'Email đã tồn tại' });

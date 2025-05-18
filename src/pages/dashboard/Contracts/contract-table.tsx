@@ -15,7 +15,7 @@ import CustomDialog from '@/components/custom-dialog';
 import { RegisterOptions } from 'react-hook-form';
 
 // import data from '@/pages/dashboard/HREmployees/data.json';
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import { fetchUsers } from '@/redux/slices/usersSlice';
 import { fetchContracts } from '@/redux/slices/contractsSlice';
 import { updateContract } from '@/services/contractService';
@@ -29,7 +29,7 @@ type Contract = {
 	userIdString: string;
 	fullName: string;
 	baseSalary: string;
-	status: boolean;
+	status: number;
 	statusLabel: string;
 	startDate: string;
 	endDate: string;
@@ -57,6 +57,9 @@ export default function ContractTable() {
 
 	const dispatch = useAppDispatch();
 	const { contracts } = useSelector((state: RootState) => state.contracts);
+	const { profile } = useAppSelector(state => state.profile);
+
+	console.log(contracts);
 
 	useEffect(() => {
 		dispatch(fetchContracts());
@@ -68,7 +71,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-16'
+					className='w-16 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					ID <ArrowUpDown />
@@ -81,7 +84,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Tên <ArrowUpDown />
@@ -89,7 +92,7 @@ export default function ContractTable() {
 			),
 			cell: ({ row }) => (
 				<span className='flex items-center'>
-					<Button variant='ghost' className='text-black p-1 h-5 mr-2'>
+					<Button variant='ghost' className='mr-2 h-5 p-1 text-black'>
 						<UserRoundPen />
 					</Button>
 					{row.getValue('fullName')}
@@ -102,7 +105,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Vai trò <ArrowUpDown />
@@ -114,7 +117,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-40'
+					className='w-40 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Cấp bậc <ArrowUpDown />
@@ -122,11 +125,11 @@ export default function ContractTable() {
 			)
 		},
 		{
-			accessorKey: 'statusLabel',
+			accessorKey: 'status',
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-20'
+					className='w-20 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Trạng thái <ArrowUpDown />
@@ -134,21 +137,21 @@ export default function ContractTable() {
 			),
 			cell: ({ row }) => (
 				<span className='flex justify-center'>
-					{row.getValue('statusLabel') === 'Hiệu lực' ? (
-						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-green-500 rounded-sm p-1'>
-							<CheckCircle className='w-4 h-4 mr-1' stroke='white' />
+					{row.getValue('status') == 1 ? (
+						<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-green-500 p-1 text-white'>
+							<CheckCircle className='mr-1 h-4 w-4' stroke='white' />
 							Hiệu lực
 						</p>
 					) : (
-						<p className='text-white flex items-center gap-1 justify-center w-[100%] bg-red-500 rounded-sm p-1'>
-							<XCircle className='w-4 h-4 mr-1' stroke='white' /> Hết hiệu lực
+						<p className='flex w-[100%] items-center justify-center gap-1 rounded-sm bg-red-500 p-1 text-white'>
+							<XCircle className='mr-1 h-4 w-4' stroke='white' /> Hết hiệu lực
 						</p>
 					)}
 				</span>
 			),
 			sortingFn: (rowA, rowB) => {
-				const statusA = rowA.original.statusLabel === 'Hiệu lực' ? 1 : 0;
-				const statusB = rowB.original.statusLabel === 'Hiệu lực' ? 1 : 0;
+				const statusA = rowA.original.status ? 1 : 0;
+				const statusB = rowB.original.status ? 1 : 0;
 				return statusA - statusB;
 			},
 			enableHiding: false
@@ -182,7 +185,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-28'
+					className='w-28 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Ngày bắt đầu <ArrowUpDown />
@@ -194,7 +197,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-28'
+					className='w-28 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Ngày kết thúc <ArrowUpDown />
@@ -207,7 +210,7 @@ export default function ContractTable() {
 			header: ({ column }) => (
 				<Button
 					variant='link'
-					className='text-white w-28'
+					className='w-28 text-white'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 				>
 					Ngày hết hạn <ArrowUpDown />
@@ -221,12 +224,14 @@ export default function ContractTable() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon'>
-							<Ellipsis className='w-4 h-4' />
+							<Ellipsis className='h-4 w-4' />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'view')}>Xem</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						{profile?.id !== row?.original?.userId && row?.original?.status === 1 && (
+							<DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'edit')}>Sửa</DropdownMenuItem>
+						)}
 						{/* <DropdownMenuItem onClick={() => handleOpenDialog(row.original, 'delete')}>Xóa</DropdownMenuItem> */}
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -351,12 +356,15 @@ export default function ContractTable() {
 			await updateContract(idContract, contractData);
 			toast.success('Cập nhật hợp đồng thành công!');
 			dispatch(fetchUsers());
+			dispatch(fetchContracts());
 			setIsDialogOpen(false);
 		} catch (error: unknown) {
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error(
+					(err.response.data as { message?: string }).message || 'Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.'
+				);
 			} else if (err.response?.status === 404) {
 				toast.error('Lỗi 404: Không tìm thấy hợp đồng.');
 			} else if (err.response?.status === 500) {

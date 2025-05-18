@@ -30,7 +30,7 @@ export function SelectProduct({ onChange }: SelectProductProps) {
 				if (res && resSupplier) {
 					const suppliers = resSupplier.data;
 					const productList = res.data;
-
+					
 					// Tạo map để tra cứu nhanh thông tin nhà cung cấp theo ID
 					const supplierMap = new Map<number, Supplier>();
 					suppliers.forEach((supplier: Supplier) => {

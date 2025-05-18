@@ -81,7 +81,7 @@ const Orders = () => {
 		<div className='container mx-auto py-6'>
 			<div className='mb-6 flex items-center justify-between'>
 				<h1 className='text-2xl font-bold'>Quản lý đơn hàng</h1>
-				<Button onClick={() => navigate('/new-order')}>
+				<Button onClick={() => navigate('/business/new-order')} className='flex items-center'>
 					<Plus className='mr-2 h-4 w-4' />
 					Tạo đơn hàng mới
 				</Button>

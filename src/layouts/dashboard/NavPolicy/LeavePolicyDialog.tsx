@@ -33,7 +33,7 @@ const LeavePolicyDialog: React.FC<LeavePolicyDialogProps> = ({ isOpen, onClose }
 								<strong>Nghỉ phép</strong>: 12 ngày / 1 năm (tối đa 5 ngày / 1 đơn).
 							</li>
 							<li>
-								<strong>Nghỉ thai sản</strong>: 6 tháng đối với nữ, 7 ngày đối với nam.
+								<strong>Nghỉ thai sản</strong>: 6 tháng.
 							</li>
 							<li>
 								<strong>Nghỉ bệnh</strong>: 7 ngày.

@@ -25,15 +25,16 @@ import { AxiosError } from 'axios';
 
 export default function EmployeeTimeTracking() {
 	const dispatch = useAppDispatch();
-	const { user } = useSelector((state: RootState) => state.user);
+	// const { user } = useSelector((state: RootState) => state.user);
+	const { profile } = useSelector((state: RootState) => state.profile);
 	const { attendanceDetailsByUserID } = useSelector((state: RootState) => state.attendanceDetailsByUserID);
 	const [events, setEvents] = useState(attendanceDetailsByUserID);
 
 	useEffect(() => {
-		if (attendanceDetailsByUserID.length === 0 && user?.id) {
-			dispatch(fetchAttendanceDetailsByUserID(user.id));
+		if (attendanceDetailsByUserID.length === 0 && profile?.id) {
+			dispatch(fetchAttendanceDetailsByUserID(profile.id));
 		}
-	}, [dispatch, user]);
+	}, [dispatch, profile]);
 
 	useEffect(() => {
 		setEvents(attendanceDetailsByUserID);
@@ -50,38 +51,40 @@ export default function EmployeeTimeTracking() {
 			const now = new Date(); // Get the current date and time
 			const nowUTC = toISOStringWithTimezone(now, 7);
 			const checkInData = {
-				userId: user.id,
+				userId: profile?.id,
 				checkIn: nowUTC
 			};
 
 			const formattedDate = now.toISOString().split('T')[0];
-			const res = await checkExistAttendanceDetail(user.id, formattedDate);
+			if (profile) {
+				const res = await checkExistAttendanceDetail(profile?.id, formattedDate);
 
-			// @ts-expect-error - Except res.success
-			if (res?.success) {
-				if (res?.data == 'AttendanceDetail not exist') {
-					await checkIn(checkInData);
-					const formattedTime = now.toLocaleTimeString('vi-VN', {
-						hour: '2-digit',
-						minute: '2-digit',
-						second: '2-digit'
-					});
-					toast.success(`Check-in thành công lúc  ${formattedTime}`);
-					dispatch(fetchAttendanceDetailsByUserID(user.id));
-				} else if (res?.data == 'AttendanceDetail already exist') {
-					await updateAttendanceDetail({
-						...checkInData,
-						checkOut: null
-					});
-					const formattedTime = now.toLocaleTimeString('vi-VN', {
-						hour: '2-digit',
-						minute: '2-digit',
-						second: '2-digit'
-					});
-					toast.success(`Check-in thành công lúc  ${formattedTime}`);
-					dispatch(fetchAttendanceDetailsByUserID(user.id));
-				} else {
-					toast.error('Có lỗi trong quá trình chấm công, vui lòng thử lại!');
+				// @ts-expect-error - Except res.success
+				if (res?.success) {
+					if (res?.data == 'AttendanceDetail not exist') {
+						await checkIn(checkInData);
+						const formattedTime = now.toLocaleTimeString('vi-VN', {
+							hour: '2-digit',
+							minute: '2-digit',
+							second: '2-digit'
+						});
+						toast.success(`Check-in thành công lúc  ${formattedTime}`);
+						dispatch(fetchAttendanceDetailsByUserID(profile?.id));
+					} else if (res?.data == 'AttendanceDetail already exist') {
+						await updateAttendanceDetail({
+							...checkInData,
+							checkOut: null
+						});
+						const formattedTime = now.toLocaleTimeString('vi-VN', {
+							hour: '2-digit',
+							minute: '2-digit',
+							second: '2-digit'
+						});
+						toast.success(`Check-in thành công lúc  ${formattedTime}`);
+						dispatch(fetchAttendanceDetailsByUserID(profile?.id));
+					} else {
+						toast.error('Có lỗi trong quá trình chấm công, vui lòng thử lại!');
+					}
 				}
 			}
 		} catch (error) {
@@ -104,19 +107,25 @@ export default function EmployeeTimeTracking() {
 	const handleCheckOut = async () => {
 		try {
 			const now = new Date();
-			const checkOutData = {
-				userId: user.id,
-				checkOut: now
-			};
+			const nowUTC = toISOStringWithTimezone(now, 7);
 
-			await checkOut(checkOutData);
-			const formattedTime = now.toLocaleTimeString('vi-VN', {
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
-			});
-			toast.success(`Check-out thành công lúc  ${formattedTime}`);
-			dispatch(fetchAttendanceDetailsByUserID(user.id));
+			const checkOutData = {
+				userId: profile?.id,
+				checkOut: nowUTC
+			};
+			if (profile) {
+				const res = await checkOut(checkOutData);
+				// @ts-expect-error - Except res.success
+				if (res?.success) {
+					const formattedTime = now.toLocaleTimeString('vi-VN', {
+						hour: '2-digit',
+						minute: '2-digit',
+						second: '2-digit'
+					});
+					toast.success(`Check-out thành công lúc  ${formattedTime}`);
+					dispatch(fetchAttendanceDetailsByUserID(profile?.id));
+				}
+			}
 		} catch (error) {
 			const err = error as AxiosError;
 
@@ -137,7 +146,7 @@ export default function EmployeeTimeTracking() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant='outline' className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'>
+				<Button variant='outline' className='h-[32px] w-full items-center justify-start border-none px-[8px] py-[6px]'>
 					<CalendarCheck />
 					Chấm công
 				</Button>

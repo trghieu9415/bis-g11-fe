@@ -8,7 +8,7 @@ interface ApiResponse {
 	userId: number;
 	fullName: string;
 	baseSalary: number;
-	status: boolean;
+	status: number;
 	startDate: string;
 	endDate: string;
 	expiryDate: string;
