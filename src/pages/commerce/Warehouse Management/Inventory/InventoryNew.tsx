@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchGoodreceipt } from '@/redux/slices/goodReceiptsSlice';
 import { AxiosError } from 'axios';
 import { AppDispatch, RootState } from '@/redux/store';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 // import { createGoodReceipt } from '@/services/goodReceiptService';
 import { fetchProducts } from '@/redux/slices/productSlice';
 import { addGoodsReceipt } from '@/services/goodReceiptService';

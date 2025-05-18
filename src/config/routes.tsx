@@ -32,7 +32,6 @@ const routes = {
 
 	statistics: 'business/statistics',
 
-
 	// For warehouse employee
 	warehouse: '/warehouse',
 	products: '/warehouse/products',
@@ -40,6 +39,7 @@ const routes = {
 	author: '/warehouse/author',
 	category: '/warehouse/category',
 	inventory: '/warehouse/inventory',
+	import_statistic: '/warehouse/statistics',
 
 	// For login
 	eLogin: '/login',

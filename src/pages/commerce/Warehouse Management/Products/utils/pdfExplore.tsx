@@ -1,5 +1,4 @@
 import html2pdf from 'html2pdf.js';
-import removeAccents from 'remove-accents';
 import './index.css';
 export type YearReportData = {
 	monthlySales: { [month: string]: number }; // Doanh thu theo tháng

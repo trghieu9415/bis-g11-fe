@@ -42,6 +42,7 @@ export default function CreateProducts({}) {
 	const authors = useSelector((state: RootState) => state.author.authors);
 	const dispatch = useDispatch<AppDispatch>();
 	const [isOpen, setIsOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const openDialog = () => {
 		reset();
 		setFormattedPrice('');
@@ -80,15 +81,20 @@ export default function CreateProducts({}) {
 		}
 		setValue('image', null);
 	};
+	function parsePrice(userInputPrice: any) {
+		return Number(userInputPrice.toString().replace(/\./g, ''));
+	}
 
 	const onSubmit = async (data: FormField) => {
-		console.log(data);
+		setIsLoading(true);
+		const formatedPrice = parsePrice(data.price);
+		console.log(formatedPrice);
 		const formData = new FormData();
 		formData.append(
 			'product',
 			JSON.stringify({
 				name: data.name,
-				price: data.price,
+				price: formatedPrice,
 				supplierId: data.supplierId,
 				authorId: data.authorId,
 				categoryId: data.categoryId
@@ -102,14 +108,15 @@ export default function CreateProducts({}) {
 			toast.success('Thêm sản phẩm thành công!');
 			dispatch(fetchProducts());
 			setIsOpen(false);
-			setIsOpen(false);
+			setIsLoading(false);
 		} catch (error) {
+			setIsLoading(false);
 			const err = error as AxiosError;
 
 			if (err.response?.status === 400) {
-				toast.error('Lỗi 400: Dữ liệu không hợp lệ! Vui lòng kiểm tra lại.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 404) {
-				toast.error('Lỗi 404: Không tìm thấy nhân viên.');
+				toast.error((err.response?.data as any).message);
 			} else if (err.response?.status === 500) {
 				toast.error((err.response?.data as any).message);
 			} else {
@@ -121,15 +128,15 @@ export default function CreateProducts({}) {
 	const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const rawValue = event.target.value.replace(/\./g, ''); // Loại bỏ dấu chấm
 		if (!/^\d*$/.test(rawValue)) return; // Chỉ chấp nhận số
-
+		console.log(`RAWVALUE: ${rawValue}`);
 		const numericValue = Number(rawValue);
 		setFormattedPrice(new Intl.NumberFormat('vi-VN').format(numericValue)); // Định dạng số
-		console.log(numericValue);
+		console.log(`numericValue : ${numericValue}`);
 		setValue('price', numericValue); // Lưu số nguyên vào react-hook-form
 	};
 
 	return (
-		<div className='text-end mb-4'>
+		<div className='mb-4 text-end'>
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogTrigger asChild>
 					<Button className='bg-slate-800 hover:bg-slate-900' onClick={openDialog}>
@@ -137,12 +144,12 @@ export default function CreateProducts({}) {
 						Thêm
 					</Button>
 				</DialogTrigger>
-				<DialogContent className='w-full max-w-2xl mx-auto p-6 space-y-4'>
+				<DialogContent className='mx-auto w-full max-w-2xl space-y-4 p-6'>
 					<DialogHeader>
 						<DialogTitle>Tạo sản phẩm mới</DialogTitle>
 					</DialogHeader>
 					<form onSubmit={handleSubmit(onSubmit)}>
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
+						<div className='grid grid-cols-1 gap-4 py-4 md:grid-cols-2'>
 							{/* Hình ảnh sản phẩm bên trái */}
 							<div className='flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-900/25 p-4'>
 								{productImage ? (
@@ -151,11 +158,11 @@ export default function CreateProducts({}) {
 											src={productImage}
 											width={'100%'}
 											alt='Hình sản phẩm'
-											className='object-cover rounded-md border'
+											className='rounded-md border object-cover'
 										/>
 										<button
 											onClick={_handleRemoveImage}
-											className='absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition'
+											className='absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white transition hover:bg-red-600'
 										>
 											<Trash2 size={16} />
 										</button>
@@ -166,7 +173,7 @@ export default function CreateProducts({}) {
 										<div className='mt-4 flex text-sm text-gray-600'>
 											<label
 												htmlFor='file-upload'
-												className='relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 hover:text-indigo-500 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2'
+												className='relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500'
 											>
 												<span>Chọn ảnh</span>
 												<input
@@ -185,7 +192,7 @@ export default function CreateProducts({}) {
 										</div>
 									</>
 								)}
-								{errors.image && <p className='text-red-500 text-sm'>{errors.image.message}</p>}
+								{errors.image && <p className='text-sm text-red-500'>{errors.image.message}</p>}
 							</div>
 
 							{/* Các trường thông tin còn lại bên phải */}
@@ -201,7 +208,7 @@ export default function CreateProducts({}) {
 										className='col-span-3'
 										{...register('name', { required: 'Vui lòng nhập tên sản phẩm' })}
 									/>
-									{errors.name && <p className='text-red-500 text-sm col-span-3'>{errors.name.message}</p>}
+									{errors.name && <p className='col-span-3 text-sm text-red-500'>{errors.name.message}</p>}
 								</div>
 
 								{/* Giá sản phẩm */}
@@ -220,7 +227,7 @@ export default function CreateProducts({}) {
 										})}
 										onChange={handlePriceChange}
 									/>
-									{errors.price && <p className='text-red-500 text-sm col-span-3'>{errors.price.message}</p>}
+									{errors.price && <p className='col-span-3 text-sm text-red-500'>{errors.price.message}</p>}
 								</div>
 								{/* Nhà cung cấp */}
 								<div className='grid items-center gap-4'>
@@ -243,7 +250,7 @@ export default function CreateProducts({}) {
 											))}
 										</SelectContent>
 									</Select>
-									{errors.supplierId && <p className='text-red-500 text-sm col-span-3'>{errors.supplierId.message}</p>}
+									{errors.supplierId && <p className='col-span-3 text-sm text-red-500'>{errors.supplierId.message}</p>}
 								</div>
 								{/* Danh mục sản phẩm */}
 								<div className='grid items-center gap-4'>
@@ -268,7 +275,7 @@ export default function CreateProducts({}) {
 											))}
 										</SelectContent>
 									</Select>
-									{errors.categoryId && <p className='text-red-500 text-sm col-span-3'>{errors.categoryId.message}</p>}
+									{errors.categoryId && <p className='col-span-3 text-sm text-red-500'>{errors.categoryId.message}</p>}
 								</div>
 
 								{/* Tác giả */}
@@ -294,7 +301,7 @@ export default function CreateProducts({}) {
 											))}
 										</SelectContent>
 									</Select>
-									{errors.authorId && <p className='text-red-500 text-sm col-span-3'>{errors.authorId.message}</p>}
+									{errors.authorId && <p className='col-span-3 text-sm text-red-500'>{errors.authorId.message}</p>}
 								</div>
 							</div>
 						</div>
@@ -305,7 +312,9 @@ export default function CreateProducts({}) {
 									Close
 								</Button>
 							</DialogClose>
-							<Button type='submit'>Save changes</Button>
+							<Button disabled={isLoading} type='submit'>
+								Save changes
+							</Button>
 						</DialogFooter>
 					</form>
 				</DialogContent>

@@ -1,0 +1,66 @@
+{
+	"statusCode": 200,
+	"success": true,
+	"message": "Thống kê thành công!",
+	"data": {
+		"year": 2025,
+		"totalProductsSold": 7,
+		"totalRevenue": 831600,
+		"totalProfit": 75600,
+		"totalCost": 756000,
+		"monthlySales": {
+			"2025-10": 0,
+			"2025-01": 0,
+			"2025-12": 0,
+			"2025-11": 0,
+			"2025-03": 0,
+			"2025-02": 0,
+			"2025-05": 7,
+			"2025-04": 0,
+			"2025-07": 0,
+			"2025-06": 0,
+			"2025-09": 0,
+			"2025-08": 0
+		},
+		"quarterlySales": {
+			"1": 0,
+			"2": 7,
+			"3": 0,
+			"4": 0
+		},
+		"topSellingProducts": [
+			{
+				"id": 2,
+				"name": "Nhà Giả Kim",
+				"quantitySold": 4,
+				"revenue": 435600,
+				"profit": 39600
+			},
+			{
+				"id": 1,
+				"name": "Đắc Nhân Tâm",
+				"quantitySold": 3,
+				"revenue": 396000,
+				"profit": 36000
+			}
+		],
+		"categorySales": [
+			{
+				"id": 2,
+				"name": "Trinh thám",
+				"quantitySold": 4,
+				"revenue": 435600,
+				"profit": 39600,
+				"percentageOfTotal": 52.38
+			},
+			{
+				"id": 1,
+				"name": "Khoa học viễn tưởng",
+				"quantitySold": 3,
+				"revenue": 396000,
+				"profit": 36000,
+				"percentageOfTotal": 47.62
+			}
+		]
+	}
+}

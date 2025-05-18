@@ -203,6 +203,13 @@ export function NavMain() {
 			icon: PackagePlus,
 			isActive: true,
 			items: []
+		},
+		{
+			title: 'Thống kê',
+			url: '/warehouse/statistics',
+			icon: ChartLine,
+			isActive: true,
+			items: []
 		}
 	];
 
