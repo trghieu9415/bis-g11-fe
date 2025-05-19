@@ -62,3 +62,11 @@ npm run dev
 - npm >= 9.8.1
 - Modern browser (Chrome, Firefox, Edge, Safari)
 - Recommended: Visual Studio Code or another editor with TypeScript and ESLint support
+
+## 🌐 Environment Variables
+
+Create a `.env` file in the root directory and add the following variables:
+
+- `VITE_API_BASE_URL`: The base URL of the backend API (e.g., `http://localhost:8866` for local development).
+
+
