@@ -15,7 +15,7 @@ This system provides an intuitive web interface designed to help enterprise mana
 
 ## 🚀 Features
 
-# Enterprise Management
+### Enterprise Management
 - Create and manage employee profiles
 - Create, monitor, and manage work contracts
 - Manage attendance and timekeeping
@@ -23,34 +23,42 @@ This system provides an intuitive web interface designed to help enterprise mana
 - Manage payroll monthly and yearly
 - Organize job positions and hierarchy
 
-# Inventory and Sales
+### Inventory and Sales
 - Support warehouse operations and real-time stock tracking
 - Facilitate point-of-sale (POS) transactions at retail counters
 
-# Employee Self-Service
+### Employee Self-Service
 - View and update personal information
 - Manage personal work contracts
 - Submit and track leave requests
 - View monthly and yearly payroll statements
 - Export payroll reports
 
-# Authentication & Security
+### Authentication & Security
 - User login and logout
 - Password recovery (forgot password)
 - Role-based access control (Admin, HR Manager, Business Manager, Warehouse Manager, Employee)
 
 Manage public holiday schedules
-## 📦 Cài đặt
+## 📦 Installation
 
 ```bash
-# Clone repo
-git clone https://github.com/username/project-name.git
+# Clone the repository
+git clone https://github.com/trghieu9415/bis-g11-fe
 
-# Di chuyển vào thư mục project
-cd project-name
+# Navigate to the project folder
+cd bis-g11-fe
 
-# Cài đặt dependencies
+# Install dependencies
 npm install
 
-# Chạy project
+# Start the development server
 npm run dev
+```
+
+## 📋 Prerequisites
+
+- Node.js >= 18.18.0
+- npm >= 9.8.1
+- Modern browser (Chrome, Firefox, Edge, Safari)
+- Recommended: Visual Studio Code or another editor with TypeScript and ESLint support
