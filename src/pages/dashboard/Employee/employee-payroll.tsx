@@ -23,7 +23,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchPayrollYearByUser } from '@/redux/slices/payrollByYearAndUserIdSlice';
 
-import { RootState, useAppDispatch } from '@/redux/store';
+import { RootState, useAppDispatch, useAppSelector } from '@/redux/store';
 import html2pdf from 'html2pdf.js';
 import { BadgeDollarSign, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -80,8 +80,9 @@ export default function EmployeeSalaryCal() {
 
 	const dispatch = useAppDispatch();
 	const { user } = useSelector((state: RootState) => state.user);
+	const { profile } = useAppSelector((state: RootState) => state.profile);
 	const { payrollYearByUser } = useSelector((state: RootState) => state.payrollYearByUser);
-	
+
 	const onChangeMonthYear = (year: string, month: string) => {
 		setMonthYear({ year, month });
 	};
@@ -91,8 +92,8 @@ export default function EmployeeSalaryCal() {
 	};
 
 	useEffect(() => {
-		if (monthYear?.year && user) {
-			dispatch(fetchPayrollYearByUser({ userId: 3, year: monthYear.year }));
+		if (monthYear?.year && user && profile) {
+			dispatch(fetchPayrollYearByUser({ userId: profile?.id, year: monthYear.year }));
 		}
 	}, [monthYear.year, dispatch]);
 
@@ -254,13 +255,13 @@ export default function EmployeeSalaryCal() {
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' className='border-none h-[32px] py-[6px] px-[8px] w-full justify-start items-center'>
+				<Button variant='outline' className='h-[32px] w-full items-center justify-start border-none px-[8px] py-[6px]'>
 					<BadgeDollarSign />
 					Tính lương
 				</Button>
 			</DialogTrigger>
 			<DialogContent
-				className={`py-1 !w-[50vw] !max-w-none !h-[98vh] ${activeTabList === 'year' && '!w-[94vw]'} flex flex-col`}
+				className={`!h-[98vh] !w-[50vw] !max-w-none py-1 ${activeTabList === 'year' && '!w-[94vw]'} flex flex-col`}
 				onOpenAutoFocus={e => e.preventDefault()}
 			>
 				<DialogHeader>
@@ -268,19 +269,19 @@ export default function EmployeeSalaryCal() {
 					<DialogDescription></DialogDescription>
 				</DialogHeader>
 
-				<div className='flex-1 mb-4 '>
+				<div className='mb-4 flex-1'>
 					<div>
-						<div className='max-w-4xl mx-auto bg-white px-4 rounded-lg'>
-							<h1 className='text-lg font-bold text-center mb-1'>Công ty INKVERSE</h1>
+						<div className='mx-auto max-w-4xl rounded-lg bg-white px-4'>
+							<h1 className='mb-1 text-center text-lg font-bold'>Công ty INKVERSE</h1>
 
-							<p className='text-center text-sm mb-4'>
+							<p className='mb-4 text-center text-sm'>
 								Địa chỉ: 273 An Dương Vương, Phường 3, Quận 5, Thành phố Hồ Chí Minh
 							</p>
-							<h2 className='text-md font-semibold text-center mb-2'>PHIẾU LƯƠNG</h2>
+							<h2 className='text-md mb-2 text-center font-semibold'>PHIẾU LƯƠNG</h2>
 						</div>
 						<Tabs value={activeTabList} onValueChange={setActiveTabList} className='w-full'>
-							<div className='w-full flex justify-center items-center'>
-								<TabsList className='grid  w-[240px] grid-cols-2'>
+							<div className='flex w-full items-center justify-center'>
+								<TabsList className='grid w-[240px] grid-cols-2'>
 									<TabsTrigger value='month'>Theo tháng</TabsTrigger>
 									<TabsTrigger value='year'>Theo năm</TabsTrigger>
 								</TabsList>
@@ -311,7 +312,7 @@ export default function EmployeeSalaryCal() {
 					{activeTabList === 'month' && (
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>
+								<Button className='w-full bg-red-500 text-white hover:bg-red-600 hover:text-white' variant='outline'>
 									<FileText />
 									Xuất PDF theo tháng
 								</Button>
@@ -331,7 +332,7 @@ export default function EmployeeSalaryCal() {
 					{activeTabList === 'year' && (
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button className='w-full bg-red-500 hover:bg-red-600 hover:text-white text-white' variant='outline'>
+								<Button className='w-full bg-red-500 text-white hover:bg-red-600 hover:text-white' variant='outline'>
 									<FileText />
 									Xuất PDF theo tháng
 								</Button>
