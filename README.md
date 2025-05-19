@@ -39,7 +39,6 @@ This system provides an intuitive web interface designed to help enterprise mana
 - Password recovery (forgot password)
 - Role-based access control (Admin, HR Manager, Business Manager, Warehouse Manager, Employee)
 
-Manage public holiday schedules
 ## 📦 Installation
 
 ```bash
